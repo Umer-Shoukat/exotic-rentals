@@ -27,7 +27,7 @@
 		<?php get_template_part('template-parts/global/nav'); ?>
 
 		<div class="site-header__actions">
-			<a class="btn btn--primary btn--sm" href="<?php echo esc_url(home_url('/fleet')); ?>">
+			<a class="btn btn--primary btn--sm" href="<?php echo esc_url(home_url('/reservation/')); ?>">
 				<?php esc_html_e('Book Now', 'echelon'); ?>
 			</a>
 			<button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="mobile-nav" aria-label="<?php esc_attr_e('Toggle menu', 'echelon'); ?>">

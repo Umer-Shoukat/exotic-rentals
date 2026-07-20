@@ -67,5 +67,101 @@ function echelon_after_switch_theme() {
             update_option('page_on_front', $home_id);
         }
     }
+
+    echelon_install_starter_content();
 }
 add_action('after_switch_theme', 'echelon_after_switch_theme');
+
+/**
+ * Create the functional reservation page and sample service zones once.
+ * Sample locations are intentionally marked so they cannot be mistaken for
+ * launch-ready business information.
+ */
+function echelon_install_starter_content() {
+    $reservation_page = get_page_by_path('reservation');
+    if (!$reservation_page) {
+        $reservation_id = wp_insert_post([
+            'post_title' => 'Reservation', 'post_name' => 'reservation',
+            'post_status' => 'publish', 'post_type' => 'page',
+            'page_template' => 'page-reservation.php',
+        ]);
+        if ($reservation_id && !is_wp_error($reservation_id)) {
+            update_post_meta($reservation_id, '_wp_page_template', 'page-reservation.php');
+        }
+    } else {
+        update_post_meta($reservation_page->ID, '_wp_page_template', 'page-reservation.php');
+    }
+
+    $existing_locations = get_posts(['post_type' => 'location', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids']);
+    $samples = [
+        ['Manhattan Demo Zone', 40.7580, -73.9855, 'Midtown concierge delivery'],
+        ['Brooklyn Demo Zone', 40.6782, -73.9442, 'Brooklyn-wide concierge delivery'],
+        ['Queens Demo Zone', 40.7282, -73.7949, 'Queens and airport delivery requests'],
+        ['Bronx Demo Zone', 40.8448, -73.8648, 'Bronx concierge delivery'],
+        ['Staten Island Demo Zone', 40.5795, -74.1502, 'Staten Island delivery requests'],
+        ['Jersey City Demo Zone', 40.7178, -74.0431, 'Jersey City concierge delivery'],
+        ['Newark Demo Zone', 40.7357, -74.1724, 'Newark and airport delivery requests'],
+        ['Hoboken Demo Zone', 40.7430, -74.0324, 'Hoboken concierge delivery'],
+        ['Stamford Demo Zone', 41.0534, -73.5387, 'Stamford concierge delivery'],
+        ['Greenwich Demo Zone', 41.0262, -73.6282, 'Greenwich concierge delivery'],
+    ];
+    foreach ($samples as $order => [$title, $latitude, $longitude, $description]) {
+        if (count($existing_locations) >= 10) {
+            break;
+        }
+        if (get_page_by_title($title, OBJECT, 'location')) {
+            continue;
+        }
+        $id = wp_insert_post([
+            'post_title' => $title, 'post_status' => 'publish', 'post_type' => 'location',
+            'menu_order' => $order,
+        ]);
+        if (!$id || is_wp_error($id)) {
+            continue;
+        }
+        $existing_locations[] = $id;
+        $fields = [
+            'description' => $description . ' (sample data — replace before launch)',
+            'address' => 'Sample service zone — replace with the operational address before launch',
+            'phone' => '+1 (000) 000-0000', 'latitude' => $latitude, 'longitude' => $longitude,
+            'is_active' => 1,
+        ];
+        foreach ($fields as $name => $value) {
+            if (function_exists('update_field')) {
+                update_field($name, $value, $id);
+            } else {
+                update_post_meta($id, $name, $value);
+            }
+        }
+    }
+
+    $coordinate_defaults = [
+        'Manhattan' => [40.7580, -73.9855], 'Brooklyn' => [40.6782, -73.9442],
+        'New Jersey' => [40.7178, -74.0431], 'Connecticut' => [41.0534, -73.5387],
+        'Los Angeles' => [34.0522, -118.2437], 'Dallas' => [32.7767, -96.7970],
+        'Manhattan Demo Zone' => [40.7580, -73.9855], 'Brooklyn Demo Zone' => [40.6782, -73.9442],
+        'Queens Demo Zone' => [40.7282, -73.7949], 'Bronx Demo Zone' => [40.8448, -73.8648],
+    ];
+    foreach (get_posts(['post_type' => 'location', 'post_status' => 'any', 'posts_per_page' => -1]) as $location) {
+        $title = get_the_title($location);
+        if (!isset($coordinate_defaults[$title])) {
+            continue;
+        }
+        [$latitude, $longitude] = $coordinate_defaults[$title];
+        foreach (['latitude' => $latitude, 'longitude' => $longitude] as $name => $value) {
+            if (echelon_field($name, $location->ID, '') !== '') {
+                continue;
+            }
+            function_exists('update_field') ? update_field($name, $value, $location->ID) : update_post_meta($location->ID, $name, $value);
+        }
+    }
+}
+
+function echelon_maybe_install_starter_content() {
+    if (get_option('echelon_starter_content_version') === '3') {
+        return;
+    }
+    echelon_install_starter_content();
+    update_option('echelon_starter_content_version', '3', false);
+}
+add_action('init', 'echelon_maybe_install_starter_content', 99);

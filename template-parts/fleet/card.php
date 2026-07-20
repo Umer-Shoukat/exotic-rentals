@@ -49,7 +49,7 @@ $featured   = echelon_field('featured', $vehicle_id, false);
 			<?php endif; ?>
 		</div>
 
-		<a class="btn <?php echo $featured ? 'btn--primary' : 'btn--outline'; ?> btn--block" href="<?php the_permalink(); ?>">
+		<a class="btn <?php echo $featured ? 'btn--primary' : 'btn--outline'; ?> btn--block" href="<?php echo esc_url(add_query_arg('vehicle', $vehicle_id, home_url('/reservation/'))); ?>">
 			<?php esc_html_e('Reserve', 'echelon'); ?>
 			<?php echelon_icon('arrow-right'); ?>
 		</a>

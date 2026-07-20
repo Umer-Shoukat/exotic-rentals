@@ -95,5 +95,24 @@ function echelon_register_post_types() {
         'supports'     => ['title', 'editor', 'page-attributes'],
         'show_in_rest' => true,
     ]);
+
+    register_post_type('rental_reservation', [
+        'labels' => [
+            'name'          => __('Reservations', 'echelon'),
+            'singular_name' => __('Reservation', 'echelon'),
+            'all_items'     => __('Reservations', 'echelon'),
+            'edit_item'     => __('Review Reservation', 'echelon'),
+            'menu_name'     => __('Reservations', 'echelon'),
+        ],
+        'public'              => false,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'menu_icon'           => 'dashicons-calendar-alt',
+        'supports'            => ['title'],
+        'capability_type'     => 'post',
+        'map_meta_cap'        => true,
+        'exclude_from_search' => true,
+        'show_in_rest'        => false,
+    ]);
 }
 add_action('init', 'echelon_register_post_types');
