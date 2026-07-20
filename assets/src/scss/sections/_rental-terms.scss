@@ -1,0 +1,153 @@
+.rental-terms {
+  height: 384px;
+  padding-block: 0 80px;
+  background: #090909;
+}
+
+.rental-terms__grid {
+  display: grid;
+  grid-template-columns: 377px 590px;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.rental-terms__intro {
+  .eyebrow { display: none; }
+
+  .section-heading__title {
+    width: 386px;
+    margin: 0;
+    font-size: 40px;
+    line-height: 44px;
+    letter-spacing: .02em;
+  }
+
+  > p:not(.eyebrow) {
+    width: 330px;
+    margin: 16px 0 16px;
+    color: rgba(255, 255, 255, .5);
+    font-size: 16px;
+    line-height: 18px;
+    text-transform: capitalize;
+  }
+
+  .btn {
+    width: 191px;
+  }
+}
+
+.agent-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.agent-card__photo {
+  width: 50px;
+  height: 50px;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+
+  img,
+  .media-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.agent-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-card__name {
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.agent-card__title {
+  font-size: 10px;
+  line-height: 12px;
+  color: rgba(255, 255, 255, .5);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.rental-terms__requirements {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px 14px;
+}
+
+.requirement-card {
+  position: relative;
+  height: 145px;
+  padding: 16px 14px;
+  border: 1px solid #313131;
+  border-radius: 0;
+  background: #0d0d0d;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--color-accent);
+  }
+}
+
+.requirement-card--accent {
+  border-left: 1px solid #313131;
+}
+
+.requirement-card__icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 16px;
+  color: var(--color-accent);
+}
+
+.requirement-card__value {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 40px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.requirement-card__label {
+  font-size: 12px;
+  line-height: 15px;
+  color: #8e8e8e;
+  text-transform: capitalize;
+}
+
+@include down(lg) {
+  .rental-terms {
+    height: auto;
+    padding-block: 64px;
+  }
+
+  .rental-terms__grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+@include down(sm) {
+  .rental-terms__intro .section-heading__title,
+  .rental-terms__intro > p:not(.eyebrow) {
+    width: 100%;
+  }
+
+  .rental-terms__requirements {
+    grid-template-columns: 1fr;
+  }
+}

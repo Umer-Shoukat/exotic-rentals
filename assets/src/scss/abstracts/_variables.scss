@@ -1,0 +1,33 @@
+// Breakpoints — mobile <768, tablet 768–1279, desktop ≥1280
+$breakpoints: (
+  sm: 480px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+  xxl: 1440px,
+);
+
+$container-max: 1320px;
+$container-padding: 24px;
+
+@mixin up($name) {
+  $bp: map-get($breakpoints, $name);
+  @media (min-width: $bp) {
+    @content;
+  }
+}
+
+@mixin down($name) {
+  $bp: map-get($breakpoints, $name);
+  @media (max-width: ($bp - 1px)) {
+    @content;
+  }
+}
+
+@mixin between($lower, $upper) {
+  $bp-lower: map-get($breakpoints, $lower);
+  $bp-upper: map-get($breakpoints, $upper);
+  @media (min-width: $bp-lower) and (max-width: ($bp-upper - 1px)) {
+    @content;
+  }
+}

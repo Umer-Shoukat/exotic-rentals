@@ -1,0 +1,22 @@
+/*
+Theme Name: Echelon Motions
+Theme URI: https://example.com/
+Author: Echelon Motions
+Author URI: https://example.com/
+Description: Hand-coded custom theme for Echelon Motions, a luxury and exotic car rental service. Pixel-faithful build of the "Homepage v3" Figma design with a fully responsive mobile layout and scroll-driven interactive animations.
+Version: 1.0.0
+Requires at least: 6.4
+Requires PHP: 8.0
+Text Domain: echelon
+Tags: dark, one-page, custom-menu, featured-images, translation-ready
+
+Stylesheet intentionally left minimal — compiled styles are built from
+assets/src/scss via Vite and enqueued from assets/dist/main.css
+(see inc/enqueue.php). This file exists to satisfy WordPress' theme header
+requirement and provide a no-JS/no-build safety net.
+*/
+
+body {
+  background: #050505;
+  color: #fff;
+}

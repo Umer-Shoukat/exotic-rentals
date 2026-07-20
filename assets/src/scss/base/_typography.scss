@@ -1,0 +1,68 @@
+body {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @include heading;
+}
+
+h1 {
+  font-size: clamp(38px, 4.6vw, 64px);
+
+  @include down(md) {
+    font-size: 34px;
+  }
+}
+
+h2 {
+  font-size: clamp(30px, 3.4vw, 44px);
+
+  @include down(md) {
+    font-size: 28px;
+  }
+}
+
+h3 {
+  font-size: clamp(20px, 1.8vw, 26px);
+}
+
+p {
+  color: var(--color-text-muted);
+}
+
+.eyebrow {
+  @include eyebrow;
+  margin-bottom: var(--space-3);
+}
+
+.eyebrow--center {
+  justify-content: center;
+}
+
+.eyebrow--flanked::after {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 2px;
+  background: var(--color-accent);
+}
+
+.section-heading {
+  margin-bottom: var(--space-5);
+}
+
+.section-heading__title {
+  margin-bottom: var(--space-3);
+}
+
+.section-heading__desc {
+  max-width: 480px;
+}
+
+.accent {
+  color: var(--color-accent);
+}

@@ -1,0 +1,25 @@
+// Progressive enhancement: content is visible by default. Only once JS confirms
+// it's ready (html.reveal-init) do [data-reveal] elements hide, awaiting .is-revealed.
+// This guarantees content is never stuck invisible if JS fails to load/run.
+html.reveal-init [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+html.reveal-init [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
+}
+
+@include reduced-motion {
+  html.reveal-init [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.count-up {
+  font-variant-numeric: tabular-nums;
+}

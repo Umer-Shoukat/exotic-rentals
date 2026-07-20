@@ -1,0 +1,115 @@
+.choose-ride {
+  overflow: hidden;
+
+  @include up(xl) {
+    min-height: 887px;
+    padding-top: 23px;
+    padding-bottom: 0;
+
+    > .container {
+      max-width: 1198px;
+      padding-inline: 0;
+    }
+
+    .section-heading {
+      margin-bottom: 113px;
+    }
+  }
+}
+
+.choose-ride__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.choose-ride__tab {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+
+  @include focus-ring;
+
+  &:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+  }
+
+  &.is-active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+}
+
+.choose-ride__category-intro {
+  margin-bottom: 36px;
+}
+
+.choose-ride__category-title {
+  margin-bottom: 8px;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.choose-ride__category-desc {
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.choose-ride__category-count {
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--color-text-dim);
+}
+
+.choose-ride__panel {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+}
+
+// Base layout works before Swiper JS enhances it into a proper carousel —
+// horizontally scrollable with snap so it's fully usable with no JS.
+.choose-ride__slider {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.choose-ride__slider .swiper-wrapper {
+  display: flex;
+  gap: 24px;
+}
+
+.choose-ride__slider .swiper-slide {
+  height: auto;
+  width: min(383px, 85vw);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.choose-ride__slider-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+
+  .btn--ghost {
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,139 @@
+.booking-widget {
+  padding-top: 60px;
+  padding-bottom: var(--space-7);
+  background: var(--color-bg-alt);
+
+  @include down(md) {
+    padding-top: var(--space-7);
+  }
+}
+
+.booking-widget__form {
+  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 3px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+}
+
+.booking-widget__field-vehicle {
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+
+  .field__search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-dim);
+    pointer-events: none;
+  }
+
+  .field__control {
+    padding-left: 40px;
+    background: transparent;
+    border: none;
+    padding-block: 4px;
+  }
+}
+
+.booking-widget__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+
+  @include down(lg) {
+    flex-wrap: wrap;
+  }
+}
+
+.booking-widget__field {
+  flex: 1;
+  min-width: 180px;
+}
+
+.field__control-wrap {
+  position: relative;
+
+  svg:not(.field__search-icon) {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--color-accent);
+    pointer-events: none;
+  }
+
+  .field__control {
+    padding-right: 40px;
+  }
+}
+
+.booking-widget__actions {
+  display: flex;
+  gap: var(--space-3);
+
+  @include down(sm) {
+    flex-direction: column;
+  }
+
+  .btn {
+    flex: 1;
+  }
+}
+
+@include up(xl) {
+  .booking-widget {
+    padding-bottom: 60px;
+  }
+
+  .booking-widget .container {
+    max-width: 1198px;
+    padding-inline: 0;
+  }
+
+  .booking-widget__form {
+    padding: 10px 21px;
+    border-radius: 0;
+  }
+
+  .booking-widget__field-vehicle {
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+
+    .field__control {
+      height: 23px;
+      padding-block: 2px;
+    }
+  }
+
+  .booking-widget__row {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .booking-widget__field {
+    gap: 4px;
+
+    .field__control {
+      height: 31px;
+      padding-block: 6px;
+    }
+  }
+
+  .booking-widget__actions {
+    gap: 0;
+
+    .btn {
+      height: 31px;
+      padding-block: 5px;
+    }
+  }
+}
