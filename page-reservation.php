@@ -13,6 +13,8 @@ $locations = get_posts([
     'orderby' => ['menu_order' => 'ASC', 'title' => 'ASC'],
 ]);
 $preselected_vehicle = isset($_GET['vehicle']) ? absint($_GET['vehicle']) : 0;
+$vehicle_ids = array_map(static fn($vehicle) => (int) $vehicle->ID, $vehicles);
+$has_preselected_vehicle = $preselected_vehicle > 0 && in_array($preselected_vehicle, $vehicle_ids, true);
 $initial_pickup = isset($_GET['pickup_date']) ? sanitize_text_field(wp_unslash($_GET['pickup_date'])) : '';
 $initial_return = isset($_GET['return_date']) ? sanitize_text_field(wp_unslash($_GET['return_date'])) : '';
 $initial_location = isset($_GET['pickup_location']) ? sanitize_title(wp_unslash($_GET['pickup_location'])) : '';
@@ -26,23 +28,20 @@ $errors = [
     'location' => __('Please select valid pick-up and return locations.', 'echelon'),
     'dates' => __('Return must be after pick-up, and pick-up cannot be in the past.', 'echelon'),
     'details' => __('Please complete all required details and accept the rental terms.', 'echelon'),
+    'name' => __('Please enter your full name.', 'echelon'),
+    'email' => __('Please enter a valid email address.', 'echelon'),
+    'phone' => __('Please enter a valid phone number.', 'echelon'),
+    'licence' => __('Please enter a valid driving licence number.', 'echelon'),
+    'age' => __('Drivers must be at least 25 years old.', 'echelon'),
+    'terms' => __('You must accept the rental terms and insurance policy.', 'echelon'),
     'duplicate' => __('This reservation was already submitted. Please check your email.', 'echelon'),
     'save' => __('We could not save your reservation. Please try again or call the concierge.', 'echelon'),
 ];
-?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo('charset'); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php wp_head(); ?>
-</head>
-<body <?php body_class('reservation-page'); ?>>
-<?php wp_body_open(); ?>
-<a class="skip-link" href="#reservation-main"><?php esc_html_e('Skip to reservation form', 'echelon'); ?></a>
-<main id="reservation-main" class="reservation" data-reservation-flow>
-    <div class="reservation__shell">
-        <a class="reservation__brand" href="<?php echo esc_url(home_url('/')); ?>"><span>Exotic</span> Rental</a>
 
+get_header();
+?>
+<div id="reservation-main" class="reservation" data-reservation-flow data-initial-step="<?php echo $has_preselected_vehicle ? '2' : '1'; ?>">
+    <div class="reservation__shell">
         <?php if ($received) : ?>
             <section class="reservation-success" aria-labelledby="reservation-success-title">
                 <p class="reservation__eyebrow"><?php esc_html_e('Request Received', 'echelon'); ?></p>
@@ -78,13 +77,16 @@ $errors = [
                     <div class="reservation__content">
                         <section class="reservation-step is-active" data-step="1" aria-labelledby="step-1-title">
                             <div class="reservation-step__heading"><p><?php esc_html_e('Step 01 / Select Vehicle', 'echelon'); ?></p><h2 id="step-1-title"><?php esc_html_e('Choose Your Car', 'echelon'); ?></h2></div>
+                            <div class="reservation-step__vehicle-action">
+                                <button class="btn btn--primary" type="button" data-reservation-next><?php esc_html_e('Continue With Selected Car', 'echelon'); ?> <?php echelon_icon('arrow-right'); ?></button>
+                            </div>
                             <div class="reservation-fleet">
                                 <?php foreach ($vehicles as $index => $vehicle) :
                                     $id = $vehicle->ID;
                                     $gallery = echelon_field('gallery', $id, []);
                                     $cover = $gallery[0] ?? get_post_thumbnail_id($id);
                                     $price = (float) echelon_field('price_per_day', $id, 0);
-                                    $selected = $preselected_vehicle ? $id === $preselected_vehicle : $index === 0;
+                                    $selected = $has_preselected_vehicle ? $id === $preselected_vehicle : $index === 0;
                                     ?>
                                     <label class="reservation-vehicle<?php echo $selected ? ' is-selected' : ''; ?>" data-vehicle-card>
                                         <input type="radio" name="vehicle_id" value="<?php echo esc_attr($id); ?>" <?php checked($selected); ?> required
@@ -114,10 +116,10 @@ $errors = [
                         <section class="reservation-step" data-step="3" aria-labelledby="step-3-title" hidden>
                             <div class="reservation-step__heading"><p><?php esc_html_e('Step 03 / Your Details', 'echelon'); ?></p><h2 id="step-3-title"><?php esc_html_e('Your Information', 'echelon'); ?></h2></div>
                             <div class="reservation-fields">
-                                <label><span><?php esc_html_e('Full Name', 'echelon'); ?> *</span><input type="text" name="customer_name" autocomplete="name" required></label>
-                                <label><span><?php esc_html_e('Email', 'echelon'); ?> *</span><input type="email" name="customer_email" autocomplete="email" required></label>
-                                <label><span><?php esc_html_e('Phone', 'echelon'); ?> *</span><input type="tel" name="customer_phone" autocomplete="tel" required></label>
-                                <label><span><?php esc_html_e('Driving Licence Number', 'echelon'); ?> *</span><input type="text" name="licence_number" required><small><?php esc_html_e('Your information is encrypted in transit and used only for verification.', 'echelon'); ?></small></label>
+                                <label><span><?php esc_html_e('Full Name', 'echelon'); ?> *</span><input type="text" name="customer_name" autocomplete="name" minlength="2" maxlength="100" required></label>
+                                <label><span><?php esc_html_e('Email', 'echelon'); ?> *</span><input type="email" name="customer_email" autocomplete="email" maxlength="254" required></label>
+                                <label><span><?php esc_html_e('Phone', 'echelon'); ?> *</span><input type="tel" name="customer_phone" autocomplete="tel" inputmode="tel" minlength="7" maxlength="25" required></label>
+                                <label><span><?php esc_html_e('Driving Licence Number', 'echelon'); ?> *</span><input type="text" name="licence_number" minlength="4" maxlength="50" required><small><?php esc_html_e('Your information is encrypted in transit and used only for verification.', 'echelon'); ?></small></label>
                                 <label><span><?php esc_html_e('Date of Birth', 'echelon'); ?></span><input type="text" name="date_of_birth" placeholder="dd/mm/yyyy" data-reservation-date="birth" autocomplete="bday"></label>
                                 <label><span><?php esc_html_e('Occasion (Optional)', 'echelon'); ?></span><select name="occasion"><option value=""><?php esc_html_e('Select an occasion', 'echelon'); ?></option><option>Wedding</option><option>Corporate</option><option>Prom</option><option>Photoshoot</option><option>Other</option></select></label>
                             </div>
@@ -149,6 +151,5 @@ $errors = [
             </form>
         <?php endif; ?>
     </div>
-</main>
-<?php wp_footer(); ?>
-</body></html>
+</div>
+<?php get_footer(); ?>

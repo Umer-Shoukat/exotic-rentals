@@ -73,7 +73,9 @@ if (!$featured->have_posts()) {
 	</div>
 
 	<?php if ($featured->have_posts()) :
-		$vehicle_links = array_map('get_permalink', $featured->posts);
+		$vehicle_links = array_map(static function ($vehicle) {
+			return add_query_arg('vehicle', $vehicle->ID, home_url('/reservation/'));
+		}, $featured->posts);
 		?>
 		<div class="hero__strip" data-hero-strip data-vehicle-links='<?php echo esc_attr(wp_json_encode($vehicle_links)); ?>'>
 			<div class="hero__strip-slides" data-hero-strip-slides>
@@ -90,15 +92,15 @@ if (!$featured->have_posts()) {
 					</div>
 				<?php endwhile; ?>
 			</div>
-			<a class="btn btn--primary btn--sm hero__strip-cta" href="<?php echo esc_url(get_permalink($featured->posts[0] ?? null) ?: home_url('/fleet')); ?>">
+			<a class="btn btn--primary btn--sm hero__strip-cta" href="<?php echo esc_url($vehicle_links[0] ?? home_url('/reservation/')); ?>">
 				<?php esc_html_e('Rent This Car', 'echelon'); ?>
 				<?php echelon_icon('arrow-right'); ?>
 			</a>
 			<div class="hero__strip-controls">
 				<button type="button" class="slider-arrow" data-hero-prev aria-label="<?php esc_attr_e('Previous vehicle', 'echelon'); ?>"><?php echelon_icon('arrow-left'); ?></button>
-				<div class="dots dots--segmented" data-hero-dots></div>
 				<button type="button" class="slider-arrow" data-hero-next aria-label="<?php esc_attr_e('Next vehicle', 'echelon'); ?>"><?php echelon_icon('arrow-right'); ?></button>
 			</div>
+			<div class="hero__strip-progress" aria-hidden="true"><span data-hero-progress></span></div>
 		</div>
 	<?php
 	wp_reset_postdata();

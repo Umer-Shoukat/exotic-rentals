@@ -87,12 +87,12 @@
   }
 }
 
-.faq .accordion__icon-open,
-.faq .accordion__trigger[aria-expanded='true'] .accordion__icon-closed {
+.faq .accordion__icon img.accordion__icon-open,
+.faq .accordion__trigger[aria-expanded='true'] .accordion__icon img.accordion__icon-closed {
   display: none;
 }
 
-.faq .accordion__trigger[aria-expanded='true'] .accordion__icon-open {
+.faq .accordion__trigger[aria-expanded='true'] .accordion__icon img.accordion__icon-open {
   display: block;
 }
 

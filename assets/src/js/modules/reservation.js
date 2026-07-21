@@ -8,8 +8,8 @@ export function initReservationFlow() {
   const steps = Array.from(form.querySelectorAll('[data-step]'));
   const progress = Array.from(form.querySelectorAll('[data-progress-step]'));
   const back = form.querySelector('[data-reservation-back]');
-  const next = form.querySelector('[data-reservation-next]');
-  let current = 1;
+  const nextButtons = Array.from(form.querySelectorAll('[data-reservation-next]'));
+  let current = Number(root.dataset.initialStep) === 2 ? 2 : 1;
 
   const pickup = form.elements.pickup_date;
   const returnDate = form.elements.return_date;
@@ -29,7 +29,9 @@ export function initReservationFlow() {
   const selectedVehicle = () => form.querySelector('input[name="vehicle_id"]:checked');
   const parseDate = (value) => {
     const [day, month, year] = value.split('/').map(Number);
-    return day && month && year ? new Date(year, month - 1, day) : null;
+    if (!day || !month || !year) return null;
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? date : null;
   };
   const selectedText = (control) => control?.options?.[control.selectedIndex]?.text || '—';
   const currency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
@@ -71,27 +73,106 @@ export function initReservationFlow() {
 
   function showStep(step) {
     current = Math.min(4, Math.max(1, step));
+    root.dataset.currentStep = String(current);
     steps.forEach((panel) => { panel.hidden = Number(panel.dataset.step) !== current; panel.classList.toggle('is-active', Number(panel.dataset.step) === current); });
     progress.forEach((item) => { const number = Number(item.dataset.progressStep); item.classList.toggle('is-active', number === current); item.classList.toggle('is-complete', number < current); });
     back.hidden = current === 1;
-    next.hidden = current === 4;
+    nextButtons.forEach((button) => { button.hidden = current === 4; });
     if (current === 4) updateReview();
     updateSummary();
     root.querySelector(`[data-step="${current}"] h2`)?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function validateStep() {
-    const fields = Array.from(steps[current - 1].querySelectorAll('input, select'));
-    for (const field of fields) {
-      if (!field.checkValidity()) { field.reportValidity(); return false; }
+  const today = () => {
+    const date = new Date();
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  };
+
+  function fieldMessage(field) {
+    const value = field.type === 'checkbox' ? field.checked : field.value.trim();
+    if (field.name === 'vehicle_id') return selectedVehicle() ? '' : 'Choose a vehicle to continue.';
+    if (field.name === 'pickup_date') {
+      if (!value) return 'Enter a pick-up date.';
+      const date = parseDate(value);
+      if (!date) return 'Enter a valid pick-up date in DD/MM/YYYY format.';
+      if (date < today()) return 'Pick-up date cannot be in the past.';
     }
-    if (current === 2) {
-      const start = parseDate(pickup.value); const end = parseDate(returnDate.value);
-      if (!start || !end || end <= start) { returnDate.setCustomValidity('Return must be after pick-up.'); returnDate.reportValidity(); return false; }
-      returnDate.setCustomValidity('');
+    if (field.name === 'return_date') {
+      if (!value) return 'Enter a return date.';
+      const end = parseDate(value); const start = parseDate(pickup.value);
+      if (!end) return 'Enter a valid return date in DD/MM/YYYY format.';
+      if (start && end <= start) return 'Return date must be after the pick-up date.';
     }
-    return true;
+    if ((field.name === 'pickup_location_id' || field.name === 'return_location_id') && !value) return 'Select a location.';
+    if (field.name === 'customer_name' && value.length < 2) return 'Enter your full name.';
+    if (field.name === 'customer_email' && (!value || !field.validity.valid)) return 'Enter a valid email address.';
+    if (field.name === 'customer_phone') {
+      const digits = value.replace(/\D/g, '');
+      if (digits.length < 7 || digits.length > 15) return 'Enter a valid phone number with 7 to 15 digits.';
+    }
+    if (field.name === 'licence_number' && value.length < 4) return 'Enter a valid driving licence number.';
+    if (field.name === 'date_of_birth' && value) {
+      const birth = parseDate(value);
+      if (!birth || birth >= today()) return 'Enter a valid date of birth.';
+      let age = today().getFullYear() - birth.getFullYear();
+      const birthdayPending = today().getMonth() < birth.getMonth() || (today().getMonth() === birth.getMonth() && today().getDate() < birth.getDate());
+      if (birthdayPending) age -= 1;
+      if (age < 25) return 'Drivers must be at least 25 years old.';
+    }
+    if (field.name === 'terms_accepted' && !field.checked) return 'Accept the rental terms and insurance policy to continue.';
+    if (field.required && !value) return 'This field is required.';
+    return '';
+  }
+
+  function clearFieldError(field) {
+    field.removeAttribute('aria-invalid');
+    const errorId = `reservation-error-${field.name}`;
+    form.querySelector(`#${errorId}`)?.remove();
+    if (field.getAttribute('aria-describedby') === errorId) field.removeAttribute('aria-describedby');
+    field.closest('label')?.classList.remove('has-error');
+  }
+
+  function showFieldError(field, message) {
+    clearFieldError(field);
+    const error = document.createElement('span');
+    error.className = 'reservation-field-error';
+    error.id = `reservation-error-${field.name}`;
+    error.textContent = message;
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', error.id);
+    const label = field.closest('label');
+    label?.classList.add('has-error');
+    (label || field.parentElement).appendChild(error);
+  }
+
+  function showValidationSummary(panel, messages) {
+    panel.querySelector('[data-validation-summary]')?.remove();
+    if (!messages.length) return;
+    const summary = document.createElement('div');
+    summary.className = 'reservation-validation-summary';
+    summary.dataset.validationSummary = '';
+    summary.setAttribute('role', 'alert');
+    const heading = document.createElement('strong');
+    heading.textContent = 'Please correct the following:';
+    const list = document.createElement('ul');
+    messages.forEach((message) => { const item = document.createElement('li'); item.textContent = message; list.appendChild(item); });
+    summary.append(heading, list);
+    panel.querySelector('.reservation-step__heading')?.after(summary);
+  }
+
+  function validateStep(stepNumber = current, shouldFocus = true) {
+    const panel = steps[stepNumber - 1];
+    const fields = Array.from(panel.querySelectorAll('input, select')).filter((field, index, all) => field.name !== 'vehicle_id' || index === all.findIndex((candidate) => candidate.name === 'vehicle_id'));
+    const invalid = [];
+    fields.forEach((field) => {
+      clearFieldError(field);
+      const message = fieldMessage(field);
+      if (message) { invalid.push({ field, message }); showFieldError(field, message); }
+    });
+    showValidationSummary(panel, invalid.map(({ message }) => message));
+    if (invalid.length && shouldFocus) invalid[0].field.focus({ preventScroll: true });
+    return invalid.length === 0;
   }
 
   form.querySelectorAll('input[name="vehicle_id"]').forEach((radio) => radio.addEventListener('change', () => {
@@ -99,8 +180,23 @@ export function initReservationFlow() {
     updateSummary();
   }));
   [form.elements.pickup_location_id, form.elements.return_location_id].forEach((select) => select.addEventListener('change', updateSummary));
-  next.addEventListener('click', () => { if (validateStep()) showStep(current + 1); });
+  form.querySelectorAll('input, select').forEach((field) => {
+    const eventName = field.type === 'radio' || field.type === 'checkbox' || field.tagName === 'SELECT' ? 'change' : 'input';
+    field.addEventListener(eventName, () => {
+      clearFieldError(field);
+      const panel = field.closest('[data-step]');
+      if (panel && !panel.querySelector('[aria-invalid="true"]')) panel.querySelector('[data-validation-summary]')?.remove();
+    });
+  });
+  nextButtons.forEach((button) => button.addEventListener('click', () => { if (validateStep()) showStep(current + 1); }));
   back.addEventListener('click', () => showStep(current - 1));
-  form.addEventListener('submit', (event) => { if (!validateStep()) event.preventDefault(); });
-  showStep(1);
+  form.addEventListener('submit', (event) => {
+    const firstInvalidStep = steps.findIndex((step, index) => !validateStep(index + 1, false));
+    if (firstInvalidStep >= 0) {
+      event.preventDefault();
+      showStep(firstInvalidStep + 1);
+      steps[firstInvalidStep].querySelector('[aria-invalid="true"]')?.focus({ preventScroll: true });
+    }
+  });
+  showStep(current);
 }

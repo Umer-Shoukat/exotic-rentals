@@ -50,22 +50,32 @@ function echelon_handle_reservation_submission() {
     $pickup_date = echelon_parse_reservation_date($_POST['pickup_date'] ?? '');
     $return_date = echelon_parse_reservation_date($_POST['return_date'] ?? '');
     $email = sanitize_email(wp_unslash($_POST['customer_email'] ?? ''));
-    $name = sanitize_text_field(wp_unslash($_POST['customer_name'] ?? ''));
-    $phone = sanitize_text_field(wp_unslash($_POST['customer_phone'] ?? ''));
-    $licence = sanitize_text_field(wp_unslash($_POST['licence_number'] ?? ''));
+    $name = trim(sanitize_text_field(wp_unslash($_POST['customer_name'] ?? '')));
+    $phone = trim(sanitize_text_field(wp_unslash($_POST['customer_phone'] ?? '')));
+    $licence = trim(sanitize_text_field(wp_unslash($_POST['licence_number'] ?? '')));
+    $date_of_birth_raw = sanitize_text_field(wp_unslash($_POST['date_of_birth'] ?? ''));
+    $date_of_birth = $date_of_birth_raw !== '' ? echelon_parse_reservation_date($date_of_birth_raw) : false;
 
     if (get_post_type($vehicle_id) !== 'fleet_vehicle' || get_post_status($vehicle_id) !== 'publish') {
         echelon_reservation_error('vehicle');
     }
-    if (get_post_type($pickup_location_id) !== 'location' || get_post_type($return_location_id) !== 'location') {
+    if (get_post_type($pickup_location_id) !== 'location' || get_post_status($pickup_location_id) !== 'publish' ||
+        get_post_type($return_location_id) !== 'location' || get_post_status($return_location_id) !== 'publish') {
         echelon_reservation_error('location');
     }
     if (!$pickup_date || !$return_date || $return_date <= $pickup_date || $pickup_date < new DateTimeImmutable('today', wp_timezone())) {
         echelon_reservation_error('dates');
     }
-    if (!$name || !is_email($email) || !$phone || !$licence || empty($_POST['terms_accepted'])) {
-        echelon_reservation_error('details');
+    if (strlen($name) < 2 || strlen($name) > 100) echelon_reservation_error('name');
+    if (!is_email($email) || strlen($email) > 254) echelon_reservation_error('email');
+    $phone_digits = preg_replace('/\D+/', '', $phone);
+    if (strlen($phone_digits) < 7 || strlen($phone_digits) > 15) echelon_reservation_error('phone');
+    if (strlen($licence) < 4 || strlen($licence) > 50) echelon_reservation_error('licence');
+    if ($date_of_birth_raw !== '') {
+        $today = new DateTimeImmutable('today', wp_timezone());
+        if (!$date_of_birth || $date_of_birth >= $today || $date_of_birth->diff($today)->y < 25) echelon_reservation_error('age');
     }
+    if (empty($_POST['terms_accepted'])) echelon_reservation_error('terms');
 
     $token = sanitize_key(wp_unslash($_POST['submission_token'] ?? ''));
     if (!$token || get_transient('echelon_reservation_' . $token)) {
@@ -97,12 +107,12 @@ function echelon_handle_reservation_submission() {
         'return_date'          => $return_date->format('Y-m-d'),
         'pickup_location_id'   => $pickup_location_id,
         'return_location_id'   => $return_location_id,
-        'estimated_mileage'    => sanitize_text_field(wp_unslash($_POST['estimated_mileage'] ?? '150')),
+        'estimated_mileage'    => in_array(wp_unslash($_POST['estimated_mileage'] ?? '150'), ['150', '250', 'unlimited'], true) ? wp_unslash($_POST['estimated_mileage']) : '150',
         'customer_name'        => $name,
         'customer_email'       => $email,
         'customer_phone'       => $phone,
         'licence_number'       => $licence,
-        'date_of_birth'        => sanitize_text_field(wp_unslash($_POST['date_of_birth'] ?? '')),
+        'date_of_birth'        => $date_of_birth ? $date_of_birth->format('Y-m-d') : '',
         'occasion'             => sanitize_text_field(wp_unslash($_POST['occasion'] ?? '')),
         'estimated_total'      => $estimated_total,
         'submitted_at'         => current_time('mysql', true),

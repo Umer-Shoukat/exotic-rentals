@@ -10,7 +10,7 @@
 			<p><?php echo esc_html(echelon_setting('footer_copyright')); ?></p>
 			<div class="legal-links">
 				<a href="<?php echo esc_url(home_url('/privacy-policy')); ?>"><?php esc_html_e('Privacy Policy', 'echelon'); ?></a>
-				<a href="<?php echo esc_url(home_url('/terms-of-service')); ?>"><?php esc_html_e('Terms Of Services', 'echelon'); ?></a>
+				<a href="<?php echo esc_url(home_url('/terms-and-conditions/')); ?>"><?php esc_html_e('Terms & Conditions', 'echelon'); ?></a>
 			</div>
 		</div>
 	</div>

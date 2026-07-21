@@ -7,7 +7,7 @@ export function initHeroStrip() {
 
   const slidesWrap = strip.querySelector('[data-hero-strip-slides]');
   const slides = Array.from(slidesWrap?.children || []);
-  const dotsWrap = strip.querySelector('[data-hero-dots]');
+  const progress = strip.querySelector('[data-hero-progress]');
   const prevBtn = strip.querySelector('[data-hero-prev]');
   const nextBtn = strip.querySelector('[data-hero-next]');
   const cta = strip.querySelector('.hero__strip-cta');
@@ -21,22 +21,23 @@ export function initHeroStrip() {
   let current = 0;
   let timer = null;
 
-  slides.forEach((slide, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'dots__dot';
-    dot.setAttribute('aria-label', `Vehicle ${i + 1}`);
-    dot.addEventListener('click', () => goTo(i));
-    dotsWrap?.appendChild(dot);
-  });
-
   function render() {
     slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current));
-    dotsWrap?.querySelectorAll('.dots__dot').forEach((dot, i) => {
-      dot.classList.toggle('is-active', i === current);
-    });
     if (cta && vehicleLinks[current]) {
       cta.setAttribute('href', vehicleLinks[current]);
+    }
+    restartProgress();
+  }
+
+  function restartProgress() {
+    if (!progress) return;
+    progress.classList.remove('is-running', 'is-paused');
+    progress.style.transform = '';
+    void progress.offsetWidth;
+    if (prefersReducedMotion()) {
+      progress.style.transform = `scaleX(${(current + 1) / slides.length})`;
+    } else {
+      progress.classList.add('is-running');
     }
   }
 
@@ -54,8 +55,14 @@ export function initHeroStrip() {
 
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));
-  strip.addEventListener('mouseenter', () => clearInterval(timer));
-  strip.addEventListener('mouseleave', restartAutoplay);
+  strip.addEventListener('mouseenter', () => {
+    clearInterval(timer);
+    progress?.classList.add('is-paused');
+  });
+  strip.addEventListener('mouseleave', () => {
+    restartProgress();
+    restartAutoplay();
+  });
 
   render();
   restartAutoplay();

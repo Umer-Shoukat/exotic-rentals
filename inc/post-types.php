@@ -114,5 +114,71 @@ function echelon_register_post_types() {
         'exclude_from_search' => true,
         'show_in_rest'        => false,
     ]);
+
+    register_post_type('instagram_item', [
+        'labels' => [
+            'name'          => __('Instagram Feed', 'echelon'),
+            'singular_name' => __('Instagram Item', 'echelon'),
+            'add_new_item'  => __('Add Instagram Item', 'echelon'),
+            'edit_item'     => __('Edit Instagram Item', 'echelon'),
+            'menu_name'     => __('Instagram Feed', 'echelon'),
+        ],
+        'public'              => false,
+        'show_ui'             => true,
+        'menu_icon'           => 'dashicons-instagram',
+        'supports'            => ['title', 'thumbnail', 'excerpt', 'page-attributes'],
+        'show_in_rest'        => true,
+        'exclude_from_search' => true,
+    ]);
 }
 add_action('init', 'echelon_register_post_types');
+
+/**
+ * Apply the public fleet archive filters without creating a second query.
+ */
+function echelon_filter_fleet_archive($query) {
+    if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive('fleet_vehicle')) {
+        return;
+    }
+
+    $query->set('posts_per_page', 9);
+    $search = sanitize_text_field(wp_unslash($_GET['fleet_search'] ?? ''));
+    if ($search !== '') {
+        $query->set('s', $search);
+    }
+
+    $tax_query = [];
+    $categories = array_filter(array_map('sanitize_title', (array) ($_GET['body_type'] ?? [])));
+    if ($categories) {
+        $tax_query[] = ['taxonomy' => 'vehicle_category', 'field' => 'slug', 'terms' => $categories];
+    }
+    if ($tax_query) {
+        $query->set('tax_query', $tax_query);
+    }
+
+    $meta_query = [];
+    $brands = array_filter(array_map('sanitize_text_field', (array) ($_GET['make'] ?? [])));
+    if ($brands) {
+        $meta_query[] = ['key' => 'brand', 'value' => $brands, 'compare' => 'IN'];
+    }
+    foreach (['min_price' => ['price_per_day', '>='], 'max_price' => ['price_per_day', '<='], 'min_hp' => ['horsepower', '>=']] as $parameter => [$key, $compare]) {
+        if (isset($_GET[$parameter]) && $_GET[$parameter] !== '') {
+            $meta_query[] = ['key' => $key, 'value' => (float) $_GET[$parameter], 'compare' => $compare, 'type' => 'NUMERIC'];
+        }
+    }
+    $seats = absint($_GET['seats'] ?? 0);
+    if ($seats) {
+        $meta_query[] = ['key' => 'seats', 'value' => $seats, 'compare' => $seats >= 5 ? '>=' : '=', 'type' => 'NUMERIC'];
+    }
+    if ($meta_query) {
+        $query->set('meta_query', $meta_query);
+    }
+
+    $sort = sanitize_key($_GET['fleet_sort'] ?? 'recommended');
+    if (in_array($sort, ['price_asc', 'price_desc', 'horsepower'], true)) {
+        $query->set('meta_key', $sort === 'horsepower' ? 'horsepower' : 'price_per_day');
+        $query->set('orderby', 'meta_value_num');
+        $query->set('order', $sort === 'price_desc' ? 'DESC' : ($sort === 'horsepower' ? 'DESC' : 'ASC'));
+    }
+}
+add_action('pre_get_posts', 'echelon_filter_fleet_archive');

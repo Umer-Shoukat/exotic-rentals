@@ -103,6 +103,9 @@
   padding: 11px 28px;
 }
 
+// The compact homepage card intentionally omits archive metadata.
+.journal .content-card__meta { display: none; }
+
 .journal .content-card__title {
   width: 100%;
   margin: 0;

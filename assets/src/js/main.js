@@ -14,6 +14,8 @@ import { initHeroStrip } from './modules/hero-strip.js';
 import { initBookingForm } from './modules/booking-form.js';
 import { initMap } from './modules/map.js';
 import { initReservationFlow } from './modules/reservation.js';
+import { initFleetFilters } from './modules/fleet.js';
+import { initVehicleGallery } from './modules/vehicle-gallery.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -26,4 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initBookingForm();
   initMap();
   initReservationFlow();
+  initFleetFilters();
+  initVehicleGallery();
 });

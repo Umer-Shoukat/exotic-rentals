@@ -6,6 +6,25 @@
 $handle = echelon_field('instagram_handle', get_the_ID(), '@echelonmotions');
 $link   = echelon_field('instagram_link', get_the_ID(), 'https://instagram.com/');
 $images = echelon_field('instagram_images', get_the_ID(), array_fill(0, 5, null));
+$feed_items = [];
+$instagram_posts = get_posts([
+	'post_type' => 'instagram_item', 'post_status' => 'publish', 'posts_per_page' => 12,
+	'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
+]);
+
+foreach ($instagram_posts as $instagram_post) {
+	$feed_items[] = [
+		'image' => get_post_thumbnail_id($instagram_post),
+		'url' => echelon_field('instagram_url', $instagram_post->ID, $link),
+		'label' => get_the_title($instagram_post),
+	];
+}
+
+if (!$feed_items) {
+	foreach ($images as $index => $image) {
+		$feed_items[] = ['image' => $image, 'url' => $link, 'label' => sprintf(__('Instagram photo %d', 'echelon'), $index + 1)];
+	}
+}
 ?>
 <section class="section instagram-feed" id="instagram" data-reveal>
 	<div class="container">
@@ -17,9 +36,11 @@ $images = echelon_field('instagram_images', get_the_ID(), array_fill(0, 5, null)
 
 	<div class="instagram-feed__slider" data-swiper data-swiper-centered>
 		<div class="swiper-wrapper">
-			<?php foreach ($images as $image) : ?>
+			<?php foreach ($feed_items as $item) : ?>
 				<div class="swiper-slide instagram-feed__slide">
-					<?php echelon_media($image, 'large', '', 'instagram'); ?>
+					<?php if (!empty($item['url'])) : ?><a href="<?php echo esc_url($item['url']); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr($item['label']); ?>"><?php endif; ?>
+						<?php echelon_media($item['image'], 'large', '', 'instagram'); ?>
+					<?php if (!empty($item['url'])) : ?></a><?php endif; ?>
 				</div>
 			<?php endforeach; ?>
 		</div>

@@ -33,9 +33,9 @@ $heading_parts = preg_split('/(over anyone else)/i', $heading, -1, PREG_SPLIT_DE
 			<?php endif; ?>
 		</div>
 
-		<div class="stat-grid" data-parallax-stats>
-			<?php foreach ($stats as $stat) : ?>
-				<div class="stat-card">
+		<div class="stat-grid" data-stat-stack>
+			<?php foreach ($stats as $index => $stat) : ?>
+				<div class="stat-card" style="--stack-index: <?php echo esc_attr($index); ?>;">
 					<?php echelon_icon($stat['icon'] ?? 'check', 'stat-card__icon'); ?>
 					<div class="stat-card__value count-up" data-count-to="<?php echo esc_attr($stat['value']); ?>"><?php echo esc_html($stat['value']); ?></div>
 					<p class="stat-card__label"><?php echo esc_html($stat['label']); ?></p>

@@ -1,0 +1,91 @@
+.about-hero {
+  position: relative;
+  display: flex;
+  min-height: 720px;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: calc(var(--header-height) + 100px) 0 96px;
+}
+
+.about-hero__media,
+.about-hero__scrim { position: absolute; inset: 0; }
+
+.about-hero__image { width: 100%; height: 100%; object-fit: cover; object-position: center 58%; }
+
+.about-hero__scrim {
+  background: linear-gradient(90deg, rgba(0,0,0,.94) 5%, rgba(0,0,0,.62) 48%, rgba(0,0,0,.2) 100%), linear-gradient(0deg, #090909 0%, transparent 35%);
+}
+
+.about-hero__content { position: relative; z-index: 1; }
+.about-hero__content h1 { max-width: 850px; margin: 0 0 24px; font-size: clamp(48px, 6vw, 80px); line-height: 1.05; }
+.about-hero__content > p:last-child { max-width: 560px; font-size: 17px; }
+
+.about-story { background: #090909; }
+.about-story__grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 96px; align-items: center; }
+.about-story__media { position: relative; min-height: 570px; }
+.about-story__media > img { width: 100%; height: 570px; object-fit: cover; filter: saturate(.75); }
+.about-story__media::before { content: ''; position: absolute; z-index: 1; inset: 24px -24px -24px 24px; border: 1px solid rgba(220,20,48,.45); pointer-events: none; }
+.about-story__badge { position: absolute; z-index: 2; right: -24px; bottom: -24px; display: flex; width: 180px; height: 140px; flex-direction: column; justify-content: center; padding: 24px; background: var(--color-accent); }
+.about-story__badge strong { font-family: var(--font-display); font-size: 42px; line-height: 1; }
+.about-story__badge span { margin-top: 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.about-story__content h2 { margin-bottom: 24px; font-size: 44px; line-height: 1.1; }
+.about-story__content .entry-content { color: var(--color-text-muted); }
+.about-story__content .btn { margin-top: 32px; }
+
+.about-proof { padding-block: 0; border-block: 1px solid var(--color-border); background: var(--color-surface); }
+.about-proof__grid { display: grid; grid-template-columns: repeat(4, 1fr); padding-inline: 0; }
+.about-proof__item { display: flex; min-height: 180px; flex-direction: column; justify-content: center; padding: 32px; border-right: 1px solid var(--color-border); }
+.about-proof__item:first-child { border-left: 1px solid var(--color-border); }
+.about-proof__item strong { font-family: var(--font-display); color: var(--color-accent); font-size: 48px; line-height: 1; }
+.about-proof__item span { margin-top: 12px; color: var(--color-text-muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+
+.about-values { background: #0c0c0c; }
+.about-section-heading { display: grid; grid-template-columns: 1fr 440px; gap: 64px; align-items: end; margin-bottom: 56px; }
+.about-section-heading h2 { font-size: 44px; }
+.about-section-heading > p { padding-bottom: 6px; }
+.about-values__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.about-value-card { position: relative; min-height: 320px; padding: 36px 32px; overflow: hidden; border: 1px solid var(--color-border); background: #101010; transition: border-color var(--transition-base), transform var(--transition-base); }
+.about-value-card:hover { transform: translateY(-6px); border-color: var(--color-accent); }
+.about-value-card > span { display: grid; width: 52px; height: 52px; place-items: center; margin-bottom: 64px; background: rgba(220,20,48,.12); color: var(--color-accent); }
+.about-value-card > span svg { width: 24px; height: 24px; }
+.about-value-card small { position: absolute; top: 36px; right: 32px; color: var(--color-text-dim); font-family: var(--font-display); font-size: 14px; }
+.about-value-card h3 { margin-bottom: 14px; font-size: 22px; }
+.about-value-card p { font-size: 14px; }
+
+.about-journey { background: #090909; }
+.about-journey__steps { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; padding: 0; list-style: none; counter-reset: none; }
+.about-journey__steps li { position: relative; display: flex; gap: 24px; min-height: 190px; padding: 32px 36px 32px 0; border-top: 1px solid var(--color-border-strong); }
+.about-journey__steps li + li { padding-left: 36px; border-left: 1px solid var(--color-border); }
+.about-journey__steps li::before { content: ''; position: absolute; top: -2px; left: 0; width: 52px; height: 3px; background: var(--color-accent); }
+.about-journey__steps li + li::before { left: 36px; }
+.about-journey__steps li > span { color: var(--color-accent); font-family: var(--font-display); font-size: 14px; }
+.about-journey__steps h3 { margin-bottom: 12px; font-size: 20px; }
+.about-journey__steps p { font-size: 14px; }
+
+@include down(lg) {
+  .about-story__grid { gap: 56px; }
+  .about-section-heading { grid-template-columns: 1fr 360px; }
+}
+
+@include down(md) {
+  .about-hero { min-height: 620px; padding-bottom: 64px; }
+  .about-hero__scrim { background: linear-gradient(0deg, rgba(0,0,0,.96) 5%, rgba(0,0,0,.35) 100%); }
+  .about-story__grid { grid-template-columns: 1fr; gap: 72px; }
+  .about-story__media, .about-story__media > img { min-height: 0; height: 440px; }
+  .about-story__media::before { inset: 16px -8px -16px 16px; }
+  .about-story__badge { right: -8px; bottom: -16px; }
+  .about-proof__grid { grid-template-columns: repeat(2, 1fr); padding-inline: 18px; }
+  .about-proof__item { min-height: 150px; border-bottom: 1px solid var(--color-border); }
+  .about-proof__item:nth-child(odd) { border-left: 1px solid var(--color-border); }
+  .about-section-heading { grid-template-columns: 1fr; gap: 20px; }
+  .about-values__grid, .about-journey__steps { grid-template-columns: 1fr; }
+  .about-value-card { min-height: 290px; }
+  .about-journey__steps li, .about-journey__steps li + li { padding: 28px 0; border-left: 0; }
+  .about-journey__steps li + li::before { left: 0; }
+}
+
+@include down(sm) {
+  .about-story__media, .about-story__media > img { height: 360px; }
+  .about-proof__item { padding: 24px 18px; }
+  .about-proof__item strong { font-size: 38px; }
+}

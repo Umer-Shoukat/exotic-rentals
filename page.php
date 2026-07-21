@@ -4,24 +4,19 @@
  */
 
 get_header();
-?>
 
-<article class="section">
-	<div class="container container--narrow">
-		<?php
-		while (have_posts()) :
-			the_post();
-			?>
-			<header class="section-heading">
-				<h1 class="section-heading__title"><?php the_title(); ?></h1>
-			</header>
-			<div class="entry-content">
-				<?php the_content(); ?>
-			</div>
-			<?php
-		endwhile;
-		?>
-	</div>
-</article>
+while (have_posts()) : the_post();
+	get_template_part('template-parts/global/inner-hero', null, [
+		'eyebrow' => __('Echelon Motions', 'echelon'),
+		'title'   => esc_html(get_the_title()),
+	]);
+	?>
+	<article class="section static-page">
+		<div class="container container--narrow">
+			<div class="entry-content"><?php the_content(); ?></div>
+		</div>
+	</article>
+	<?php
+endwhile;
 
-<?php get_footer(); ?>
+get_footer();

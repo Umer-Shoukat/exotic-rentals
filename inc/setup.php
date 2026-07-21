@@ -155,13 +155,117 @@ function echelon_install_starter_content() {
             function_exists('update_field') ? update_field($name, $value, $location->ID) : update_post_meta($location->ID, $name, $value);
         }
     }
+
+    echelon_install_sample_fleet();
+    echelon_install_instagram_items();
+}
+
+/**
+ * Expand sparse development installs with editable sample vehicles. Existing
+ * vehicles are never overwritten and the seed is capped at twelve records.
+ */
+function echelon_install_sample_fleet() {
+    $existing = get_posts([
+        'post_type' => 'fleet_vehicle', 'post_status' => 'any', 'posts_per_page' => -1,
+        'orderby' => 'date', 'order' => 'ASC',
+    ]);
+    if (count($existing) >= 12) {
+        return;
+    }
+
+    $image_ids = array_values(array_filter(array_map('get_post_thumbnail_id', $existing)));
+    $samples = [
+        ['Lamborghini Urus', 'Lamborghini', 1450, 657, '3.3s', 5, 'SUV', true],
+        ['Ferrari Roma', 'Ferrari', 1750, 612, '3.4s', 4, 'Exotic', true],
+        ['Bentley Bentayga', 'Bentley', 1200, 542, '4.4s', 5, 'SUV', true],
+        ['Chevrolet Corvette C8', 'Chevrolet', 900, 495, '2.9s', 2, 'Sports', true],
+        ['BMW M8 Competition', 'BMW', 850, 617, '3.0s', 4, 'Sports', false],
+        ['Audi R8 V10', 'Audi', 1350, 602, '3.1s', 2, 'Exotic', true],
+        ['Mercedes-AMG G 63', 'Mercedes', 1100, 577, '4.5s', 5, 'SUV', false],
+        ['Porsche 911 Turbo S', 'Porsche', 1400, 640, '2.6s', 4, 'Sports', false],
+        ['Rolls-Royce Ghost', 'Rolls-Royce', 1500, 563, '4.6s', 5, 'Luxury', false],
+    ];
+
+    foreach ($samples as $index => [$title, $brand, $price, $horsepower, $zero_to_sixty, $seats, $category, $featured]) {
+        if (count($existing) >= 12) {
+            break;
+        }
+        if (get_page_by_path(sanitize_title($title), OBJECT, 'fleet_vehicle')) {
+            continue;
+        }
+        $vehicle_id = wp_insert_post([
+            'post_type' => 'fleet_vehicle', 'post_status' => 'publish',
+            'post_title' => $title, 'post_name' => sanitize_title($title),
+            'post_excerpt' => __('Sample fleet data — replace specifications and photography before launch.', 'echelon'),
+            'menu_order' => count($existing),
+        ]);
+        if (!$vehicle_id || is_wp_error($vehicle_id)) {
+            continue;
+        }
+
+        $term = term_exists($category, 'vehicle_category');
+        if (!$term) {
+            $term = wp_insert_term($category, 'vehicle_category');
+        }
+        if (!is_wp_error($term)) {
+            wp_set_object_terms($vehicle_id, [(int) (is_array($term) ? $term['term_id'] : $term)], 'vehicle_category');
+        }
+
+        $thumbnail_id = $image_ids ? $image_ids[$index % count($image_ids)] : 0;
+        if ($thumbnail_id) {
+            set_post_thumbnail($vehicle_id, $thumbnail_id);
+        }
+        $fields = [
+            'brand' => $brand, 'price_per_day' => $price, 'horsepower' => $horsepower,
+            'zero_to_sixty' => $zero_to_sixty, 'seats' => $seats,
+            'tagline' => $category . ' performance rental', 'featured' => $featured ? 1 : 0,
+        ];
+        if ($thumbnail_id) {
+            $fields['gallery'] = [$thumbnail_id];
+        }
+        foreach ($fields as $name => $value) {
+            function_exists('update_field') ? update_field($name, $value, $vehicle_id) : update_post_meta($vehicle_id, $name, $value);
+        }
+        $existing[] = get_post($vehicle_id);
+    }
+}
+
+/**
+ * Convert the legacy homepage gallery into independently manageable feed
+ * items once. The source gallery remains untouched as a fallback.
+ */
+function echelon_install_instagram_items() {
+    $existing = get_posts(['post_type' => 'instagram_item', 'post_status' => 'any', 'posts_per_page' => 1, 'fields' => 'ids']);
+    if ($existing) {
+        return;
+    }
+    $home_id = (int) get_option('page_on_front');
+    $gallery = echelon_field('instagram_images', $home_id, []);
+    $profile_url = echelon_field('instagram_link', $home_id, 'https://instagram.com/');
+    foreach (array_slice((array) $gallery, 0, 12) as $index => $image) {
+        $attachment_id = is_array($image) ? absint($image['ID'] ?? 0) : absint($image);
+        if (!$attachment_id) {
+            continue;
+        }
+        $title = get_post_meta($attachment_id, '_wp_attachment_image_alt', true);
+        $item_id = wp_insert_post([
+            'post_type' => 'instagram_item', 'post_status' => 'publish',
+            'post_title' => $title ?: sprintf(__('Instagram Photo %d', 'echelon'), $index + 1),
+            'menu_order' => $index,
+        ]);
+        if (!$item_id || is_wp_error($item_id)) {
+            continue;
+        }
+        set_post_thumbnail($item_id, $attachment_id);
+        function_exists('update_field') ? update_field('instagram_url', $profile_url, $item_id) : update_post_meta($item_id, 'instagram_url', $profile_url);
+    }
 }
 
 function echelon_maybe_install_starter_content() {
-    if (get_option('echelon_starter_content_version') === '3') {
+    if (get_option('echelon_starter_content_version') === '5') {
         return;
     }
     echelon_install_starter_content();
-    update_option('echelon_starter_content_version', '3', false);
+    update_option('echelon_starter_content_version', '5', false);
 }
 add_action('init', 'echelon_maybe_install_starter_content', 99);

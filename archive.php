@@ -5,15 +5,16 @@
  */
 
 get_header();
+
+get_template_part('template-parts/global/inner-hero', null, [
+	'eyebrow'     => __('Explore', 'echelon'),
+	'title'       => wp_strip_all_tags(get_the_archive_title()),
+	'description' => wp_strip_all_tags(get_the_archive_description()),
+]);
 ?>
 
-<section class="section">
+<section class="section editorial-listing">
 	<div class="container">
-		<header class="section-heading">
-			<h1 class="section-heading__title"><?php the_archive_title(); ?></h1>
-			<?php the_archive_description('<div class="section-heading__desc">', '</div>'); ?>
-		</header>
-
 		<?php if (have_posts()) : ?>
 			<div class="post-grid">
 				<?php

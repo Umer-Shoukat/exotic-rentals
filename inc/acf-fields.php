@@ -26,6 +26,16 @@ function echelon_register_acf_fields() {
             ['key' => 'field_v_060', 'name' => 'zero_to_sixty', 'label' => '0–60', 'type' => 'text', 'placeholder' => 'e.g. 4.9s'],
             ['key' => 'field_v_seats', 'name' => 'seats', 'label' => 'Seats', 'type' => 'number'],
             ['key' => 'field_v_tagline', 'name' => 'tagline', 'label' => 'Tagline', 'type' => 'text'],
+            ['key' => 'field_v_year', 'name' => 'year', 'label' => 'Model Year', 'type' => 'number'],
+            ['key' => 'field_v_doors', 'name' => 'doors', 'label' => 'Doors', 'type' => 'number'],
+            ['key' => 'field_v_deposit', 'name' => 'security_deposit', 'label' => 'Security Deposit', 'type' => 'number', 'prepend' => '$'],
+            ['key' => 'field_v_miles', 'name' => 'included_miles', 'label' => 'Included Miles / Day', 'type' => 'number'],
+            ['key' => 'field_v_transmission', 'name' => 'transmission', 'label' => 'Transmission', 'type' => 'text'],
+            ['key' => 'field_v_engine', 'name' => 'engine', 'label' => 'Engine', 'type' => 'text'],
+            ['key' => 'field_v_drivetrain', 'name' => 'drivetrain', 'label' => 'Drivetrain', 'type' => 'text'],
+            ['key' => 'field_v_exterior', 'name' => 'exterior_color', 'label' => 'Exterior Color', 'type' => 'text'],
+            ['key' => 'field_v_interior', 'name' => 'interior_color', 'label' => 'Interior Color', 'type' => 'text'],
+            ['key' => 'field_v_fuel', 'name' => 'fuel_type', 'label' => 'Fuel Type', 'type' => 'text'],
             ['key' => 'field_v_featured', 'name' => 'featured', 'label' => 'Featured in Hero', 'type' => 'true_false', 'ui' => 1],
         ],
         'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'fleet_vehicle']]],
@@ -71,6 +81,16 @@ function echelon_register_acf_fields() {
             ['key' => 'field_l_active', 'name' => 'is_active', 'label' => 'Active Zone', 'type' => 'true_false', 'ui' => 1, 'default_value' => 1],
         ],
         'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'location']]],
+    ]);
+
+    // ---- Curated Instagram feed -----------------------------------------
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_instagram_item',
+        'title'  => 'Instagram Item Details',
+        'fields' => [
+            ['key' => 'field_ig_item_url', 'name' => 'instagram_url', 'label' => 'Instagram Post URL', 'type' => 'url', 'instructions' => 'Optional. The homepage image links to this Instagram post.'],
+        ],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'instagram_item']]],
     ]);
 
     // ---- Home page content ------------------------------------------------
