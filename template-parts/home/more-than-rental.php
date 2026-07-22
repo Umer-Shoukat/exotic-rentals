@@ -1,10 +1,10 @@
 <?php
 /**
- * Home: "More Than a Rental" — occasion cards.
+ * Home: "More Than a Rental" — featured service cards.
  */
 
-$occasions = new WP_Query([
-    'post_type'      => 'occasion',
+$services = new WP_Query([
+    'post_type'      => 'service',
     'posts_per_page' => 4,
     'orderby'        => ['menu_order' => 'ASC', 'date' => 'ASC'],
     'order'          => 'ASC',
@@ -14,7 +14,7 @@ $occasions = new WP_Query([
 $eyebrow = echelon_field('occasions_eyebrow', get_the_ID(), 'Services');
 $heading = echelon_field('occasions_heading', get_the_ID(), 'More Than a Rental');
 $desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion — a first look at the aisle, a boardroom pull-up, or a shoot at golden hour — we tailor the car, the crew, and the moment.');
-$cta     = echelon_field('occasions_cta', get_the_ID(), ['title' => 'View More', 'url' => home_url('/chauffeur-services')]);
+$cta     = echelon_field('occasions_cta', get_the_ID(), ['title' => 'View More', 'url' => get_post_type_archive_link('service')]);
 $heading_parts = preg_split('/(rental)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 $fallback_images = [
 	'wedding'    => 'wedding.jpg',
@@ -37,11 +37,10 @@ $fallback_images = [
 			<p class="more-than-rental__desc"><?php echo esc_html($desc); ?></p>
 		</header>
 
-		<?php if ($occasions->have_posts()) : ?>
+		<?php if ($services->have_posts()) : ?>
 			<div class="occasion-grid">
-				<?php while ($occasions->have_posts()) : $occasions->the_post();
-					$link = echelon_field('link', get_the_ID(), ['url' => get_permalink()]);
-					$desc = echelon_field('description', get_the_ID(), get_the_excerpt());
+				<?php while ($services->have_posts()) : $services->the_post();
+					$desc = echelon_field('service_kicker', get_the_ID(), get_the_excerpt());
 					$thumbnail_id = get_post_thumbnail_id();
 					$thumbnail_path = $thumbnail_id ? get_attached_file($thumbnail_id) : '';
 					$fallback_image = 'wedding.jpg';
@@ -53,7 +52,7 @@ $fallback_images = [
 						}
 					}
 					?>
-					<a class="occasion-card" href="<?php echo esc_url($link['url'] ?? get_permalink()); ?>">
+					<a class="occasion-card" href="<?php echo esc_url(get_permalink()); ?>">
 						<?php if ($thumbnail_path && file_exists($thumbnail_path)) : ?>
 							<?php echelon_media($thumbnail_id, 'content-card', 'occasion-card__media', 'check'); ?>
 						<?php else : ?>

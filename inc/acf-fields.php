@@ -9,10 +9,72 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function echelon_register_service_options_page() {
+    if (function_exists('acf_add_options_sub_page')) {
+        acf_add_options_sub_page([
+            'page_title'  => __('Services Archive', 'echelon'),
+            'menu_title'  => __('Archive Settings', 'echelon'),
+            'parent_slug' => 'edit.php?post_type=service',
+            'menu_slug'   => 'service-archive',
+            'capability'  => 'edit_theme_options',
+        ]);
+    }
+}
+add_action('acf/init', 'echelon_register_service_options_page', 5);
+
 function echelon_register_acf_fields() {
     if (!function_exists('acf_add_local_field_group')) {
         return;
     }
+
+    // ---- Services ------------------------------------------------------
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_service',
+        'title'  => 'Service Details',
+        'fields' => [
+            ['key' => 'field_s_kicker', 'name' => 'service_kicker', 'label' => 'Card Kicker', 'type' => 'text', 'placeholder' => 'e.g. Elegant arrival for your big day.'],
+            ['key' => 'field_s_menu_icon', 'name' => 'service_menu_icon', 'label' => 'Mega Menu Icon', 'type' => 'select', 'choices' => echelon_icon_choices(), 'default_value' => 'star'],
+            ['key' => 'field_s_menu_desc', 'name' => 'service_menu_description', 'label' => 'Mega Menu Description', 'type' => 'text', 'instructions' => 'Short supporting line shown in the desktop Services menu. Defaults to the card kicker or excerpt.'],
+            ['key' => 'field_s_cta', 'name' => 'service_cta_label', 'label' => 'CTA Label', 'type' => 'text', 'default_value' => 'Explore Service'],
+            ['key' => 'field_s_featured', 'name' => 'service_featured', 'label' => 'Featured Service', 'type' => 'true_false', 'ui' => 1],
+            ['key' => 'field_s_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
+            ['key' => 'field_s_hero_eyebrow', 'name' => 'service_hero_eyebrow', 'label' => 'Hero Eyebrow', 'type' => 'text', 'default_value' => 'Luxury Transportation'],
+            ['key' => 'field_s_hero_desc', 'name' => 'service_hero_description', 'label' => 'Hero Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_s_hero_image', 'name' => 'service_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large', 'instructions' => 'Defaults to the service featured image.'],
+            ['key' => 'field_s_tab_advantage', 'label' => 'Advantage', 'type' => 'tab'],
+            ['key' => 'field_s_adv_heading', 'name' => 'service_advantage_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Make Your Special Day Unforgettable'],
+            ['key' => 'field_s_adv_body', 'name' => 'service_advantage_body', 'label' => 'Supporting Copy', 'type' => 'wysiwyg', 'tabs' => 'visual', 'toolbar' => 'basic', 'media_upload' => 0],
+            [
+                'key' => 'field_s_advantages', 'name' => 'service_advantages', 'label' => 'Advantage Cards', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 5,
+                'sub_fields' => [
+                    ['key' => 'field_s_adv_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_s_adv_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                ],
+            ],
+            ['key' => 'field_s_tab_fleet', 'label' => 'Recommended Fleet', 'type' => 'tab'],
+            ['key' => 'field_s_fleet_heading', 'name' => 'service_fleet_heading', 'label' => 'Fleet Heading', 'type' => 'text', 'default_value' => 'Popular Vehicles'],
+            ['key' => 'field_s_fleet', 'name' => 'service_vehicles', 'label' => 'Recommended Vehicles', 'type' => 'relationship', 'post_type' => ['fleet_vehicle'], 'filters' => ['search', 'taxonomy'], 'max' => 3, 'return_format' => 'id'],
+            ['key' => 'field_s_tab_cta', 'label' => 'Final CTA', 'type' => 'tab'],
+            ['key' => 'field_s_cta_heading', 'name' => 'service_final_cta_heading', 'label' => 'CTA Heading', 'type' => 'text', 'default_value' => 'Ready To Redefine Your Drive?'],
+            ['key' => 'field_s_cta_desc', 'name' => 'service_final_cta_description', 'label' => 'CTA Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_s_cta_image', 'name' => 'service_final_cta_image', 'label' => 'CTA Image', 'type' => 'image', 'preview_size' => 'large'],
+        ],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'service']]],
+    ]);
+
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_service_archive',
+        'title'  => 'Services Archive Content',
+        'fields' => [
+            ['key' => 'field_sa_eyebrow', 'name' => 'services_hero_eyebrow', 'label' => 'Hero Eyebrow', 'type' => 'text', 'default_value' => 'Premium Automotive Services'],
+            ['key' => 'field_sa_title', 'name' => 'services_hero_title', 'label' => 'Hero Title', 'type' => 'text', 'default_value' => 'Luxury Service For Every Occasion'],
+            ['key' => 'field_sa_desc', 'name' => 'services_hero_description', 'label' => 'Hero Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_sa_image', 'name' => 'services_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_sa_list_title', 'name' => 'services_list_title', 'label' => 'Services Section Title', 'type' => 'text', 'default_value' => 'Luxury, Tailored To Every Occasion'],
+            ['key' => 'field_sa_list_desc', 'name' => 'services_list_description', 'label' => 'Services Section Description', 'type' => 'textarea', 'rows' => 3],
+        ],
+        'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'service-archive']]],
+    ]);
 
     // ---- Fleet Vehicle -----------------------------------------------
     acf_add_local_field_group([
@@ -55,23 +117,19 @@ function echelon_register_acf_fields() {
         'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'testimonial']]],
     ]);
 
-    // ---- Occasion --------------------------------------------------------
-    acf_add_local_field_group([
-        'key'    => 'group_echelon_occasion',
-        'title'  => 'Occasion Details',
-        'fields' => [
-            ['key' => 'field_o_desc', 'name' => 'description', 'label' => 'Short Description', 'type' => 'text'],
-            ['key' => 'field_o_link', 'name' => 'link', 'label' => 'Link', 'type' => 'link'],
-        ],
-        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'occasion']]],
-    ]);
-
     // ---- Location --------------------------------------------------------
     acf_add_local_field_group([
         'key'    => 'group_echelon_location',
         'title'  => 'Location Details',
         'fields' => [
+            ['key' => 'field_l_hero_image', 'name' => 'hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_l_hero_heading', 'name' => 'hero_heading', 'label' => 'Hero Heading', 'type' => 'text', 'instructions' => 'Optional. Defaults to “Exotic Car Rentals Across {Location}”.'],
             ['key' => 'field_l_desc', 'name' => 'description', 'label' => 'Delivery Description', 'type' => 'text'],
+            ['key' => 'field_l_menu_region', 'name' => 'menu_region', 'label' => 'Mega Menu Region', 'type' => 'select', 'choices' => ['New York' => 'New York', 'New Jersey' => 'New Jersey', 'Connecticut' => 'Connecticut', 'Long Island' => 'Long Island'], 'allow_null' => 1],
+            ['key' => 'field_l_menu_desc', 'name' => 'menu_description', 'label' => 'Mega Menu Description', 'type' => 'text', 'instructions' => 'Short supporting line shown in the desktop Locations menu. Defaults to the delivery description or excerpt.'],
+            ['key' => 'field_l_intro_heading', 'name' => 'intro_heading', 'label' => 'Support Section Heading', 'type' => 'text', 'instructions' => 'Optional. Defaults to “Premium Rental Support For {Location}”.'],
+            ['key' => 'field_l_neighborhoods', 'name' => 'neighborhoods', 'label' => 'Service Areas', 'type' => 'text', 'instructions' => 'Comma-separated labels shown on the location card, for example Manhattan, Brooklyn, Bronx.'],
+            ['key' => 'field_l_cta_heading', 'name' => 'cta_heading', 'label' => 'Reservation CTA Heading', 'type' => 'text', 'instructions' => 'Optional. Defaults to “Reserve A Premium Vehicle For {Location}.”'],
             ['key' => 'field_l_address', 'name' => 'address', 'label' => 'Address', 'type' => 'textarea', 'rows' => 2, 'new_lines' => 'br'],
             ['key' => 'field_l_phone', 'name' => 'phone', 'label' => 'Phone Number', 'type' => 'text', 'instructions' => 'Include the country/area code, for example +1 (212) 555-0147.'],
             ['key' => 'field_l_latitude', 'name' => 'latitude', 'label' => 'Latitude', 'type' => 'number', 'min' => -85, 'max' => 85, 'step' => 0.000001, 'instructions' => 'Used for Google Maps positioning, for example 40.7831.'],

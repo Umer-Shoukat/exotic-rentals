@@ -160,6 +160,7 @@
 }
 
 .serving-cities__list {
+  min-width: 0;
   padding-top: 48px;
 }
 
@@ -299,7 +300,16 @@
     gap: 32px;
   }
 
-  .serving-cities__list { padding-top: 0; }
+  .serving-cities__grid > *,
+  .serving-cities__list,
+  .city-list { min-width: 0; }
+  .serving-cities__list { width: 100%; padding-top: 0; }
   .serving-cities__intro { min-height: 0; }
-  .city-list { max-height: none; }
+  .city-list { width: 100%; max-height: none; }
+
+  .us-map__pin-label {
+    width: min(240px, calc(100vw - 48px));
+    min-width: 0;
+    white-space: normal;
+  }
 }

@@ -3,7 +3,7 @@
  * Mobile slide-in navigation panel.
  */
 ?>
-<div id="mobile-nav" class="mobile-nav" data-mobile-nav>
+<nav id="mobile-nav" class="mobile-nav" data-mobile-nav aria-label="<?php esc_attr_e('Mobile navigation', 'echelon'); ?>" aria-hidden="true">
 	<?php
 	if (has_nav_menu('primary')) {
 		wp_nav_menu([
@@ -25,4 +25,4 @@
 	<a class="btn btn--primary btn--block mobile-nav__cta" href="<?php echo esc_url(home_url('/fleet')); ?>">
 		<?php esc_html_e('Book Now', 'echelon'); ?>
 	</a>
-</div>
+</nav>

@@ -1,0 +1,57 @@
+.service-detail { overflow:hidden; background:#080808; color:#fff; }
+.service-detail h1,.service-detail h2,.service-detail h3 { font-family:var(--font-display); font-weight:400; text-transform:uppercase; }
+.service-detail h2 { margin:0; font-size:clamp(38px,4.4vw,64px); line-height:.98; }
+.service-detail__hero { position:relative; min-height:700px; display:flex; align-items:flex-end; }
+.service-detail__hero > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 42%; }
+.service-detail__hero-scrim { position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.94),rgba(0,0,0,.32) 72%),linear-gradient(0deg,rgba(0,0,0,.82),transparent 46%); }
+.service-detail__hero-content { position:relative; z-index:1; padding-bottom:72px; }
+.service-detail__breadcrumb { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:45px; color:#777; font-size:10px; text-transform:uppercase; letter-spacing:.1em; }
+.service-detail__breadcrumb a { color:inherit; }
+.service-detail__hero h1 { max-width:760px; margin:16px 0; font-size:clamp(60px,7vw,104px); line-height:.92; }
+.service-detail__hero h1 span { color:var(--color-accent); }
+.service-detail__hero-description { max-width:540px; margin:0; color:#d0d0d0; line-height:1.55; }
+.service-detail__hero-actions { display:flex; gap:12px; margin-top:28px; }
+.service-detail__advantage-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,.8fr); gap:90px; align-items:center; }
+.service-detail__advantage-copy h2 { max-width:630px; }
+.service-detail__richtext { margin-top:24px; color:#888; line-height:1.65; }
+.service-detail__advantage-list { display:grid; gap:14px; }
+.service-detail__advantage-list > div { display:grid; grid-template-columns:42px 1fr; align-items:center; min-height:84px; padding:18px; border:1px solid #292929; background:#121212; }
+.service-detail__advantage-list svg { width:24px; height:24px; color:var(--color-accent); }
+.service-detail__advantage-list h3 { margin:0; font-size:18px; }
+.service-detail__fleet { padding-top:20px; }
+.service-detail__fleet h2 { margin-bottom:35px; }
+.service-detail__fleet h2::first-line { color:#fff; }
+.service-detail__fleet-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.service-detail__availability { background:#0b0b0b; }
+.service-detail__availability-grid { display:grid; grid-template-columns:.7fr 1.3fr; gap:70px; align-items:center; }
+.service-detail__availability h2 span { color:var(--color-accent); }
+.service-detail__availability p:not(.eyebrow),.service-detail__availability li { color:#777; line-height:1.55; }
+.service-detail__availability ul { margin:20px 0 0; padding:0; list-style:none; }
+.service-detail__availability li { margin:7px 0; font-size:13px; }
+.service-detail__availability li::before { content:'✓'; margin-right:9px; color:var(--color-accent); }
+.service-detail__availability form { padding:26px; border:1px solid #272727; background:#121212; }
+.service-detail__availability form > div { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.service-detail__availability label { display:grid; gap:7px; margin-bottom:18px; }
+.service-detail__availability label span { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+.service-detail__availability input { width:100%; min-height:46px; padding:10px 12px; border:1px solid #303030; background:#101010; color:#fff; }
+.service-detail__availability .btn { border-radius:0; }
+.service-detail > .faq { background:#0d0d0d; }
+.service-detail__cta { position:relative; min-height:470px; display:flex; align-items:center; overflow:hidden; }
+.service-detail__cta-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.service-detail__cta-scrim { position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.96),rgba(0,0,0,.12)); }
+.service-detail__cta-content { position:relative; z-index:1; }
+.service-detail__cta h2 { max-width:670px; }
+.service-detail__cta-content > p:not(.eyebrow) { max-width:540px; color:#aaa; line-height:1.55; }
+.service-detail__cta-content > div { display:flex; gap:12px; margin-top:26px; }
+@media (max-width:1023px) {
+  .service-detail__advantage-grid,.service-detail__availability-grid { gap:40px; }
+}
+@media (max-width:767px) {
+  .service-detail__hero { min-height:650px; }
+  .service-detail__hero-content { padding-bottom:42px; }
+  .service-detail__hero-actions { flex-direction:column; align-items:flex-start; }
+  .service-detail__advantage-grid,.service-detail__availability-grid { grid-template-columns:1fr; }
+  .service-detail__fleet-grid { grid-template-columns:1fr; }
+  .service-detail__availability form > div { grid-template-columns:1fr; gap:0; }
+  .service-detail__cta-content > div { flex-wrap:wrap; }
+}

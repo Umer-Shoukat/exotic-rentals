@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom post types + taxonomy for the fleet, testimonials, occasions,
+ * Custom post types + taxonomy for services, fleet, testimonials,
  * locations, and FAQs.
  */
 
@@ -9,6 +9,26 @@ if (!defined('ABSPATH')) {
 }
 
 function echelon_register_post_types() {
+    register_post_type('service', [
+        'labels' => [
+            'name'               => __('Services', 'echelon'),
+            'singular_name'      => __('Service', 'echelon'),
+            'add_new_item'       => __('Add New Service', 'echelon'),
+            'edit_item'          => __('Edit Service', 'echelon'),
+            'all_items'          => __('All Services', 'echelon'),
+            'menu_name'          => __('Services', 'echelon'),
+        ],
+        'public'              => true,
+        'hierarchical'        => true,
+        'has_archive'         => 'services',
+        'rewrite'             => ['slug' => 'services', 'with_front' => false, 'hierarchical' => true],
+        'menu_icon'           => 'dashicons-star-filled',
+        'supports'            => ['title', 'editor', 'thumbnail', 'excerpt', 'page-attributes'],
+        'show_in_rest'        => true,
+        'publicly_queryable'  => true,
+        'exclude_from_search' => false,
+    ]);
+
     register_post_type('fleet_vehicle', [
         'labels' => [
             'name'               => __('Fleet Vehicles', 'echelon'),
@@ -52,21 +72,6 @@ function echelon_register_post_types() {
         'show_in_rest' => true,
     ]);
 
-    register_post_type('occasion', [
-        'labels' => [
-            'name'          => __('Occasions', 'echelon'),
-            'singular_name' => __('Occasion', 'echelon'),
-            'add_new_item'  => __('Add New Occasion', 'echelon'),
-            'edit_item'     => __('Edit Occasion', 'echelon'),
-        ],
-        'public'       => true,
-        'has_archive'  => false,
-        'rewrite'      => ['slug' => 'occasions'],
-        'menu_icon'    => 'dashicons-star-filled',
-        'supports'     => ['title', 'editor', 'thumbnail'],
-        'show_in_rest' => true,
-    ]);
-
     register_post_type('location', [
         'labels' => [
             'name'          => __('Locations', 'echelon'),
@@ -78,7 +83,7 @@ function echelon_register_post_types() {
         'has_archive'  => 'locations',
         'rewrite'      => ['slug' => 'locations'],
         'menu_icon'    => 'dashicons-location',
-        'supports'     => ['title', 'editor'],
+        'supports'     => ['title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'],
         'show_in_rest' => true,
     ]);
 
@@ -132,6 +137,177 @@ function echelon_register_post_types() {
     ]);
 }
 add_action('init', 'echelon_register_post_types');
+
+/** Flush routes once when the public content hierarchy changes. */
+function echelon_maybe_flush_rewrite_rules() {
+    $rewrite_version = 'services-v3';
+    if (get_option('echelon_rewrite_version') === $rewrite_version) {
+        return;
+    }
+
+    flush_rewrite_rules(false);
+    update_option('echelon_rewrite_version', $rewrite_version, false);
+}
+add_action('init', 'echelon_maybe_flush_rewrite_rules', 99);
+
+/**
+ * Consolidate the retired Occasion content type into Services without
+ * changing post IDs, media, authors, dates, or custom-field data.
+ */
+function echelon_migrate_occasions_to_services() {
+    if (get_option('echelon_services_consolidated')) {
+        return;
+    }
+
+    global $wpdb;
+    $legacy_ids = $wpdb->get_col($wpdb->prepare(
+        "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s",
+        'occasion'
+    ));
+
+    foreach (array_map('absint', $legacy_ids) as $post_id) {
+        $post = get_post($post_id);
+        if (!$post) {
+            continue;
+        }
+
+        $legacy_description = (string) get_post_meta($post_id, 'description', true);
+        if (!$post->post_excerpt && $legacy_description) {
+            wp_update_post(['ID' => $post_id, 'post_excerpt' => $legacy_description]);
+        }
+        foreach (['service_kicker', 'service_menu_description', 'service_hero_description'] as $meta_key) {
+            if (!metadata_exists('post', $post_id, $meta_key) && $legacy_description) {
+                update_post_meta($post_id, $meta_key, $legacy_description);
+            }
+        }
+
+        $wpdb->update($wpdb->posts, ['post_type' => 'service'], ['ID' => $post_id], ['%s'], ['%d']);
+        clean_post_cache($post_id);
+    }
+
+    update_option('echelon_services_consolidated', gmdate('c'), false);
+}
+add_action('init', 'echelon_migrate_occasions_to_services', 20);
+
+/** Seed a small, editable starter set without duplicating existing services. */
+function echelon_seed_sample_services() {
+    if (get_option('echelon_sample_services_seeded')) {
+        return;
+    }
+
+    $samples = [
+        'wedding-car-rental' => ['Wedding Car Rental', 'Elegant, photo-ready luxury vehicles coordinated around your ceremony and reception.', 'star', 'wedding'],
+        'prom-car-rental' => ['Prom Car Rental', 'Make a memorable entrance with a premium vehicle prepared for the occasion.', 'star', 'prom'],
+        'corporate-car-rental' => ['Corporate Car Rental', 'Professional executive transportation for meetings, events, and client arrivals.', 'id-card', 'corporate'],
+        'photoshoot-car-rental' => ['Photoshoot Car Rental', 'Distinctive vehicles prepared for editorial, commercial, and creator productions.', 'star', 'photoshoot'],
+    ];
+
+    $existing_services = get_posts(['post_type' => 'service', 'post_status' => 'any', 'posts_per_page' => -1]);
+    foreach ($samples as $slug => [$title, $description, $icon, $concept]) {
+        $concept_exists = (bool) array_filter($existing_services, static function ($service) use ($concept) {
+            return false !== stripos($service->post_title, $concept);
+        });
+        if ($concept_exists || get_page_by_path($slug, OBJECT, 'service')) {
+            continue;
+        }
+        $post_id = wp_insert_post([
+            'post_type' => 'service', 'post_status' => 'publish', 'post_title' => $title,
+            'post_name' => $slug, 'post_excerpt' => $description,
+            'post_content' => '<p>' . esc_html($description) . '</p>',
+        ], true);
+        if (is_wp_error($post_id)) {
+            continue;
+        }
+        update_post_meta($post_id, 'service_kicker', $description);
+        update_post_meta($post_id, 'service_menu_description', $description);
+        update_post_meta($post_id, 'service_hero_description', $description);
+        update_post_meta($post_id, 'service_menu_icon', $icon);
+        update_post_meta($post_id, '_echelon_sample_content', 1);
+    }
+
+    update_option('echelon_sample_services_seeded', gmdate('c'), false);
+}
+add_action('init', 'echelon_seed_sample_services', 30);
+
+/** Remove only semantic duplicates created by the starter-data seeder. */
+function echelon_dedupe_seeded_services() {
+    if (get_option('echelon_seeded_services_deduped')) {
+        return;
+    }
+    $services = get_posts(['post_type' => 'service', 'post_status' => 'any', 'posts_per_page' => -1]);
+    foreach (['wedding', 'prom', 'corporate', 'photoshoot'] as $concept) {
+        $matches = array_values(array_filter($services, static function ($service) use ($concept) {
+            return false !== stripos($service->post_title, $concept);
+        }));
+        if (count($matches) < 2) {
+            continue;
+        }
+        foreach ($matches as $service) {
+            if (get_post_meta($service->ID, '_echelon_sample_content', true)) {
+                wp_delete_post($service->ID, true);
+            }
+        }
+    }
+    update_option('echelon_seeded_services_deduped', gmdate('c'), false);
+}
+add_action('init', 'echelon_dedupe_seeded_services', 35);
+
+/** Normalize migrated starter URLs to the public Services SEO hierarchy. */
+function echelon_normalize_service_slugs() {
+    if (get_option('echelon_service_slugs_normalized')) {
+        return;
+    }
+    $canonical_slugs = [
+        'wedding' => 'wedding-car-rental',
+        'prom' => 'prom-car-rental',
+        'corporate' => 'corporate-car-rental',
+        'photoshoot' => 'photoshoot-car-rental',
+    ];
+    $services = get_posts(['post_type' => 'service', 'post_status' => 'any', 'posts_per_page' => -1]);
+    foreach ($canonical_slugs as $concept => $slug) {
+        foreach ($services as $service) {
+            if (false === stripos($service->post_title, $concept)) {
+                continue;
+            }
+            $owner = get_page_by_path($slug, OBJECT, 'service');
+            if (!$owner || (int) $owner->ID === (int) $service->ID) {
+                wp_update_post(['ID' => $service->ID, 'post_name' => $slug]);
+            }
+            break;
+        }
+    }
+    update_option('echelon_service_slugs_normalized', gmdate('c'), false);
+}
+add_action('init', 'echelon_normalize_service_slugs', 40);
+
+/** Preserve old inbound links while enforcing the canonical /services/ URL. */
+function echelon_redirect_legacy_occasion_urls() {
+    $path = trim((string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
+    if (!preg_match('#^(?:occasions|services)/([^/]+)$#', $path, $matches)) {
+        return;
+    }
+    $requested_slug = sanitize_title($matches[1]);
+    $legacy_aliases = [
+        'prom-night-rental' => 'prom-car-rental',
+        'corporate-executive-2' => 'corporate-car-rental',
+        'photoshoot-content-2' => 'photoshoot-car-rental',
+    ];
+    $target_slug = $legacy_aliases[$requested_slug] ?? $requested_slug;
+    $service = get_page_by_path($target_slug, OBJECT, 'service');
+    if (!$service) {
+        $legacy_match = get_posts([
+            'post_type' => 'service', 'post_status' => 'publish', 'posts_per_page' => 1,
+            'meta_key' => '_wp_old_slug', 'meta_value' => $requested_slug,
+        ]);
+        $service = $legacy_match[0] ?? null;
+    }
+    $is_legacy_path = 0 === strpos($path, 'occasions/') || $target_slug !== $requested_slug;
+    if ($service && $is_legacy_path) {
+        wp_safe_redirect(get_permalink($service), 301);
+        exit;
+    }
+}
+add_action('template_redirect', 'echelon_redirect_legacy_occasion_urls', 1);
 
 /**
  * Apply the public fleet archive filters without creating a second query.
