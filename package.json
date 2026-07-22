@@ -5,7 +5,8 @@
   "description": "Echelon Motions car rental WordPress theme build tooling",
   "scripts": {
     "dev": "vite build --watch --mode development",
-    "build": "vite build --mode production"
+    "build": "vite build --mode production",
+    "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
     "sass": "^1.77.0",
