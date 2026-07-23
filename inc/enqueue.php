@@ -47,6 +47,27 @@ function echelon_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'echelon_enqueue_assets');
 
 /**
+ * Provide the Echelon brand mark as a favicon until a Site Icon is selected
+ * in WordPress. A dashboard-configured Site Icon always takes precedence.
+ */
+function echelon_favicon_fallback() {
+    if (has_site_icon()) {
+        return;
+    }
+
+    $favicon_path = '/assets/images/logo-icon.png';
+    $favicon_url  = add_query_arg(
+        'ver',
+        echelon_asset_version($favicon_path),
+        ECHELON_THEME_URI . $favicon_path
+    );
+
+    printf("<link rel=\"icon\" href=\"%s\" type=\"image/png\">\n", esc_url($favicon_url));
+    printf("<link rel=\"apple-touch-icon\" href=\"%s\">\n", esc_url($favicon_url));
+}
+add_action('wp_head', 'echelon_favicon_fallback', 2);
+
+/**
  * Mark <html> as JS-capable before paint so scroll-reveal CSS can safely
  * hide [data-reveal] elements only when JS is actually going to run them.
  */
