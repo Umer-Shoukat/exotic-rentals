@@ -6,6 +6,9 @@ while (have_posts()) : the_post();
     $service_id = get_the_ID();
     $title = get_the_title();
     $hero_eyebrow = echelon_field('service_hero_eyebrow', $service_id, 'Luxury Transportation');
+    $hero_heading = echelon_field('service_hero_heading', $service_id, $title);
+    $hero_heading_words = preg_split('/\s+/', trim($hero_heading), 2);
+    $hero_accent = echelon_field('service_hero_accent', $service_id, $hero_heading_words[0] ?? $hero_heading);
     $hero_description = echelon_field('service_hero_description', $service_id, has_excerpt() ? get_the_excerpt() : 'A tailored luxury vehicle experience, coordinated around your schedule, route, guests, and the moments that matter.');
     $hero_image = echelon_field('service_hero_image', $service_id, get_post_thumbnail_id($service_id));
     $hero_url = is_array($hero_image) ? wp_get_attachment_image_url($hero_image['ID'] ?? 0, 'full') : wp_get_attachment_image_url((int) $hero_image, 'full');
@@ -23,8 +26,19 @@ while (have_posts()) : the_post();
     $cta_description = echelon_field('service_final_cta_description', $service_id, 'Tell us the occasion, timing, and preferred vehicle. Our concierge will coordinate the route, presentation, and every detail.');
     $cta_image = echelon_field('service_final_cta_image', $service_id, null);
     $cta_url = add_query_arg('service', get_post_field('post_name', $service_id), home_url('/reservation/'));
+    $hero_primary_cta = echelon_field('service_hero_primary_cta', $service_id, ['title' => __('Request Service Quote', 'echelon'), 'url' => $cta_url, 'target' => '']);
+    $hero_secondary_cta = echelon_field('service_hero_secondary_cta', $service_id, ['title' => __('Browse Fleet', 'echelon'), 'url' => get_post_type_archive_link('fleet_vehicle'), 'target' => '']);
+    $availability_heading = echelon_field('service_availability_heading', $service_id, __('Check The Fleet In Real Time', 'echelon'));
+    $availability_accent = echelon_field('service_availability_accent', $service_id, __('Real Time', 'echelon'));
+    $availability_benefits = echelon_field('service_availability_benefits', $service_id, [
+        ['label' => __('Live date validation', 'echelon')],
+        ['label' => __('Vehicle-specific availability', 'echelon')],
+        ['label' => __('Fast reservation handoff', 'echelon')],
+        ['label' => __('Concierge support when needed', 'echelon')],
+    ]);
+    $final_primary_cta = echelon_field('service_final_cta_primary', $service_id, ['title' => __('Check Availability', 'echelon'), 'url' => $cta_url, 'target' => '']);
+    $final_secondary_cta = echelon_field('service_final_cta_secondary', $service_id, ['title' => __('Contact Us', 'echelon'), 'url' => home_url('/contact/'), 'target' => '']);
     $ancestors = array_reverse(get_post_ancestors($service_id));
-    $title_words = preg_split('/\s+/', trim($title), 2);
     $service_schema = [
         '@context'    => 'https://schema.org',
         '@type'       => 'Service',
@@ -52,11 +66,11 @@ while (have_posts()) : the_post();
                 <span><?php echo esc_html($title); ?></span>
             </nav>
             <p class="eyebrow eyebrow--flanked"><?php echo esc_html($hero_eyebrow); ?></p>
-            <h1><span><?php echo esc_html($title_words[0] ?? $title); ?></span><?php echo isset($title_words[1]) ? ' ' . esc_html($title_words[1]) : ''; ?></h1>
+            <h1><?php echo wp_kses(echelon_accent_heading($hero_heading, $hero_accent), ['span' => ['class' => true]]); ?></h1>
             <p class="service-detail__hero-description"><?php echo esc_html($hero_description); ?></p>
             <div class="service-detail__hero-actions">
-                <a class="btn btn--primary" href="<?php echo esc_url($cta_url); ?>"><?php esc_html_e('Request Service Quote', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a>
-                <a class="btn btn--outline" href="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>"><?php esc_html_e('Browse Fleet', 'echelon'); ?></a>
+                <a class="btn btn--primary" href="<?php echo esc_url($hero_primary_cta['url'] ?? $cta_url); ?>"<?php echo !empty($hero_primary_cta['target']) ? ' target="' . esc_attr($hero_primary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($hero_primary_cta['title'] ?? __('Request Service Quote', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a>
+                <a class="btn btn--outline" href="<?php echo esc_url($hero_secondary_cta['url'] ?? get_post_type_archive_link('fleet_vehicle')); ?>"<?php echo !empty($hero_secondary_cta['target']) ? ' target="' . esc_attr($hero_secondary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($hero_secondary_cta['title'] ?? __('Browse Fleet', 'echelon')); ?></a>
             </div>
         </div>
     </section>
@@ -64,7 +78,7 @@ while (have_posts()) : the_post();
     <section class="section service-detail__advantage" data-reveal>
         <div class="container service-detail__advantage-grid">
             <div class="service-detail__advantage-copy">
-                <p class="eyebrow"><?php esc_html_e('Advantage', 'echelon'); ?></p>
+                <p class="eyebrow"><?php echo esc_html(echelon_field('service_advantage_eyebrow', $service_id, __('Advantage', 'echelon'))); ?></p>
                 <h2><?php echo esc_html($advantage_heading); ?></h2>
                 <?php if ($advantage_body) : ?><div class="service-detail__richtext"><?php echo wp_kses_post(apply_filters('the_content', $advantage_body)); ?></div><?php endif; ?>
             </div>
@@ -88,7 +102,7 @@ while (have_posts()) : the_post();
     if ($service_fleet->have_posts()) : ?>
         <section class="section service-detail__fleet" data-reveal>
             <div class="container">
-                <p class="eyebrow"><?php esc_html_e('Recommended Fleet', 'echelon'); ?></p>
+                <p class="eyebrow"><?php echo esc_html(echelon_field('service_fleet_eyebrow', $service_id, __('Recommended Fleet', 'echelon'))); ?></p>
                 <h2><?php echo esc_html($fleet_heading); ?></h2>
                 <div class="service-detail__fleet-grid"><?php while ($service_fleet->have_posts()) : $service_fleet->the_post(); get_template_part('template-parts/fleet/card'); endwhile; ?></div>
             </div>
@@ -98,17 +112,17 @@ while (have_posts()) : the_post();
     <section class="section service-detail__availability" data-reveal>
         <div class="container service-detail__availability-grid">
             <div>
-                <p class="eyebrow"><?php esc_html_e('Availability Search', 'echelon'); ?></p>
-                <h2><?php esc_html_e('Check The Fleet In', 'echelon'); ?> <span><?php esc_html_e('Real Time', 'echelon'); ?></span></h2>
-                <p><?php esc_html_e('Choose your rental window and continue to the fleet with your dates already loaded.', 'echelon'); ?></p>
-                <ul><li><?php esc_html_e('Live date validation', 'echelon'); ?></li><li><?php esc_html_e('Vehicle-specific availability', 'echelon'); ?></li><li><?php esc_html_e('Fast reservation handoff', 'echelon'); ?></li><li><?php esc_html_e('Concierge support when needed', 'echelon'); ?></li></ul>
+                <p class="eyebrow"><?php echo esc_html(echelon_field('service_availability_eyebrow', $service_id, __('Availability Search', 'echelon'))); ?></p>
+                <h2><?php echo wp_kses(echelon_accent_heading($availability_heading, $availability_accent), ['span' => ['class' => true]]); ?></h2>
+                <p><?php echo esc_html(echelon_field('service_availability_description', $service_id, __('Choose your rental window and continue to the fleet with your dates already loaded.', 'echelon'))); ?></p>
+                <ul><?php foreach ($availability_benefits as $benefit) : ?><li><?php echo esc_html($benefit['label'] ?? ''); ?></li><?php endforeach; ?></ul>
             </div>
             <form action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>" method="get">
                 <input type="hidden" name="service" value="<?php echo esc_attr(get_post_field('post_name', $service_id)); ?>">
-                <label class="service-detail__search"><span><?php esc_html_e('Search For A Car', 'echelon'); ?></span><input type="search" name="fleet_search" placeholder="<?php esc_attr_e('Search for a car…', 'echelon'); ?>"></label>
-                <div><label><span><?php esc_html_e('Pick-up Date', 'echelon'); ?></span><input type="text" name="pickup_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php esc_html_e('Pick-up Time', 'echelon'); ?></span><input type="time" name="pickup_time"></label></div>
-                <div><label><span><?php esc_html_e('Return Date', 'echelon'); ?></span><input type="text" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php esc_html_e('Return Time', 'echelon'); ?></span><input type="time" name="return_time"></label></div>
-                <button class="btn btn--primary btn--block" type="submit"><?php esc_html_e('Check Availability', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></button>
+                <label class="service-detail__search"><span><?php echo esc_html(echelon_field('service_search_label', $service_id, __('Search For A Car', 'echelon'))); ?></span><input type="search" name="fleet_search" placeholder="<?php echo esc_attr(echelon_field('service_search_placeholder', $service_id, __('Search for a car…', 'echelon'))); ?>"></label>
+                <div><label><span><?php echo esc_html(echelon_field('service_pickup_date_label', $service_id, __('Pick-up Date', 'echelon'))); ?></span><input type="text" name="pickup_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php echo esc_html(echelon_field('service_pickup_time_label', $service_id, __('Pick-up Time', 'echelon'))); ?></span><input type="time" name="pickup_time"></label></div>
+                <div><label><span><?php echo esc_html(echelon_field('service_return_date_label', $service_id, __('Return Date', 'echelon'))); ?></span><input type="text" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php echo esc_html(echelon_field('service_return_time_label', $service_id, __('Return Time', 'echelon'))); ?></span><input type="time" name="return_time"></label></div>
+                <button class="btn btn--primary btn--block" type="submit"><?php echo esc_html(echelon_field('service_availability_button_label', $service_id, __('Check Availability', 'echelon'))); ?><?php echelon_icon('arrow-right'); ?></button>
             </form>
         </div>
     </section>
@@ -118,7 +132,7 @@ while (have_posts()) : the_post();
     <section class="service-detail__cta">
         <?php if ($cta_image) : ?><?php echelon_media($cta_image, 'full', 'service-detail__cta-image'); ?><?php else : ?><img class="service-detail__cta-image" src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/reservation-cta.jpg')); ?>" alt="" loading="lazy" decoding="async"><?php endif; ?>
         <div class="service-detail__cta-scrim"></div>
-        <div class="container service-detail__cta-content"><p class="eyebrow eyebrow--flanked"><?php esc_html_e('Reserve Today', 'echelon'); ?></p><h2><?php echo esc_html($cta_heading); ?></h2><p><?php echo esc_html($cta_description); ?></p><div><a class="btn btn--outline" href="<?php echo esc_url(home_url('/contact/')); ?>"><?php esc_html_e('Contact Us', 'echelon'); ?></a><a class="btn btn--primary" href="<?php echo esc_url($cta_url); ?>"><?php esc_html_e('Check Availability', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a></div></div>
+        <div class="container service-detail__cta-content"><p class="eyebrow eyebrow--flanked"><?php echo esc_html(echelon_field('service_final_cta_eyebrow', $service_id, __('Reserve Today', 'echelon'))); ?></p><h2><?php echo esc_html($cta_heading); ?></h2><p><?php echo esc_html($cta_description); ?></p><div><a class="btn btn--outline" href="<?php echo esc_url($final_secondary_cta['url'] ?? home_url('/contact/')); ?>"<?php echo !empty($final_secondary_cta['target']) ? ' target="' . esc_attr($final_secondary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($final_secondary_cta['title'] ?? __('Contact Us', 'echelon')); ?></a><a class="btn btn--primary" href="<?php echo esc_url($final_primary_cta['url'] ?? $cta_url); ?>"<?php echo !empty($final_primary_cta['target']) ? ' target="' . esc_attr($final_primary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($final_primary_cta['title'] ?? __('Check Availability', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a></div></div>
     </section>
 </article>
 <?php endwhile; get_footer();
