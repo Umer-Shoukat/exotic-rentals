@@ -19,6 +19,7 @@ require ECHELON_THEME_DIR . '/inc/post-types.php';
 require ECHELON_THEME_DIR . '/inc/acf-fields.php';
 require ECHELON_THEME_DIR . '/inc/customizer.php';
 require ECHELON_THEME_DIR . '/inc/reservations.php';
+require ECHELON_THEME_DIR . '/inc/contact-inquiries.php';
 require ECHELON_THEME_DIR . '/inc/vehicle-gallery.php';
 
 /**

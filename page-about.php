@@ -10,23 +10,39 @@ get_header();
 while (have_posts()) : the_post();
 	$page_id = get_the_ID();
 	$hero_image = echelon_field('about_hero_image', $page_id, get_post_thumbnail_id());
-	$editor_content = trim(get_the_content());
-	$story_content = echelon_field('about_story_content', $page_id, $editor_content);
+	$hero_description = echelon_field('about_hero_description', $page_id, '');
+	if (!$hero_description || stripos($hero_description, 'Team Members') !== false || stripos($hero_description, 'web crawler expert') !== false) {
+		$hero_description = __('Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it is a wedding arrival or an important business engagement.', 'echelon');
+	}
+	$story_content = echelon_field('about_story_content', $page_id, '');
+	if (!$story_content || stripos($story_content, 'Team Members') !== false || stripos($story_content, 'web crawler expert') !== false || stripos($story_content, 'Our Beloved Partners') !== false) {
+		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product — the vehicle is just one part of getting that right.', 'echelon') . '</p><p>' . __('From the first conversation through the final destination, our team coordinates the chauffeur, vehicle preparation, timing, and details around each client’s occasion.', 'echelon') . '</p>';
+	}
 	$story_cta = echelon_field('about_story_cta', $page_id, ['title' => __('Explore Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
 	$stats = echelon_field('about_stats', $page_id, [
-		['value' => '500+', 'label' => __('Exceptional Vehicles', 'echelon')],
+		['value' => __('Curated', 'echelon'), 'label' => __('Exceptional Vehicles', 'echelon')],
 		['value' => '100%', 'label' => __('Inspected & Detailed', 'echelon')],
-		['value' => '45M', 'label' => __('Average Delivery Time', 'echelon')],
+		['value' => __('Planned', 'echelon'), 'label' => __('Carefully Scheduled Pickups', 'echelon')],
 		['value' => '24/7', 'label' => __('Concierge Support', 'echelon')],
 	]);
+	foreach ($stats as &$stat) {
+		if ('500+' === ($stat['value'] ?? '')) {
+			$stat['value'] = __('Curated', 'echelon');
+		}
+		if ('45M' === ($stat['value'] ?? '')) {
+			$stat['value'] = __('Planned', 'echelon');
+			$stat['label'] = __('Carefully Scheduled Pickups', 'echelon');
+		}
+	}
+	unset($stat);
 	$values = echelon_field('about_values', $page_id, [
 		['icon' => 'shield-check', 'title' => __('Uncompromising Quality', 'echelon'), 'description' => __('Every vehicle is selected, inspected, and meticulously prepared before it reaches your door.', 'echelon')],
 		['icon' => 'headset', 'title' => __('Human Service', 'echelon'), 'description' => __('A knowledgeable concierge stays available before, during, and after every reservation.', 'echelon')],
-		['icon' => 'bolt', 'title' => __('Effortless Execution', 'echelon'), 'description' => __('Clear communication, reliable delivery, and thoughtful coordination keep the experience seamless.', 'echelon')],
+		['icon' => 'bolt', 'title' => __('Effortless Execution', 'echelon'), 'description' => __('Clear communication, reliable pickups, and thoughtful coordination keep the experience seamless.', 'echelon')],
 	]);
 	$journey_steps = echelon_field('about_journey_steps', $page_id, [
 		['title' => __('Tell Us The Occasion', 'echelon'), 'description' => __('Share the date, destination, preferences, and the kind of arrival you have in mind.', 'echelon')],
-		['title' => __('We Curate The Details', 'echelon'), 'description' => __('Your concierge confirms the right vehicle and coordinates coverage, delivery, and timing.', 'echelon')],
+		['title' => __('We Curate The Details', 'echelon'), 'description' => __('Your concierge confirms the right vehicle and coordinates coverage, pickup, and timing.', 'echelon')],
 		['title' => __('Enjoy The Drive', 'echelon'), 'description' => __('The vehicle arrives prepared and on time, with our team available whenever you need us.', 'echelon')],
 	]);
 	?>
@@ -42,7 +58,7 @@ while (have_posts()) : the_post();
 		<div class="container about-hero__content">
 			<p class="eyebrow eyebrow--flanked"><?php echo esc_html(echelon_field('about_hero_eyebrow', $page_id, __('Driven By The Experience', 'echelon'))); ?></p>
 			<h1><?php echo esc_html(echelon_field('about_hero_title', $page_id, __('More Than A Car.', 'echelon'))); ?><br><span class="accent"><?php echo esc_html(echelon_field('about_hero_accent', $page_id, __('A Standard Of Service.', 'echelon'))); ?></span></h1>
-			<p><?php echo esc_html(echelon_field('about_hero_description', $page_id, get_the_excerpt() ?: __('We pair an exceptional fleet with personal, detail-driven service to make every journey feel effortless.', 'echelon'))); ?></p>
+			<p><?php echo esc_html($hero_description); ?></p>
 		</div>
 	</section>
 

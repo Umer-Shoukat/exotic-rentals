@@ -22,14 +22,14 @@ function echelon_customize_register(WP_Customize_Manager $wp_customize) {
     ]);
 
     $contact_fields = [
-        'contact_address' => ['label' => __('Address', 'echelon'), 'default' => '8500 Beverly Blvd, Los Angeles CA'],
-        'contact_email'   => ['label' => __('Email', 'echelon'), 'default' => 'concierge@exoticrental.com'],
-        'contact_phone'   => ['label' => __('Phone', 'echelon'), 'default' => '+1 (310) 555-0199'],
+        'contact_address' => ['label' => __('Service Area / Address', 'echelon'), 'default' => 'New York City & Long Island — By Appointment'],
+        'contact_email'   => ['label' => __('Email', 'echelon'), 'default' => 'concierge@example.com'],
+        'contact_phone'   => ['label' => __('Phone', 'echelon'), 'default' => '+1 (212) 555-0100'],
     ];
     foreach ($contact_fields as $id => $field) {
         $wp_customize->add_setting($id, [
             'default'           => $field['default'],
-            'sanitize_callback' => 'sanitize_text_field',
+            'sanitize_callback' => 'contact_email' === $id ? 'sanitize_email' : 'sanitize_text_field',
         ]);
         $wp_customize->add_control($id, [
             'label'   => $field['label'],
@@ -157,5 +157,25 @@ function echelon_sanitize_map_zoom($value) {
  * theme_mod getter with a plain-value fallback.
  */
 function echelon_setting($key, $default = '') {
-    return get_theme_mod($key, $default);
+    $contact_defaults = [
+        'contact_address' => 'New York City & Long Island — By Appointment',
+        'contact_email'   => 'concierge@example.com',
+        'contact_phone'   => '+1 (212) 555-0100',
+    ];
+    $legacy_placeholders = [
+        'contact_address' => '8500 Beverly Blvd, Los Angeles CA',
+        'contact_email'   => 'concierge@exoticrental.com',
+        'contact_phone'   => '+1 (310) 555-0199',
+    ];
+
+    if (isset($contact_defaults[$key]) && '' === $default) {
+        $default = $contact_defaults[$key];
+    }
+
+    $value = get_theme_mod($key, $default);
+    if (isset($legacy_placeholders[$key]) && $legacy_placeholders[$key] === $value) {
+        return $contact_defaults[$key];
+    }
+
+    return $value;
 }

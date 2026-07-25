@@ -234,19 +234,67 @@
   svg { width: 20px; height: 20px; }
 }
 
-.contact-page__form,
-.contact-form-placeholder {
+.contact-page__form {
   padding: var(--space-7);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
 }
 
-.contact-form-placeholder {
-  min-height: 100%;
-  padding: var(--space-6);
-  border-style: dashed;
+.contact-form__intro { margin: var(--space-4) 0 var(--space-6); }
 
-  p:not(.eyebrow) { margin: var(--space-4) 0 var(--space-6); }
+.contact-form__notice {
+  margin-bottom: var(--space-5);
+  padding: 14px 16px;
+  border: 1px solid;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.contact-form__notice--success {
+  border-color: rgba(67, 180, 116, .55);
+  background: rgba(67, 180, 116, .1);
+  color: #9ee0b8;
+}
+
+.contact-form__notice--error {
+  border-color: rgba(255, 82, 105, .55);
+  background: rgba(255, 82, 105, .1);
+  color: #ff9aaa;
+}
+
+.contact-inquiry-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.contact-inquiry-form__details { grid-column: 1 / -1; }
+
+.contact-inquiry-form textarea.field__control {
+  min-height: 128px;
+  resize: vertical;
+}
+
+.contact-inquiry-form input[type='date'] {
+  min-height: 47px;
+  color-scheme: dark;
+}
+
+.contact-inquiry-form__disclaimer {
+  margin: var(--space-5) 0;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.contact-inquiry-form__honeypot {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
 }
 
 .error-404 {
@@ -285,6 +333,8 @@
   .inner-hero--article { min-height: 420px; }
   .contact-page__grid { grid-template-columns: 1fr; gap: var(--space-6); }
   .contact-page__form { padding: var(--space-5); }
+  .contact-inquiry-form__grid { grid-template-columns: 1fr; }
+  .contact-inquiry-form__details { grid-column: auto; }
   .single-thumbnail { margin-top: calc(var(--space-7) * -1); }
   .single-article__footer { align-items: flex-start; flex-direction: column; }
   .error-404__actions { align-items: stretch; flex-direction: column; }
