@@ -120,7 +120,7 @@ function echelon_customize_register(WP_Customize_Manager $wp_customize) {
     ]);
 
     $wp_customize->add_setting('footer_tagline', [
-        'default'           => 'Handpicked exotic and luxury cars. Delivered, insured, and ready when you are.',
+        'default'           => 'Chauffeur-driven luxury and exotic vehicles for New York City and Long Island.',
         'sanitize_callback' => 'sanitize_text_field',
     ]);
     $wp_customize->add_control('footer_tagline', [
@@ -130,7 +130,7 @@ function echelon_customize_register(WP_Customize_Manager $wp_customize) {
     ]);
 
     $wp_customize->add_setting('footer_copyright', [
-        'default'           => sprintf(__('© %s Exotic Rental. All rights reserved.', 'echelon'), gmdate('Y')),
+        'default'           => sprintf(__('© %s Echelon Motions. All rights reserved.', 'echelon'), gmdate('Y')),
         'sanitize_callback' => 'sanitize_text_field',
     ]);
     $wp_customize->add_control('footer_copyright', [

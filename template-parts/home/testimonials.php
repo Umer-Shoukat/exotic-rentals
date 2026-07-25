@@ -9,13 +9,6 @@ $testimonials = new WP_Query([
     'no_found_rows'  => true,
 ]);
 
-$fallback = [
-    'quote'  => 'The 720S was delivered to my hotel in under an hour, spotless and fueled. This is how exotic rental should feel.',
-    'name'   => 'Marcus D.',
-    'title'  => 'Founder, Atlas Ventures',
-    'rating' => 5,
-];
-
 $page_id = get_queried_object_id();
 $eyebrow = echelon_field('testimonials_eyebrow', $page_id, 'Clients');
 $heading = echelon_field('testimonials_heading', $page_id, 'Trusted, Quietly.');
@@ -56,10 +49,10 @@ if ($testimonials->have_posts()) {
         ];
     }
     wp_reset_postdata();
-} else {
-    for ($i = 0; $i < 9; $i++) {
-        $testimonial_items[] = $fallback + ['photo' => null];
-    }
+}
+
+if (!$testimonial_items) {
+	return;
 }
 
 $testimonial_columns = [[], [], []];

@@ -1,6 +1,6 @@
 <?php
 /**
- * Home: "More Than a Rental" — featured service cards.
+ * Home: featured chauffeur services.
  */
 
 $services = new WP_Query([
@@ -12,17 +12,28 @@ $services = new WP_Query([
 ]);
 
 $eyebrow = echelon_field('occasions_eyebrow', get_the_ID(), 'Services');
-$heading = echelon_field('occasions_heading', get_the_ID(), 'CHAUFFEUR SERVICES
-FOR EVERY OCCASION');
-$desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion — a wedding, a boardroom arrival, or a shoot at golden
-hour — we tailor the vehicle, the chauffeur, and the schedule.');
+$heading = echelon_field('occasions_heading', get_the_ID(), 'Chauffeur Services For Every Occasion');
+$desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.');
 $cta     = echelon_field('occasions_cta', get_the_ID(), ['title' => 'View More', 'url' => get_post_type_archive_link('service')]);
+$normalized_heading = preg_replace('/\s+/', ' ', trim((string) $heading));
+if (in_array($normalized_heading, ['More Than a Rental', 'CHAUFFEUR SERVICES FOR EVERY OCCASION'], true)) {
+	$heading = 'Chauffeur Services For Every Occasion';
+}
+if (stripos((string) $desc, 'first look at the aisle') !== false || stripos((string) $desc, 'we tailor the car') !== false) {
+	$desc = 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.';
+}
 $heading_parts = preg_split('/(rental)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 $fallback_images = [
 	'wedding'    => 'wedding.jpg',
 	'prom'       => 'prom.jpg',
 	'corporate'  => 'corporate.jpg',
 	'photoshoot' => 'photoshoot.jpg',
+];
+$service_copy = [
+	'wedding'    => ['title' => 'Wedding Transportation', 'desc' => 'A composed, on-time arrival for your ceremony and reception.'],
+	'prom'       => ['title' => 'Prom Transportation', 'desc' => 'A safe, chauffeured ride your group will remember.'],
+	'corporate'  => ['title' => 'Corporate & Executive', 'desc' => 'Professional chauffeur service for meetings, clients, and travel.'],
+	'photoshoot' => ['title' => 'Photoshoot & Production', 'desc' => 'The right vehicle for the right shot.'],
 ];
 ?>
 <section class="section more-than-rental" id="services" data-reveal>
@@ -42,7 +53,8 @@ $fallback_images = [
 		<?php if ($services->have_posts()) : ?>
 			<div class="occasion-grid">
 				<?php while ($services->have_posts()) : $services->the_post();
-					$desc = echelon_field('service_kicker', get_the_ID(), get_the_excerpt());
+					$card_title = get_the_title();
+					$card_desc = echelon_field('service_kicker', get_the_ID(), get_the_excerpt());
 					$thumbnail_id = get_post_thumbnail_id();
 					$thumbnail_path = $thumbnail_id ? get_attached_file($thumbnail_id) : '';
 					$fallback_image = 'wedding.jpg';
@@ -50,6 +62,10 @@ $fallback_images = [
 					foreach ($fallback_images as $keyword => $filename) {
 						if (strpos($title_key, $keyword) !== false) {
 							$fallback_image = $filename;
+							if (isset($service_copy[$keyword])) {
+								$card_title = $service_copy[$keyword]['title'];
+								$card_desc = $service_copy[$keyword]['desc'];
+							}
 							break;
 						}
 					}
@@ -61,8 +77,8 @@ $fallback_images = [
 							<img class="occasion-card__media" src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/occasions/' . $fallback_image)); ?>" alt="<?php echo esc_attr(get_the_title()); ?>">
 						<?php endif; ?>
 						<div class="content-card__overlay">
-							<h3 class="occasion-card__title"><?php the_title(); ?></h3>
-							<p class="occasion-card__desc"><?php echo esc_html($desc); ?></p>
+							<h3 class="occasion-card__title"><?php echo esc_html($card_title); ?></h3>
+							<p class="occasion-card__desc"><?php echo esc_html($card_desc); ?></p>
 							<span class="occasion-card__link"><?php esc_html_e('Learn More', 'echelon'); ?></span>
 						</div>
 					</a>
@@ -73,10 +89,10 @@ $fallback_images = [
 		<?php else : ?>
 			<?php
 			$fallback = [
-                ['title' => 'Wedding Car Rental', 'desc' => 'Elegant arrival for your big day.', 'image' => 'wedding.jpg'],
-                ['title' => 'Prom Night Rental', 'desc' => 'Make an entrance that gets remembered.', 'image' => 'prom.jpg'],
-                ['title' => 'Corporate & Executive', 'desc' => 'White-glove transport for the boardroom.', 'image' => 'corporate.jpg'],
-                ['title' => 'Photoshoot & Content', 'desc' => 'The right car for the right frame.', 'image' => 'photoshoot.jpg'],
+                ['title' => 'Wedding Transportation', 'desc' => 'A composed, on-time arrival for your ceremony and reception.', 'image' => 'wedding.jpg'],
+                ['title' => 'Prom Transportation', 'desc' => 'A safe, chauffeured ride your group will remember.', 'image' => 'prom.jpg'],
+                ['title' => 'Corporate & Executive', 'desc' => 'Professional chauffeur service for meetings, clients, and travel.', 'image' => 'corporate.jpg'],
+                ['title' => 'Photoshoot & Production', 'desc' => 'The right vehicle for the right shot.', 'image' => 'photoshoot.jpg'],
             ];
 			?>
 			<div class="occasion-grid">

@@ -1,6 +1,6 @@
 <?php
 /**
- * Home: "Latest From Exotic Rental" — journal/blog preview.
+ * Home: journal/blog preview.
  */
 
 $journal_args = [
@@ -18,12 +18,29 @@ if (get_category_by_slug('journal')) {
 $posts = new WP_Query($journal_args);
 $page_id = get_queried_object_id();
 $eyebrow = echelon_field('journal_eyebrow', $page_id, 'The Journal');
-$heading = echelon_field('journal_heading', $page_id, 'Latest From Exotic Rental');
+$heading = echelon_field('journal_heading', $page_id, 'Latest From Echelon Motions');
 $description = echelon_field('journal_desc', $page_id, 'Fleet drops, driving guides, and the occasional look behind the garage door.');
 $cta = echelon_field('journal_cta', $page_id, ['title' => 'View All Articles', 'url' => get_post_type_archive_link('post') ?: home_url('/blog')]);
-$heading_parts = preg_split('/(?=Exotic Rental)/i', $heading, 2);
+if ($heading === 'Latest From Exotic Rental') {
+	$heading = 'Latest From Echelon Motions';
+}
+$heading_parts = preg_split('/(?=Echelon Motions)/i', $heading, 2);
 $heading_primary = trim($heading_parts[0] ?? $heading);
 $heading_accent = trim($heading_parts[1] ?? '');
+$fallback_posts = [
+	[
+		'title' => 'The New Corvette Joins The Collection',
+		'excerpt' => 'The Corvette C8 joins our fleet as a sharper option for clients who want a chauffeured sports-car arrival without sacrificing comfort.',
+	],
+	[
+		'title' => 'Introducing The 2026 Maybach GLS 600 To Our Fleet',
+		'excerpt' => 'The Maybach GLS 600 brings executive-level comfort to our SUV lineup, built for airport transfers and multi-stop corporate days.',
+	],
+	[
+		'title' => 'Behind The Wheel: Our Matte Black Huracan',
+		'excerpt' => 'A closer look at our matte black Huracan, one of the most requested vehicles for evening arrivals and photo productions.',
+	],
+];
 ?>
 <section class="section journal" id="journal" data-reveal>
 	<div class="container">
@@ -43,7 +60,23 @@ $heading_accent = trim($heading_parts[1] ?? '');
 			</div>
 			<?php wp_reset_postdata(); ?>
 		<?php else : ?>
-			<p><?php esc_html_e('New stories are on the way — check back soon.', 'echelon'); ?></p>
+			<div class="post-grid">
+				<?php foreach ($fallback_posts as $item) : ?>
+					<article class="content-card">
+						<div class="content-card__body">
+							<div class="content-card__meta">
+								<span><?php esc_html_e('Journal', 'echelon'); ?></span>
+							</div>
+							<h2 class="content-card__title"><?php echo esc_html($item['title']); ?></h2>
+							<div class="content-card__excerpt"><p><?php echo esc_html($item['excerpt']); ?></p></div>
+							<a class="btn btn--ghost" href="<?php echo esc_url($cta['url'] ?: home_url('/blog')); ?>">
+								<?php esc_html_e('Read More', 'echelon'); ?>
+								<?php echelon_icon('arrow-right'); ?>
+							</a>
+						</div>
+					</article>
+				<?php endforeach; ?>
+			</div>
 		<?php endif; ?>
 
 		<?php if (!empty($cta['url'])) : ?>

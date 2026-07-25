@@ -435,7 +435,7 @@ function echelon_register_acf_fields() {
                 ],
             ],
             ['key' => 'field_h_concierge_cta', 'name' => 'concierge_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Start With Dates', 'url' => '/fleet']],
-            ['key' => 'field_h_chat_title', 'name' => 'concierge_chat_title', 'label' => 'Chat Widget Title', 'type' => 'text', 'default_value' => 'Exotic Rental Concierge'],
+            ['key' => 'field_h_chat_title', 'name' => 'concierge_chat_title', 'label' => 'Chat Widget Title', 'type' => 'text', 'default_value' => 'Echelon Concierge'],
             [
                 'key' => 'field_h_chat_messages', 'name' => 'concierge_chat_messages', 'label' => 'Chat Messages', 'type' => 'repeater', 'layout' => 'table', 'min' => 0,
                 'sub_fields' => [
@@ -444,12 +444,12 @@ function echelon_register_acf_fields() {
                 ],
             ],
 
-            // Rental terms
-            ['key' => 'field_h_tab_terms', 'label' => 'Rental Terms', 'type' => 'tab'],
-            ['key' => 'field_h_terms_heading', 'name' => 'terms_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Rental Terms'],
-            ['key' => 'field_h_terms_desc', 'name' => 'terms_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => "We're here for you to help find the perfect car that matches your needs."],
-            ['key' => 'field_h_agent_name', 'name' => 'agent_name', 'label' => 'Agent Name', 'type' => 'text', 'default_value' => 'Marcus D.'],
-            ['key' => 'field_h_agent_title', 'name' => 'agent_title', 'label' => 'Agent Title', 'type' => 'text', 'default_value' => 'Founder, Atlas Ventures'],
+            // Service details
+            ['key' => 'field_h_tab_terms', 'label' => 'Service Details', 'type' => 'tab'],
+            ['key' => 'field_h_terms_heading', 'name' => 'terms_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Service Details'],
+            ['key' => 'field_h_terms_desc', 'name' => 'terms_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Our concierge team is available 24/7 to help confirm the right vehicle, chauffeur, and schedule for your plans.'],
+            ['key' => 'field_h_agent_name', 'name' => 'agent_name', 'label' => 'Agent Name', 'type' => 'text', 'default_value' => 'Echelon Concierge'],
+            ['key' => 'field_h_agent_title', 'name' => 'agent_title', 'label' => 'Agent Title', 'type' => 'text', 'default_value' => 'Available 24/7'],
             ['key' => 'field_h_agent_photo', 'name' => 'agent_photo', 'label' => 'Agent Photo', 'type' => 'image', 'preview_size' => 'thumbnail'],
             ['key' => 'field_h_agent_phone', 'name' => 'agent_phone', 'label' => 'Agent Phone', 'type' => 'text'],
             [
@@ -484,22 +484,22 @@ function echelon_register_acf_fields() {
             // Occasions / services
             ['key' => 'field_h_tab_occasions', 'label' => 'More Than a Rental', 'type' => 'tab'],
             ['key' => 'field_h_occasions_eyebrow', 'name' => 'occasions_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Services'],
-            ['key' => 'field_h_occasions_heading', 'name' => 'occasions_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'More Than a Rental'],
-            ['key' => 'field_h_occasions_desc', 'name' => 'occasions_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Whatever the occasion — a first look at the aisle, a boardroom pull-up, or a shoot at golden hour — we tailor the car, the crew, and the moment.'],
+            ['key' => 'field_h_occasions_heading', 'name' => 'occasions_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Chauffeur Services For Every Occasion'],
+            ['key' => 'field_h_occasions_desc', 'name' => 'occasions_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.'],
             ['key' => 'field_h_occasions_cta', 'name' => 'occasions_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'View More', 'url' => '/chauffeur-services']],
 
             // Service cities
             ['key' => 'field_h_tab_cities', 'label' => 'Service Cities', 'type' => 'tab'],
-            ['key' => 'field_h_cities_eyebrow', 'name' => 'cities_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Where We Deliver'],
-            ['key' => 'field_h_cities_heading', 'name' => 'cities_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Serving The Cities That Demand More'],
-            ['key' => 'field_h_cities_intro', 'name' => 'cities_intro', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => 'From coast to coast, our concierge team routes the closest vehicle to your pickup point. If your city isn’t listed, ask — extended delivery is available on request.'],
+            ['key' => 'field_h_cities_eyebrow', 'name' => 'cities_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Where We Serve'],
+            ['key' => 'field_h_cities_heading', 'name' => 'cities_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Serving New York City and Long Island'],
+            ['key' => 'field_h_cities_intro', 'name' => 'cities_intro', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => 'Across Manhattan, Brooklyn, Queens, the Bronx, and Long Island, our concierge team coordinates the closest available vehicle and chauffeur. Extended service to New Jersey, Connecticut, and Pennsylvania is available by request.'],
             ['key' => 'field_h_cities_map', 'name' => 'cities_map', 'label' => 'Map Image', 'type' => 'image', 'preview_size' => 'large', 'instructions' => 'Optional. Upload a clean map backdrop to display the dynamic location pins.'],
-            ['key' => 'field_h_cities_cta', 'name' => 'cities_cta', 'label' => 'Map Link', 'type' => 'link', 'default_value' => ['title' => 'Active Service Zones', 'url' => '/locations']],
+            ['key' => 'field_h_cities_cta', 'name' => 'cities_cta', 'label' => 'Map Link', 'type' => 'link', 'default_value' => ['title' => 'View All Locations', 'url' => '/locations']],
 
             // Journal
             ['key' => 'field_h_tab_journal', 'label' => 'Journal', 'type' => 'tab'],
             ['key' => 'field_h_journal_eyebrow', 'name' => 'journal_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'The Journal'],
-            ['key' => 'field_h_journal_heading', 'name' => 'journal_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Latest From Exotic Rental'],
+            ['key' => 'field_h_journal_heading', 'name' => 'journal_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Latest From Echelon Motions'],
             ['key' => 'field_h_journal_desc', 'name' => 'journal_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Fleet drops, driving guides, and the occasional look behind the garage door.'],
             ['key' => 'field_h_journal_cta', 'name' => 'journal_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'View All Articles', 'url' => '/blog']],
 
@@ -517,10 +517,10 @@ function echelon_register_acf_fields() {
             // CTA
             ['key' => 'field_h_tab_cta', 'label' => 'CTA', 'type' => 'tab'],
             ['key' => 'field_h_cta_eyebrow', 'name' => 'cta_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Reserve Today'],
-            ['key' => 'field_h_cta_heading', 'name' => 'cta_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Ready To Redefine Your Drive?'],
-            ['key' => 'field_h_cta_desc', 'name' => 'cta_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Whatever the occasion — a first look at the aisle, a boardroom pull-up, or a shoot at golden hour — we tailor the car, the crew, and the moment.'],
+            ['key' => 'field_h_cta_heading', 'name' => 'cta_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Ready To Plan Your Ride?'],
+            ['key' => 'field_h_cta_desc', 'name' => 'cta_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Whatever the occasion, our concierge team will confirm the right vehicle, chauffeur, and schedule for you.'],
             ['key' => 'field_h_cta_image', 'name' => 'cta_image', 'label' => 'Image', 'type' => 'image', 'preview_size' => 'large'],
-            ['key' => 'field_h_cta_button', 'name' => 'cta_button', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Start Your Reservation', 'url' => '/fleet']],
+            ['key' => 'field_h_cta_button', 'name' => 'cta_button', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Start Your Reservation', 'url' => '/reservation']],
         ],
         'location' => [[['param' => 'page_template', 'operator' => '==', 'value' => 'front-page.php']]],
     ]);

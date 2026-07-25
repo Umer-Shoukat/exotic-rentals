@@ -1,6 +1,6 @@
 <?php
 /**
- * Home: "Serving the Cities That Demand More" — stylized map + city list.
+ * Home: service area map and location list.
  */
 
 $locations = get_posts([
@@ -21,10 +21,13 @@ $locations = array_values(array_filter($locations, static function ($location) {
 
 if (!$locations) {
     $locations = [
-        (object) ['ID' => 0, 'title' => 'Manhattan', 'desc' => 'Midtown & downtown concierge delivery', 'address' => '', 'phone' => '', 'pin_x' => 78, 'pin_y' => 32, 'active' => true],
-        (object) ['ID' => 1, 'title' => 'Brooklyn', 'desc' => 'Borough-wide concierge delivery', 'address' => '', 'phone' => '', 'pin_x' => 80, 'pin_y' => 36, 'active' => true],
-        (object) ['ID' => 2, 'title' => 'New Jersey', 'desc' => 'Newark & Jersey City delivery', 'address' => '', 'phone' => '', 'pin_x' => 76, 'pin_y' => 30, 'active' => true],
-        (object) ['ID' => 3, 'title' => 'Connecticut', 'desc' => 'Greenwich & Stamford delivery', 'address' => '', 'phone' => '', 'pin_x' => 45, 'pin_y' => 62, 'active' => true],
+        (object) ['ID' => 0, 'title' => 'Manhattan', 'desc' => 'Midtown and downtown chauffeur service.', 'address' => '', 'phone' => '', 'pin_x' => 58, 'pin_y' => 42, 'active' => true],
+        (object) ['ID' => 1, 'title' => 'Brooklyn', 'desc' => 'Borough-wide chauffeur coverage.', 'address' => '', 'phone' => '', 'pin_x' => 60, 'pin_y' => 48, 'active' => true],
+        (object) ['ID' => 2, 'title' => 'Queens', 'desc' => 'Airport transfers and event transportation.', 'address' => '', 'phone' => '', 'pin_x' => 63, 'pin_y' => 45, 'active' => true],
+        (object) ['ID' => 3, 'title' => 'The Bronx', 'desc' => 'Chauffeur service by request.', 'address' => '', 'phone' => '', 'pin_x' => 58, 'pin_y' => 38, 'active' => true],
+        (object) ['ID' => 4, 'title' => 'Staten Island', 'desc' => 'Chauffeur service by request.', 'address' => '', 'phone' => '', 'pin_x' => 55, 'pin_y' => 54, 'active' => true],
+        (object) ['ID' => 5, 'title' => 'Long Island (Nassau & Suffolk)', 'desc' => 'Wedding, event, and airport transportation throughout Nassau and Suffolk County.', 'address' => '', 'phone' => '', 'pin_x' => 70, 'pin_y' => 50, 'active' => true],
+        (object) ['ID' => 6, 'title' => 'New Jersey / Connecticut / Pennsylvania', 'desc' => 'Extended service available on request.', 'address' => '', 'phone' => '', 'pin_x' => 50, 'pin_y' => 48, 'active' => true],
     ];
     $is_fallback = true;
 } else {
@@ -32,11 +35,23 @@ if (!$locations) {
 }
 
 $page_id = get_queried_object_id();
-$eyebrow = echelon_field('cities_eyebrow', $page_id, 'Where We Deliver');
-$heading = echelon_field('cities_heading', $page_id, 'Serving The Cities That Demand More');
-$intro = echelon_field('cities_intro', $page_id, 'From coast to coast, our concierge team routes the closest vehicle to your pickup point. If your city isn’t listed, ask — extended delivery is available on request.');
+$eyebrow = echelon_field('cities_eyebrow', $page_id, 'Where We Serve');
+$heading = echelon_field('cities_heading', $page_id, 'Serving New York City and Long Island');
+$intro = echelon_field('cities_intro', $page_id, 'Across Manhattan, Brooklyn, Queens, the Bronx, and Long Island, our concierge team coordinates the closest available vehicle and chauffeur. Extended service to New Jersey, Connecticut, and Pennsylvania is available by request.');
 $map_image = echelon_field('cities_map', $page_id, null);
-$map_link = echelon_field('cities_cta', $page_id, ['title' => 'Active Service Zones', 'url' => home_url('/locations')]);
+$map_link = echelon_field('cities_cta', $page_id, ['title' => 'View All Locations', 'url' => home_url('/locations')]);
+if ($eyebrow === 'Where We Deliver') {
+    $eyebrow = 'Where We Serve';
+}
+if ($heading === 'Serving The Cities That Demand More') {
+    $heading = 'Serving New York City and Long Island';
+}
+if (stripos((string) $intro, 'From coast to coast') !== false) {
+    $intro = 'Across Manhattan, Brooklyn, Queens, the Bronx, and Long Island, our concierge team coordinates the closest available vehicle and chauffeur. Extended service to New Jersey, Connecticut, and Pennsylvania is available by request.';
+}
+if (is_array($map_link) && ($map_link['title'] ?? '') === 'Active Service Zones') {
+    $map_link['title'] = 'View All Locations';
+}
 $map_url = '';
 
 if (is_array($map_image) && !empty($map_image['ID'])) {
@@ -51,7 +66,7 @@ $using_google_map = $google_map_url !== '';
 $map_center_lat = (float) echelon_setting('google_maps_center_lat', '40.730610');
 $map_center_lng = (float) echelon_setting('google_maps_center_lng', '-74.006000');
 $map_zoom = echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));
-$heading_parts = preg_split('/(?=That Demand More)/i', $heading, 2);
+$heading_parts = preg_split('/(?=and Long Island)/i', $heading, 2);
 $heading_primary = trim($heading_parts[0] ?? $heading);
 $heading_accent = trim($heading_parts[1] ?? '');
 ?>
@@ -97,7 +112,7 @@ $heading_accent = trim($heading_parts[1] ?? '');
 				<?php endforeach; ?>
 				<?php if (!empty($map_link['url'])) : ?>
 					<a class="us-map__link" href="<?php echo esc_url($map_link['url']); ?>"<?php echo !empty($map_link['target']) ? ' target="' . esc_attr($map_link['target']) . '" rel="noopener"' : ''; ?>>
-						<span aria-hidden="true"></span><?php echo esc_html($map_link['title'] ?: 'Active Service Zones'); ?>
+						<span aria-hidden="true"></span><?php echo esc_html($map_link['title'] ?: 'View All Locations'); ?>
 					</a>
 				<?php endif; ?>
 			</div>

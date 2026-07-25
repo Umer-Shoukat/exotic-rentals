@@ -12,11 +12,10 @@ $faqs = get_posts([
 ]);
 
 $fallback = [
-    ['q' => 'What Are The Age And License Requirements?', 'a' => 'Drivers must be 25 or older with a valid driver\'s license held for at least 3 years and a clean recent driving record.'],
-    ['q' => 'How Does Insurance And The Security Deposit Work?', 'a' => 'Every rental includes full coverage. A refundable security deposit is authorized on your card at pickup and released after a clean return inspection.'],
-    ['q' => 'Are There Mileage Limits?', 'a' => 'Standard rentals include 100 miles per day. Unlimited mileage packages are available for an additional fee.'],
-    ['q' => 'Where Do You Deliver?', 'a' => 'We deliver across the Tri-State Area, including Manhattan, Brooklyn, New Jersey, and Connecticut, with extended delivery available on request.'],
-    ['q' => 'What Is Your Cancellation Policy?', 'a' => 'Free cancellation up to 48 hours before pickup. Cancellations inside that window are subject to a one-day rental fee.'],
+    ['q' => 'Do I Need To Meet Age Or License Requirements To Book A Chauffeur?', 'a' => 'For chauffeur-driven service, no license or age requirement applies to the passenger.'],
+    ['q' => 'How Does Insurance And The Security Deposit Work?', 'a' => 'Chauffeur-driven reservations are covered under our commercial insurance.'],
+    ['q' => 'Is There A Time Or Mileage Limit On Chauffeur Service?', 'a' => 'Hourly and point-to-point packages are available.'],
+    ['q' => 'Where Do You Deliver?', 'a' => 'We serve New York City and Long Island, including Manhattan, Brooklyn, Queens, the Bronx, and Staten Island, with extended service to New Jersey, Connecticut, and Pennsylvania available on request.'],
 ];
 
 $page_id = get_queried_object_id();
