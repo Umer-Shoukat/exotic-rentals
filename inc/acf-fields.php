@@ -95,11 +95,11 @@ function echelon_register_acf_fields() {
                     ['key' => 'field_s_availability_benefit', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
                 ],
             ],
-            ['key' => 'field_s_search_label', 'name' => 'service_search_label', 'label' => 'Search Field Label', 'type' => 'text', 'default_value' => 'Search For A Car'],
-            ['key' => 'field_s_search_placeholder', 'name' => 'service_search_placeholder', 'label' => 'Search Placeholder', 'type' => 'text', 'default_value' => 'Search for a car…'],
+            ['key' => 'field_s_search_label', 'name' => 'service_search_label', 'label' => 'Search Field Label', 'type' => 'text', 'default_value' => 'Search the fleet'],
+            ['key' => 'field_s_search_placeholder', 'name' => 'service_search_placeholder', 'label' => 'Search Placeholder', 'type' => 'text', 'default_value' => 'Search the fleet…'],
             ['key' => 'field_s_pickup_date_label', 'name' => 'service_pickup_date_label', 'label' => 'Pick-up Date Label', 'type' => 'text', 'default_value' => 'Pick-up Date'],
             ['key' => 'field_s_pickup_time_label', 'name' => 'service_pickup_time_label', 'label' => 'Pick-up Time Label', 'type' => 'text', 'default_value' => 'Pick-up Time'],
-            ['key' => 'field_s_return_date_label', 'name' => 'service_return_date_label', 'label' => 'Return Date Label', 'type' => 'text', 'default_value' => 'Return Date'],
+            ['key' => 'field_s_return_date_label', 'name' => 'service_return_date_label', 'label' => 'Drop-off Date Label', 'type' => 'text', 'default_value' => 'Drop-off Date'],
             ['key' => 'field_s_return_time_label', 'name' => 'service_return_time_label', 'label' => 'Return Time Label', 'type' => 'text', 'default_value' => 'Return Time'],
             ['key' => 'field_s_availability_button', 'name' => 'service_availability_button_label', 'label' => 'Submit Button Label', 'type' => 'text', 'default_value' => 'Check Availability'],
             ['key' => 'field_s_tab_cta', 'label' => 'Final CTA', 'type' => 'tab'],
@@ -399,7 +399,7 @@ function echelon_register_acf_fields() {
 
             // Stats
             ['key' => 'field_h_tab_stats', 'label' => 'Stats', 'type' => 'tab'],
-            ['key' => 'field_h_stats_heading', 'name' => 'stats_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Why Clients Choose Us Over Anyone Else'],
+            ['key' => 'field_h_stats_heading', 'name' => 'stats_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'WHY CLIENTS CHOOSE ECHELON MOTIONS'],
             ['key' => 'field_h_stats_desc', 'name' => 'stats_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'We measure ourselves on the things that actually matter to a client: how quickly the car arrives, how spotless it is when you step in, and how easy it is to reach a real human at 3 a.m. The numbers below are the proof.'],
             ['key' => 'field_h_stats_cta', 'name' => 'stats_cta', 'label' => 'CTA', 'type' => 'link', 'default_value' => ['title' => 'Learn More', 'url' => '/about']],
             [

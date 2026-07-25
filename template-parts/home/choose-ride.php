@@ -20,7 +20,7 @@ if (is_wp_error($categories)) {
 	<div class="container">
 		<header class="section-heading">
 			<p class="eyebrow"><?php esc_html_e('Explore By Category', 'echelon'); ?></p>
-			<h2 class="section-heading__title"><?php esc_html_e('Choose Your', 'echelon'); ?> <span class="accent"><?php esc_html_e('Ride', 'echelon'); ?></span></h2>
+			<h2 class="section-heading__title"><?php esc_html_e('Choose Your', 'echelon'); ?> <span class="accent"><?php esc_html_e('Vehicle', 'echelon'); ?></span></h2>
 		</header>
 
 		<?php if ($categories) : ?>

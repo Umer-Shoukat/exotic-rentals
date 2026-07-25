@@ -22,7 +22,7 @@ $booking_locations = array_values(array_filter($booking_locations, static functi
 				<label class="field__label" for="vehicle-search"><?php esc_html_e('Vehicle', 'echelon'); ?></label>
 				<div class="field__control-wrap">
 					<svg class="field__search-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M18 18L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-					<input class="field__control" type="text" id="vehicle-search" placeholder="<?php esc_attr_e('Search for a car…', 'echelon'); ?>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="vehicle-search-results" aria-expanded="false" data-vehicle-search>
+					<input class="field__control" type="text" id="vehicle-search" placeholder="<?php esc_attr_e('Search the fleet…', 'echelon'); ?>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="vehicle-search-results" aria-expanded="false" data-vehicle-search>
 					<input type="hidden" name="vehicle" value="" data-vehicle-value>
 				</div>
 				<div class="vehicle-search-results" id="vehicle-search-results" role="listbox" aria-label="<?php esc_attr_e('Available vehicles', 'echelon'); ?>" data-vehicle-results hidden>
@@ -58,7 +58,7 @@ $booking_locations = array_values(array_filter($booking_locations, static functi
 					</div>
 				</div>
 				<div class="field booking-widget__field">
-					<label class="field__label" for="return-date"><?php esc_html_e('Return Date', 'echelon'); ?></label>
+					<label class="field__label" for="return-date"><?php esc_html_e('Drop-off Date', 'echelon'); ?></label>
 					<div class="field__control-wrap">
 						<input class="field__control" type="text" id="return-date" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off">
 						<?php echelon_icon('calendar'); ?>
@@ -87,7 +87,7 @@ $booking_locations = array_values(array_filter($booking_locations, static functi
 					<?php esc_html_e('View Our Fleet', 'echelon'); ?>
 				</a>
 				<button type="submit" class="btn btn--primary">
-					<?php esc_html_e('Book Your Ride', 'echelon'); ?>
+					<?php esc_html_e('Check Availability', 'echelon'); ?>
 					<?php echelon_icon('arrow-right'); ?>
 				</button>
 			</div>
