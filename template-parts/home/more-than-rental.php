@@ -12,8 +12,10 @@ $services = new WP_Query([
 ]);
 
 $eyebrow = echelon_field('occasions_eyebrow', get_the_ID(), 'Services');
-$heading = echelon_field('occasions_heading', get_the_ID(), 'More Than a Rental');
-$desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion — a first look at the aisle, a boardroom pull-up, or a shoot at golden hour — we tailor the car, the crew, and the moment.');
+$heading = echelon_field('occasions_heading', get_the_ID(), 'CHAUFFEUR SERVICES
+FOR EVERY OCCASION');
+$desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion — a wedding, a boardroom arrival, or a shoot at golden
+hour — we tailor the vehicle, the chauffeur, and the schedule.');
 $cta     = echelon_field('occasions_cta', get_the_ID(), ['title' => 'View More', 'url' => get_post_type_archive_link('service')]);
 $heading_parts = preg_split('/(rental)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 $fallback_images = [

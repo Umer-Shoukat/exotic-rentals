@@ -3,8 +3,9 @@
  * Home: "Rental Terms" — agent card + requirement stat boxes.
  */
 
-$heading     = echelon_field('terms_heading', get_the_ID(), 'Rental Terms');
-$desc        = echelon_field('terms_desc', get_the_ID(), "We're here for you ready to help find the perfect car that matches your needs.");
+$heading     = echelon_field('terms_heading', get_the_ID(), 'SERVICE REQUIREMENTS');
+$desc        = echelon_field('terms_desc', get_the_ID(), "Our team is here to help you find the right vehicle and the right
+chauffeur for your plans.");
 $agent_name  = echelon_field('agent_name', get_the_ID(), 'Marcus D.');
 $agent_title = echelon_field('agent_title', get_the_ID(), 'Founder, Atlas Ventures');
 $agent_photo = echelon_field('agent_photo', get_the_ID(), null);
@@ -21,7 +22,7 @@ $heading_parts = preg_split('/(terms)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE
 <section class="section section--alt rental-terms" id="rental-terms" data-reveal>
 	<div class="container rental-terms__grid">
 		<div class="rental-terms__intro">
-			<p class="eyebrow"><?php esc_html_e('Know Before You Go', 'echelon'); ?></p>
+			<p class="eyebrow"><?php esc_html_e('Good to Know', 'echelon'); ?></p>
 			<h2 class="section-heading__title">
 				<?php foreach ($heading_parts as $part) : ?>
 					<?php echo strcasecmp(trim($part), 'terms') === 0 ? '<span class="accent">' . esc_html($part) . '</span>' : esc_html($part); ?>

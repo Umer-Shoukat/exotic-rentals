@@ -4,18 +4,19 @@
  */
 
 $heading    = echelon_field('concierge_heading', get_the_ID(), 'Your Personal Exotic Car Concierge');
-$desc       = echelon_field('concierge_desc', get_the_ID(), 'We measure ourselves on the things that actually matter to a client: how quickly the car arrives, how spotless it is when you step in, and how easy it is to reach a real human at 3 a.m.');
+$desc       = echelon_field('concierge_desc', get_the_ID(), 'Our concierge team confirms availability,
+coordinates pickup logistics, and stays reachable before, during, and after your reservation.');
 $checklist  = echelon_field('concierge_checklist', get_the_ID(), [
     ['icon' => 'clock', 'label' => 'Availability Checks'],
-    ['icon' => 'shield-check', 'label' => 'Live Exotic Rentals'],
-    ['icon' => 'calendar', 'label' => 'Booking-Ready Forms'],
+    ['icon' => 'shield-check', 'label' => 'Chauffeur Scheduling'],
+    ['icon' => 'calendar', 'label' => 'Reservation Requests'],
     ['icon' => 'id-card', 'label' => 'Payment Link Support'],
 ]);
 $cta        = echelon_field('concierge_cta', get_the_ID(), ['title' => 'Start With Dates', 'url' => home_url('/fleet')]);
-$chat_title = echelon_field('concierge_chat_title', get_the_ID(), 'Exotic Rental Concierge');
+$chat_title = echelon_field('concierge_chat_title', get_the_ID(), 'Echelon Concierge');
 $messages   = echelon_field('concierge_chat_messages', get_the_ID(), [
-    ['sender' => 'user', 'message' => 'I need a Rolls-Royce or Lamborghini this weekend.'],
-    ['sender' => 'agent', 'message' => "Let me check live availability. What's your pickup city and dates?"],
+    ['sender' => 'user', 'message' => 'I need a Rolls-Royce with a driver this weekend.'],
+    ['sender' => 'agent', 'message' => "Let me confirm availability — what's your pickup city and dates?"],
     ['sender' => 'user', 'message' => 'Manhattan, Saturday to Sunday.'],
 ]);
 
@@ -25,6 +26,7 @@ $heading_parts = preg_split('/(exotic car concierge)/i', $heading, -1, PREG_SPLI
 	<div class="container concierge__grid">
 		<div class="concierge__intro">
 			<p class="eyebrow"><?php esc_html_e('Concierge Powered', 'echelon'); ?></p>
+
 			<h2 class="section-heading__title">
 				<?php foreach ($heading_parts as $part) : ?>
 					<?php echo strcasecmp(trim($part), 'exotic car concierge') === 0 ? '<span class="accent">' . esc_html($part) . '</span>' : esc_html($part); ?>
