@@ -18,6 +18,13 @@ function echelon_register_service_options_page() {
             'menu_slug'   => 'service-archive',
             'capability'  => 'edit_theme_options',
         ]);
+        acf_add_options_sub_page([
+            'page_title'  => __('Locations Archive', 'echelon'),
+            'menu_title'  => __('Archive Settings', 'echelon'),
+            'parent_slug' => 'edit.php?post_type=location',
+            'menu_slug'   => 'location-archive',
+            'capability'  => 'edit_theme_options',
+        ]);
     }
 }
 add_action('acf/init', 'echelon_register_service_options_page', 5);
@@ -25,6 +32,23 @@ add_action('acf/init', 'echelon_register_service_options_page', 5);
 function echelon_register_acf_fields() {
     if (!function_exists('acf_add_local_field_group')) {
         return;
+    }
+
+    $contact_locations = [[['param' => 'page_template', 'operator' => '==', 'value' => 'page-contact.php']]];
+    $contact_page = get_page_by_path('contact');
+    if ($contact_page) {
+        $contact_locations[] = [['param' => 'page', 'operator' => '==', 'value' => (string) $contact_page->ID]];
+    }
+
+    $about_locations = [
+        [['param' => 'page_template', 'operator' => '==', 'value' => 'page-about.php']],
+        [['param' => 'page_template', 'operator' => '==', 'value' => 'page-about-us.php']],
+    ];
+    foreach (['about', 'about-us'] as $about_slug) {
+        $about_page = get_page_by_path($about_slug);
+        if ($about_page) {
+            $about_locations[] = [['param' => 'page', 'operator' => '==', 'value' => (string) $about_page->ID]];
+        }
     }
 
     // ---- Services ------------------------------------------------------
@@ -66,14 +90,123 @@ function echelon_register_acf_fields() {
         'key'    => 'group_echelon_service_archive',
         'title'  => 'Services Archive Content',
         'fields' => [
+            ['key' => 'field_sa_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
             ['key' => 'field_sa_eyebrow', 'name' => 'services_hero_eyebrow', 'label' => 'Hero Eyebrow', 'type' => 'text', 'default_value' => 'Premium Automotive Services'],
             ['key' => 'field_sa_title', 'name' => 'services_hero_title', 'label' => 'Hero Title', 'type' => 'text', 'default_value' => 'Luxury Service For Every Occasion'],
             ['key' => 'field_sa_desc', 'name' => 'services_hero_description', 'label' => 'Hero Description', 'type' => 'textarea', 'rows' => 3],
             ['key' => 'field_sa_image', 'name' => 'services_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_sa_primary_cta', 'name' => 'services_hero_primary_cta', 'label' => 'Primary Button', 'type' => 'link', 'default_value' => ['title' => 'Explore Services', 'url' => '#service-list']],
+            ['key' => 'field_sa_secondary_cta', 'name' => 'services_hero_secondary_cta', 'label' => 'Secondary Button', 'type' => 'link', 'default_value' => ['title' => 'Plan Your Experience', 'url' => '/contact/']],
+            ['key' => 'field_sa_tab_proof', 'label' => 'Proof Bar', 'type' => 'tab'],
+            [
+                'key' => 'field_sa_proof', 'name' => 'services_proof_items', 'label' => 'Proof Items', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
+                'instructions' => 'Leave empty to use the current automatic service and vehicle totals.',
+                'sub_fields' => [
+                    ['key' => 'field_sa_proof_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text'],
+                    ['key' => 'field_sa_proof_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
+                ],
+            ],
+            ['key' => 'field_sa_tab_list', 'label' => 'Service Listing', 'type' => 'tab'],
+            ['key' => 'field_sa_list_eyebrow', 'name' => 'services_list_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Premium Services'],
             ['key' => 'field_sa_list_title', 'name' => 'services_list_title', 'label' => 'Services Section Title', 'type' => 'text', 'default_value' => 'Luxury, Tailored To Every Occasion'],
             ['key' => 'field_sa_list_desc', 'name' => 'services_list_description', 'label' => 'Services Section Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_sa_tab_steps', 'label' => 'Process', 'type' => 'tab'],
+            ['key' => 'field_sa_steps_eyebrow', 'name' => 'services_steps_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Simple From Start To Finish'],
+            ['key' => 'field_sa_steps_heading', 'name' => 'services_steps_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Renting Your Dream Car Is Simple'],
+            [
+                'key' => 'field_sa_steps', 'name' => 'services_steps', 'label' => 'Steps', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 4,
+                'sub_fields' => [
+                    ['key' => 'field_sa_step_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_sa_step_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['key' => 'field_sa_step_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+                ],
+            ],
         ],
         'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'service-archive']]],
+    ]);
+
+    // ---- Contact page -------------------------------------------------
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_contact_page',
+        'title'  => 'Contact Page Content',
+        'fields' => [
+            ['key' => 'field_cp_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
+            ['key' => 'field_cp_hero_eyebrow', 'name' => 'contact_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Contact Us'],
+            ['key' => 'field_cp_hero_title', 'name' => 'contact_hero_title', 'label' => 'Title', 'type' => 'text', 'default_value' => "Let's Plan Your Drive"],
+            ['key' => 'field_cp_hero_accent', 'name' => 'contact_hero_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Drive', 'instructions' => 'This text is highlighted when it appears in the title.'],
+            ['key' => 'field_cp_hero_desc', 'name' => 'contact_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_cp_hero_image', 'name' => 'contact_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_cp_tab_intro', 'label' => 'Contact Details', 'type' => 'tab'],
+            ['key' => 'field_cp_intro_eyebrow', 'name' => 'contact_intro_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Concierge'],
+            ['key' => 'field_cp_intro_heading', 'name' => 'contact_intro_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Start The Conversation'],
+            ['key' => 'field_cp_intro_desc', 'name' => 'contact_intro_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_cp_phone_label', 'name' => 'contact_phone_label', 'label' => 'Phone Label', 'type' => 'text', 'default_value' => 'Call Us'],
+            ['key' => 'field_cp_email_label', 'name' => 'contact_email_label', 'label' => 'Email Label', 'type' => 'text', 'default_value' => 'Email Us'],
+            ['key' => 'field_cp_address_label', 'name' => 'contact_address_label', 'label' => 'Address Label', 'type' => 'text', 'default_value' => 'Visit Us'],
+            ['key' => 'field_cp_tab_form', 'label' => 'Form Placeholder', 'type' => 'tab'],
+            ['key' => 'field_cp_form_eyebrow', 'name' => 'contact_form_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Send An Inquiry'],
+            ['key' => 'field_cp_form_heading', 'name' => 'contact_form_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Contact Form'],
+            ['key' => 'field_cp_form_desc', 'name' => 'contact_form_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_cp_form_button', 'name' => 'contact_form_button_label', 'label' => 'Email Button Label', 'type' => 'text', 'default_value' => 'Email Concierge'],
+        ],
+        'location' => $contact_locations,
+    ]);
+
+    // ---- About page ---------------------------------------------------
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_about_page',
+        'title'  => 'About Page Content',
+        'fields' => [
+            ['key' => 'field_ap_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
+            ['key' => 'field_ap_hero_eyebrow', 'name' => 'about_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Driven By The Experience'],
+            ['key' => 'field_ap_hero_title', 'name' => 'about_hero_title', 'label' => 'Title', 'type' => 'text', 'default_value' => 'More Than A Car.'],
+            ['key' => 'field_ap_hero_accent', 'name' => 'about_hero_accent', 'label' => 'Accent Title', 'type' => 'text', 'default_value' => 'A Standard Of Service.'],
+            ['key' => 'field_ap_hero_desc', 'name' => 'about_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_ap_hero_image', 'name' => 'about_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large', 'instructions' => 'Defaults to the page featured image.'],
+            ['key' => 'field_ap_tab_story', 'label' => 'Story', 'type' => 'tab'],
+            ['key' => 'field_ap_story_image', 'name' => 'about_story_image', 'label' => 'Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_ap_badge_value', 'name' => 'about_story_badge_value', 'label' => 'Badge Value', 'type' => 'text', 'default_value' => '24/7'],
+            ['key' => 'field_ap_badge_label', 'name' => 'about_story_badge_label', 'label' => 'Badge Label', 'type' => 'text', 'default_value' => 'Personal Concierge'],
+            ['key' => 'field_ap_story_eyebrow', 'name' => 'about_story_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Story'],
+            ['key' => 'field_ap_story_heading', 'name' => 'about_story_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Luxury Should Feel Effortless'],
+            ['key' => 'field_ap_story_accent', 'name' => 'about_story_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Effortless'],
+            ['key' => 'field_ap_story_content', 'name' => 'about_story_content', 'label' => 'Story Copy', 'type' => 'wysiwyg', 'tabs' => 'visual', 'toolbar' => 'basic', 'media_upload' => 0, 'instructions' => 'Defaults to the page editor content.'],
+            ['key' => 'field_ap_story_cta', 'name' => 'about_story_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Explore Our Fleet', 'url' => '/fleet/']],
+            ['key' => 'field_ap_tab_stats', 'label' => 'Statistics', 'type' => 'tab'],
+            [
+                'key' => 'field_ap_stats', 'name' => 'about_stats', 'label' => 'Statistics', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
+                'sub_fields' => [
+                    ['key' => 'field_ap_stat_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text'],
+                    ['key' => 'field_ap_stat_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
+                ],
+            ],
+            ['key' => 'field_ap_tab_values', 'label' => 'Values', 'type' => 'tab'],
+            ['key' => 'field_ap_values_eyebrow', 'name' => 'about_values_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'What Guides Us'],
+            ['key' => 'field_ap_values_heading', 'name' => 'about_values_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'The Echelon Standard'],
+            ['key' => 'field_ap_values_accent', 'name' => 'about_values_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Standard'],
+            ['key' => 'field_ap_values_desc', 'name' => 'about_values_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            [
+                'key' => 'field_ap_values', 'name' => 'about_values', 'label' => 'Value Cards', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 6,
+                'sub_fields' => [
+                    ['key' => 'field_ap_value_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_ap_value_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['key' => 'field_ap_value_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+                ],
+            ],
+            ['key' => 'field_ap_tab_journey', 'label' => 'Journey', 'type' => 'tab'],
+            ['key' => 'field_ap_journey_eyebrow', 'name' => 'about_journey_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'From Request To Road'],
+            ['key' => 'field_ap_journey_heading', 'name' => 'about_journey_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Your Journey, Handled'],
+            ['key' => 'field_ap_journey_accent', 'name' => 'about_journey_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Handled'],
+            ['key' => 'field_ap_journey_desc', 'name' => 'about_journey_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            [
+                'key' => 'field_ap_steps', 'name' => 'about_journey_steps', 'label' => 'Journey Steps', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 6,
+                'sub_fields' => [
+                    ['key' => 'field_ap_step_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['key' => 'field_ap_step_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+                ],
+            ],
+        ],
+        'location' => $about_locations,
     ]);
 
     // ---- Fleet Vehicle -----------------------------------------------
@@ -81,7 +214,6 @@ function echelon_register_acf_fields() {
         'key'    => 'group_echelon_vehicle',
         'title'  => 'Vehicle Details',
         'fields' => [
-            ['key' => 'field_v_gallery', 'name' => 'gallery', 'label' => 'Gallery', 'type' => 'gallery'],
             ['key' => 'field_v_brand', 'name' => 'brand', 'label' => 'Brand (short label)', 'type' => 'text', 'placeholder' => 'e.g. Mercedes'],
             ['key' => 'field_v_price_hour', 'name' => 'price_per_hour', 'label' => 'Price / Hour', 'type' => 'number', 'prepend' => '$', 'min' => 0],
             ['key' => 'field_v_daily_rental', 'name' => 'daily_rental_price', 'label' => 'Price / Day', 'type' => 'number', 'prepend' => '$', 'min' => 0],
@@ -157,6 +289,55 @@ function echelon_register_acf_fields() {
         'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'location']]],
     ]);
 
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_location_archive',
+        'title'  => 'Locations Archive Content',
+        'fields' => [
+            ['key' => 'field_la_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
+            ['key' => 'field_la_hero_eyebrow', 'name' => 'locations_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Service Areas'],
+            ['key' => 'field_la_hero_title', 'name' => 'locations_hero_title', 'label' => 'Title', 'type' => 'text', 'default_value' => 'Exotic Car Rentals Across New Jersey & Connecticut'],
+            ['key' => 'field_la_hero_accent', 'name' => 'locations_hero_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'New Jersey & Connecticut'],
+            ['key' => 'field_la_hero_desc', 'name' => 'locations_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
+            ['key' => 'field_la_hero_image', 'name' => 'locations_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_la_primary_cta', 'name' => 'locations_hero_primary_cta', 'label' => 'Primary Button', 'type' => 'link', 'default_value' => ['title' => 'Book Your Vehicle', 'url' => '/fleet/']],
+            ['key' => 'field_la_secondary_cta', 'name' => 'locations_hero_secondary_cta', 'label' => 'Secondary Button', 'type' => 'link', 'default_value' => ['title' => 'View Our Fleet', 'url' => '/fleet/']],
+            [
+                'key' => 'field_la_trust', 'name' => 'locations_hero_trust_items', 'label' => 'Trust Items', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
+                'sub_fields' => [
+                    ['key' => 'field_la_trust_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_la_trust_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
+                ],
+            ],
+            ['key' => 'field_la_tab_proof', 'label' => 'Proof Bar', 'type' => 'tab'],
+            [
+                'key' => 'field_la_proof', 'name' => 'locations_proof_items', 'label' => 'Proof Items', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
+                'sub_fields' => [
+                    ['key' => 'field_la_proof_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_la_proof_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
+                ],
+            ],
+            ['key' => 'field_la_tab_list', 'label' => 'Location Listing', 'type' => 'tab'],
+            ['key' => 'field_la_list_eyebrow', 'name' => 'locations_list_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Featured Locations'],
+            ['key' => 'field_la_list_heading', 'name' => 'locations_list_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'White-Glove Access Where Luxury Clients Move'],
+            ['key' => 'field_la_list_accent', 'name' => 'locations_list_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Luxury Clients Move'],
+            ['key' => 'field_la_view_label', 'name' => 'locations_view_label', 'label' => 'View Button Label', 'type' => 'text', 'default_value' => 'View'],
+            ['key' => 'field_la_book_label', 'name' => 'locations_book_label', 'label' => 'Book Button Label', 'type' => 'text', 'default_value' => 'Book Now'],
+            ['key' => 'field_la_tab_benefits', 'label' => 'Benefits', 'type' => 'tab'],
+            ['key' => 'field_la_benefits_eyebrow', 'name' => 'locations_benefits_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Why Rent With Us'],
+            ['key' => 'field_la_benefits_heading', 'name' => 'locations_benefits_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Built For Clients Who Expect The Details Handled'],
+            ['key' => 'field_la_benefits_accent', 'name' => 'locations_benefits_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Details Handled'],
+            [
+                'key' => 'field_la_benefits', 'name' => 'locations_benefits', 'label' => 'Benefit Cards', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 6,
+                'sub_fields' => [
+                    ['key' => 'field_la_benefit_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                    ['key' => 'field_la_benefit_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                    ['key' => 'field_la_benefit_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+                ],
+            ],
+        ],
+        'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'location-archive']]],
+    ]);
+
     // ---- Curated Instagram feed -----------------------------------------
     acf_add_local_field_group([
         'key'    => 'group_echelon_instagram_item',
@@ -178,8 +359,9 @@ function echelon_register_acf_fields() {
             ['key' => 'field_h_heading', 'name' => 'hero_heading', 'label' => 'Heading', 'type' => 'textarea', 'rows' => 2, 'default_value' => "Tri-State's Premier\nExotic Rental Experience"],
             ['key' => 'field_h_subtext', 'name' => 'hero_subtext', 'label' => 'Subtext', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'From Lamborghinis and Rolls-Royces to executive chauffeur service, we deliver luxury vehicles across Tri-State Areas. Premium cars, white-glove service, and a seamless booking experience from start to finish.'],
             ['key' => 'field_h_bg', 'name' => 'hero_background', 'label' => 'Background Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_h_bg_mobile', 'name' => 'hero_background_mobile', 'label' => 'Mobile Background Image', 'type' => 'image', 'preview_size' => 'medium_large', 'instructions' => 'Optional portrait crop used below 768px.'],
             ['key' => 'field_h_cta1', 'name' => 'hero_cta_primary', 'label' => 'Primary CTA', 'type' => 'link', 'default_value' => ['title' => 'Browse Our Fleet', 'url' => '/fleet']],
-            ['key' => 'field_h_cta2', 'name' => 'hero_cta_secondary', 'label' => 'Secondary CTA', 'type' => 'link', 'default_value' => ['title' => 'How It Works', 'url' => '#']],
+            ['key' => 'field_h_cta2', 'name' => 'hero_cta_secondary', 'label' => 'Secondary CTA', 'type' => 'link', 'default_value' => ['title' => 'How It Works', 'url' => '#how-it-works']],
             [
                 'key' => 'field_h_badges', 'name' => 'hero_badges', 'label' => 'Trust Badges', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
                 'sub_fields' => [

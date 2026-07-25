@@ -82,6 +82,29 @@ function echelon_acf_active() {
 }
 
 /**
+ * Escape a heading and wrap its final matching accent phrase in a span.
+ */
+function echelon_accent_heading($heading, $accent = '') {
+    $heading = trim((string) $heading);
+    $accent = trim((string) $accent);
+
+    if ($heading === '' || $accent === '') {
+        return esc_html($heading);
+    }
+
+    $position = strripos($heading, $accent);
+    if ($position === false) {
+        return esc_html($heading);
+    }
+
+    $before = substr($heading, 0, $position);
+    $match = substr($heading, $position, strlen($accent));
+    $after = substr($heading, $position + strlen($accent));
+
+    return esc_html($before) . '<span class="accent">' . esc_html($match) . '</span>' . esc_html($after);
+}
+
+/**
  * Build the branded Google Static Maps URL used behind the interactive
  * location overlay. Returns an empty string until an API key is configured.
  */

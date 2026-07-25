@@ -8,8 +8,27 @@
 get_header();
 
 while (have_posts()) : the_post();
-	$hero_image = get_post_thumbnail_id();
+	$page_id = get_the_ID();
+	$hero_image = echelon_field('about_hero_image', $page_id, get_post_thumbnail_id());
 	$editor_content = trim(get_the_content());
+	$story_content = echelon_field('about_story_content', $page_id, $editor_content);
+	$story_cta = echelon_field('about_story_cta', $page_id, ['title' => __('Explore Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
+	$stats = echelon_field('about_stats', $page_id, [
+		['value' => '500+', 'label' => __('Exceptional Vehicles', 'echelon')],
+		['value' => '100%', 'label' => __('Inspected & Detailed', 'echelon')],
+		['value' => '45M', 'label' => __('Average Delivery Time', 'echelon')],
+		['value' => '24/7', 'label' => __('Concierge Support', 'echelon')],
+	]);
+	$values = echelon_field('about_values', $page_id, [
+		['icon' => 'shield-check', 'title' => __('Uncompromising Quality', 'echelon'), 'description' => __('Every vehicle is selected, inspected, and meticulously prepared before it reaches your door.', 'echelon')],
+		['icon' => 'headset', 'title' => __('Human Service', 'echelon'), 'description' => __('A knowledgeable concierge stays available before, during, and after every reservation.', 'echelon')],
+		['icon' => 'bolt', 'title' => __('Effortless Execution', 'echelon'), 'description' => __('Clear communication, reliable delivery, and thoughtful coordination keep the experience seamless.', 'echelon')],
+	]);
+	$journey_steps = echelon_field('about_journey_steps', $page_id, [
+		['title' => __('Tell Us The Occasion', 'echelon'), 'description' => __('Share the date, destination, preferences, and the kind of arrival you have in mind.', 'echelon')],
+		['title' => __('We Curate The Details', 'echelon'), 'description' => __('Your concierge confirms the right vehicle and coordinates coverage, delivery, and timing.', 'echelon')],
+		['title' => __('Enjoy The Drive', 'echelon'), 'description' => __('The vehicle arrives prepared and on time, with our team available whenever you need us.', 'echelon')],
+	]);
 	?>
 	<section class="about-hero">
 		<div class="about-hero__media" aria-hidden="true">
@@ -21,53 +40,55 @@ while (have_posts()) : the_post();
 			<div class="about-hero__scrim"></div>
 		</div>
 		<div class="container about-hero__content">
-			<p class="eyebrow eyebrow--flanked"><?php esc_html_e('Driven By The Experience', 'echelon'); ?></p>
-			<h1><?php esc_html_e('More Than A Car.', 'echelon'); ?><br><span class="accent"><?php esc_html_e('A Standard Of Service.', 'echelon'); ?></span></h1>
-			<p><?php echo esc_html(get_the_excerpt() ?: __('We pair an exceptional fleet with personal, detail-driven service to make every journey feel effortless.', 'echelon')); ?></p>
+			<p class="eyebrow eyebrow--flanked"><?php echo esc_html(echelon_field('about_hero_eyebrow', $page_id, __('Driven By The Experience', 'echelon'))); ?></p>
+			<h1><?php echo esc_html(echelon_field('about_hero_title', $page_id, __('More Than A Car.', 'echelon'))); ?><br><span class="accent"><?php echo esc_html(echelon_field('about_hero_accent', $page_id, __('A Standard Of Service.', 'echelon'))); ?></span></h1>
+			<p><?php echo esc_html(echelon_field('about_hero_description', $page_id, get_the_excerpt() ?: __('We pair an exceptional fleet with personal, detail-driven service to make every journey feel effortless.', 'echelon'))); ?></p>
 		</div>
 	</section>
 
 	<section class="section about-story" data-reveal>
 		<div class="container about-story__grid">
 			<div class="about-story__media">
-				<img src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/occasions/corporate.jpg')); ?>" alt="<?php esc_attr_e('Luxury vehicle prepared for a client', 'echelon'); ?>" loading="lazy">
-				<div class="about-story__badge"><strong><?php esc_html_e('24/7', 'echelon'); ?></strong><span><?php esc_html_e('Personal Concierge', 'echelon'); ?></span></div>
+				<?php $story_image = echelon_field('about_story_image', $page_id, null); ?>
+				<?php if ($story_image) : echelon_media($story_image, 'large', __('Luxury vehicle prepared for a client', 'echelon')); else : ?>
+					<img src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/occasions/corporate.jpg')); ?>" alt="<?php esc_attr_e('Luxury vehicle prepared for a client', 'echelon'); ?>" loading="lazy">
+				<?php endif; ?>
+				<div class="about-story__badge"><strong><?php echo esc_html(echelon_field('about_story_badge_value', $page_id, '24/7')); ?></strong><span><?php echo esc_html(echelon_field('about_story_badge_label', $page_id, __('Personal Concierge', 'echelon'))); ?></span></div>
 			</div>
 			<div class="about-story__content">
-				<p class="eyebrow"><?php esc_html_e('Our Story', 'echelon'); ?></p>
-				<h2><?php esc_html_e('Luxury Should Feel', 'echelon'); ?> <span class="accent"><?php esc_html_e('Effortless', 'echelon'); ?></span></h2>
-				<?php if ($editor_content) : ?>
-					<div class="entry-content"><?php the_content(); ?></div>
+				<p class="eyebrow"><?php echo esc_html(echelon_field('about_story_eyebrow', $page_id, __('Our Story', 'echelon'))); ?></p>
+				<h2><?php echo wp_kses(echelon_accent_heading(echelon_field('about_story_heading', $page_id, __('Luxury Should Feel Effortless', 'echelon')), echelon_field('about_story_accent', $page_id, __('Effortless', 'echelon'))), ['span' => ['class' => true]]); ?></h2>
+				<?php if ($story_content) : ?>
+					<div class="entry-content"><?php echo wp_kses_post(apply_filters('the_content', $story_content)); ?></div>
 				<?php else : ?>
 					<div class="entry-content">
 						<p><?php esc_html_e('Echelon Motions was built around a simple belief: an extraordinary vehicle deserves an equally extraordinary experience. From the first conversation to final collection, every detail should feel considered.', 'echelon'); ?></p>
 						<p><?php esc_html_e('Our team brings together a carefully selected fleet, uncompromising preparation, and a real concierge who understands the occasion behind every booking.', 'echelon'); ?></p>
 					</div>
 				<?php endif; ?>
-				<a class="btn btn--primary" href="<?php echo esc_url(home_url('/fleet/')); ?>"><?php esc_html_e('Explore Our Fleet', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a>
+				<a class="btn btn--primary" href="<?php echo esc_url($story_cta['url'] ?? home_url('/fleet/')); ?>"<?php echo !empty($story_cta['target']) ? ' target="' . esc_attr($story_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($story_cta['title'] ?? __('Explore Our Fleet', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a>
 			</div>
 		</div>
 	</section>
 
 	<section class="about-proof" data-reveal>
 		<div class="container about-proof__grid">
-			<div class="about-proof__item"><strong>500+</strong><span><?php esc_html_e('Exceptional Vehicles', 'echelon'); ?></span></div>
-			<div class="about-proof__item"><strong>100%</strong><span><?php esc_html_e('Inspected & Detailed', 'echelon'); ?></span></div>
-			<div class="about-proof__item"><strong>45M</strong><span><?php esc_html_e('Average Delivery Time', 'echelon'); ?></span></div>
-			<div class="about-proof__item"><strong>24/7</strong><span><?php esc_html_e('Concierge Support', 'echelon'); ?></span></div>
+			<?php foreach ($stats as $stat) : ?>
+				<div class="about-proof__item"><strong><?php echo esc_html($stat['value'] ?? ''); ?></strong><span><?php echo esc_html($stat['label'] ?? ''); ?></span></div>
+			<?php endforeach; ?>
 		</div>
 	</section>
 
 	<section class="section about-values" data-reveal>
 		<div class="container">
 			<header class="about-section-heading">
-				<div><p class="eyebrow"><?php esc_html_e('What Guides Us', 'echelon'); ?></p><h2><?php esc_html_e('The Echelon', 'echelon'); ?> <span class="accent"><?php esc_html_e('Standard', 'echelon'); ?></span></h2></div>
-				<p><?php esc_html_e('The details clients may never see are often the ones that matter most. These principles shape every booking.', 'echelon'); ?></p>
+				<div><p class="eyebrow"><?php echo esc_html(echelon_field('about_values_eyebrow', $page_id, __('What Guides Us', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading(echelon_field('about_values_heading', $page_id, __('The Echelon Standard', 'echelon')), echelon_field('about_values_accent', $page_id, __('Standard', 'echelon'))), ['span' => ['class' => true]]); ?></h2></div>
+				<p><?php echo esc_html(echelon_field('about_values_description', $page_id, __('The details clients may never see are often the ones that matter most. These principles shape every booking.', 'echelon'))); ?></p>
 			</header>
 			<div class="about-values__grid">
-				<article class="about-value-card"><span><?php echelon_icon('shield-check'); ?></span><small>01</small><h3><?php esc_html_e('Uncompromising Quality', 'echelon'); ?></h3><p><?php esc_html_e('Every vehicle is selected, inspected, and meticulously prepared before it reaches your door.', 'echelon'); ?></p></article>
-				<article class="about-value-card"><span><?php echelon_icon('headset'); ?></span><small>02</small><h3><?php esc_html_e('Human Service', 'echelon'); ?></h3><p><?php esc_html_e('A knowledgeable concierge stays available before, during, and after every reservation.', 'echelon'); ?></p></article>
-				<article class="about-value-card"><span><?php echelon_icon('bolt'); ?></span><small>03</small><h3><?php esc_html_e('Effortless Execution', 'echelon'); ?></h3><p><?php esc_html_e('Clear communication, reliable delivery, and thoughtful coordination keep the experience seamless.', 'echelon'); ?></p></article>
+				<?php foreach ($values as $index => $value) : ?>
+					<article class="about-value-card"><span><?php echelon_icon($value['icon'] ?? 'check'); ?></span><small><?php echo esc_html(sprintf('%02d', $index + 1)); ?></small><h3><?php echo esc_html($value['title'] ?? ''); ?></h3><p><?php echo esc_html($value['description'] ?? ''); ?></p></article>
+				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
@@ -75,13 +96,13 @@ while (have_posts()) : the_post();
 	<section class="section about-journey" data-reveal>
 		<div class="container">
 			<header class="about-section-heading">
-				<div><p class="eyebrow"><?php esc_html_e('From Request To Road', 'echelon'); ?></p><h2><?php esc_html_e('Your Journey,', 'echelon'); ?> <span class="accent"><?php esc_html_e('Handled', 'echelon'); ?></span></h2></div>
-				<p><?php esc_html_e('One dedicated team coordinates the complete experience around your schedule and destination.', 'echelon'); ?></p>
+				<div><p class="eyebrow"><?php echo esc_html(echelon_field('about_journey_eyebrow', $page_id, __('From Request To Road', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading(echelon_field('about_journey_heading', $page_id, __('Your Journey, Handled', 'echelon')), echelon_field('about_journey_accent', $page_id, __('Handled', 'echelon'))), ['span' => ['class' => true]]); ?></h2></div>
+				<p><?php echo esc_html(echelon_field('about_journey_description', $page_id, __('One dedicated team coordinates the complete experience around your schedule and destination.', 'echelon'))); ?></p>
 			</header>
 			<ol class="about-journey__steps">
-				<li><span>01</span><div><h3><?php esc_html_e('Tell Us The Occasion', 'echelon'); ?></h3><p><?php esc_html_e('Share the date, destination, preferences, and the kind of arrival you have in mind.', 'echelon'); ?></p></div></li>
-				<li><span>02</span><div><h3><?php esc_html_e('We Curate The Details', 'echelon'); ?></h3><p><?php esc_html_e('Your concierge confirms the right vehicle and coordinates coverage, delivery, and timing.', 'echelon'); ?></p></div></li>
-				<li><span>03</span><div><h3><?php esc_html_e('Enjoy The Drive', 'echelon'); ?></h3><p><?php esc_html_e('The vehicle arrives prepared and on time, with our team available whenever you need us.', 'echelon'); ?></p></div></li>
+				<?php foreach ($journey_steps as $index => $step) : ?>
+					<li><span><?php echo esc_html(sprintf('%02d', $index + 1)); ?></span><div><h3><?php echo esc_html($step['title'] ?? ''); ?></h3><p><?php echo esc_html($step['description'] ?? ''); ?></p></div></li>
+				<?php endforeach; ?>
 			</ol>
 		</div>
 	</section>

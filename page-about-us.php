@@ -1,5 +1,7 @@
 <?php
 /**
+ * Template Name: About Us Page
+ *
  * Slug-specific loader for the existing /about-us/ page.
  */
 

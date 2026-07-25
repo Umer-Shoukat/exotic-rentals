@@ -10,6 +10,20 @@ $hero_description = echelon_field('services_hero_description', 'option', 'From l
 $hero_image = echelon_field('services_hero_image', 'option', null);
 $list_title = echelon_field('services_list_title', 'option', 'Luxury, Tailored To Every Occasion');
 $list_description = echelon_field('services_list_description', 'option', 'Select the experience that matches the moment. Every service is tailored around your schedule, route, vehicle preferences, and guest requirements.');
+$primary_cta = echelon_field('services_hero_primary_cta', 'option', ['title' => __('Explore Services', 'echelon'), 'url' => '#service-list', 'target' => '']);
+$secondary_cta = echelon_field('services_hero_secondary_cta', 'option', ['title' => __('Plan Your Experience', 'echelon'), 'url' => home_url('/contact/'), 'target' => '']);
+$proof_items = echelon_field('services_proof_items', 'option', [
+	['value' => '5.0', 'label' => __('Google Reviews', 'echelon')],
+	['value' => $vehicle_count ? $vehicle_count . '+' : '40+', 'label' => __('Vehicles', 'echelon')],
+	['value' => $service_count ? $service_count . '+' : '6+', 'label' => __('Luxury Services', 'echelon')],
+	['value' => '100%', 'label' => __('Insured', 'echelon')],
+]);
+$steps = echelon_field('services_steps', 'option', [
+	['icon' => 'gauge', 'title' => __('Choose Your Vehicle', 'echelon'), 'description' => __('Choose your vehicle from the live fleet.', 'echelon')],
+	['icon' => 'calendar', 'title' => __('Select Your Dates', 'echelon'), 'description' => __('Pick timing, location, and delivery details.', 'echelon')],
+	['icon' => 'shield-check', 'title' => __('Confirm Reservation', 'echelon'), 'description' => __('Review pricing, documents, and coverage.', 'echelon')],
+	['icon' => 'check', 'title' => __('Enjoy The Experience', 'echelon'), 'description' => __('We deliver. You drive. That is the promise.', 'echelon')],
+]);
 $hero_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($hero_title));
 $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_title));
 ?>
@@ -27,25 +41,22 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 			<h1><?php echo wp_kses($hero_title_html, ['span' => []]); ?></h1>
 			<p><?php echo esc_html($hero_description); ?></p>
 			<div class="services-hero__actions">
-				<a class="btn btn--primary" href="#service-list"><?php esc_html_e('Explore Services', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a>
-				<a class="btn btn--outline" href="<?php echo esc_url(home_url('/contact/')); ?>"><?php esc_html_e('Plan Your Experience', 'echelon'); ?></a>
+				<a class="btn btn--primary" href="<?php echo esc_url($primary_cta['url'] ?? '#service-list'); ?>"<?php echo !empty($primary_cta['target']) ? ' target="' . esc_attr($primary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($primary_cta['title'] ?? __('Explore Services', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a>
+				<a class="btn btn--outline" href="<?php echo esc_url($secondary_cta['url'] ?? home_url('/contact/')); ?>"<?php echo !empty($secondary_cta['target']) ? ' target="' . esc_attr($secondary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($secondary_cta['title'] ?? __('Plan Your Experience', 'echelon')); ?></a>
 			</div>
 		</div>
 	</section>
 
 	<section class="services-proof" aria-label="<?php esc_attr_e('Service summary', 'echelon'); ?>">
 		<div class="container services-proof__grid">
-			<div><strong>5.0</strong><span><?php esc_html_e('Google Reviews', 'echelon'); ?></span></div>
-			<div><strong><?php echo esc_html($vehicle_count ? $vehicle_count . '+' : '40+'); ?></strong><span><?php esc_html_e('Vehicles', 'echelon'); ?></span></div>
-			<div><strong><?php echo esc_html($service_count ? $service_count . '+' : '6+'); ?></strong><span><?php esc_html_e('Luxury Services', 'echelon'); ?></span></div>
-			<div><strong>100%</strong><span><?php esc_html_e('Insured', 'echelon'); ?></span></div>
+			<?php foreach ($proof_items as $item) : ?><div><strong><?php echo esc_html($item['value'] ?? ''); ?></strong><span><?php echo esc_html($item['label'] ?? ''); ?></span></div><?php endforeach; ?>
 		</div>
 	</section>
 
 	<section class="section services-list" id="service-list" data-reveal>
 		<div class="container">
 			<header class="services-list__header">
-				<div><p class="eyebrow"><?php esc_html_e('Our Premium Services', 'echelon'); ?></p><h2><?php echo wp_kses($list_title_html, ['span' => []]); ?></h2></div>
+				<div><p class="eyebrow"><?php echo esc_html(echelon_field('services_list_eyebrow', 'option', __('Our Premium Services', 'echelon'))); ?></p><h2><?php echo wp_kses($list_title_html, ['span' => []]); ?></h2></div>
 				<p><?php echo esc_html($list_description); ?></p>
 			</header>
 			<?php if (have_posts()) : ?>
@@ -59,12 +70,12 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 
 	<section class="section service-steps" data-reveal>
 		<div class="container">
-			<header><p class="eyebrow"><?php esc_html_e('Simple From Start To Finish', 'echelon'); ?></p><h2><?php esc_html_e('Renting Your', 'echelon'); ?> <span><?php esc_html_e('Dream Car', 'echelon'); ?> </span><?php esc_html_e('Is Simple', 'echelon'); ?></h2></header>
+			<?php $steps_heading = echelon_field('services_steps_heading', 'option', __('Renting Your Dream Car Is Simple', 'echelon')); ?>
+			<header><p class="eyebrow"><?php echo esc_html(echelon_field('services_steps_eyebrow', 'option', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Dream Car', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
 			<ol>
-				<li><b>01</b><?php echelon_icon('gauge'); ?><h3><?php esc_html_e('Choose Your Vehicle', 'echelon'); ?></h3><p><?php esc_html_e('Choose your vehicle from the live fleet.', 'echelon'); ?></p></li>
-				<li><b>02</b><?php echelon_icon('calendar'); ?><h3><?php esc_html_e('Select Your Dates', 'echelon'); ?></h3><p><?php esc_html_e('Pick timing, location, and delivery details.', 'echelon'); ?></p></li>
-				<li><b>03</b><?php echelon_icon('shield-check'); ?><h3><?php esc_html_e('Confirm Reservation', 'echelon'); ?></h3><p><?php esc_html_e('Review pricing, documents, and coverage.', 'echelon'); ?></p></li>
-				<li><b>04</b><?php echelon_icon('check'); ?><h3><?php esc_html_e('Enjoy The Experience', 'echelon'); ?></h3><p><?php esc_html_e('We deliver. You drive. That is the promise.', 'echelon'); ?></p></li>
+				<?php foreach ($steps as $index => $step) : ?>
+					<li><b><?php echo esc_html(sprintf('%02d', $index + 1)); ?></b><?php echelon_icon($step['icon'] ?? 'check'); ?><h3><?php echo esc_html($step['title'] ?? ''); ?></h3><p><?php echo esc_html($step['description'] ?? ''); ?></p></li>
+				<?php endforeach; ?>
 			</ol>
 		</div>
 	</section>
