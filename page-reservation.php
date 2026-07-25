@@ -17,6 +17,13 @@ $vehicle_ids = array_map(static fn($vehicle) => (int) $vehicle->ID, $vehicles);
 $has_preselected_vehicle = $preselected_vehicle > 0 && in_array($preselected_vehicle, $vehicle_ids, true);
 $initial_pickup = isset($_GET['pickup_date']) ? sanitize_text_field(wp_unslash($_GET['pickup_date'])) : '';
 $initial_return = isset($_GET['return_date']) ? sanitize_text_field(wp_unslash($_GET['return_date'])) : '';
+$initial_pickup_time = isset($_GET['pickup_time']) ? sanitize_text_field(wp_unslash($_GET['pickup_time'])) : '';
+$initial_return_time = isset($_GET['return_time']) ? sanitize_text_field(wp_unslash($_GET['return_time'])) : '';
+$time_options = [];
+for ($minutes = 0; $minutes < 24 * 60; $minutes += 30) {
+    $value = sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
+    $time_options[$value] = wp_date('g:i A', strtotime($value));
+}
 $initial_location = isset($_GET['pickup_location']) ? sanitize_title(wp_unslash($_GET['pickup_location'])) : '';
 $received = isset($_GET['reservation']) && $_GET['reservation'] === 'received';
 $reference = isset($_GET['reference']) ? sanitize_text_field(wp_unslash($_GET['reference'])) : '';
@@ -109,8 +116,8 @@ get_header();
                             <div class="reservation-fields">
                                 <label><span><?php esc_html_e('Pick-up Date', 'echelon'); ?> *</span><input type="text" name="pickup_date" value="<?php echo esc_attr($initial_pickup); ?>" placeholder="dd/mm/yyyy" data-reservation-date="pickup" required autocomplete="off"></label>
                                 <label><span><?php esc_html_e('Return Date', 'echelon'); ?> *</span><input type="text" name="return_date" value="<?php echo esc_attr($initial_return); ?>" placeholder="dd/mm/yyyy" data-reservation-date="return" required autocomplete="off"></label>
-                                <label><span><?php esc_html_e('Pick-up Time', 'echelon'); ?> *</span><input type="time" name="pickup_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['pickup_time'] ?? ''))); ?>" required></label>
-                                <label><span><?php esc_html_e('Return Time', 'echelon'); ?> *</span><input type="time" name="return_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['return_time'] ?? ''))); ?>" required></label>
+                                <label><span><?php esc_html_e('Pick-up Time', 'echelon'); ?> *</span><select name="pickup_time" required><option value=""><?php esc_html_e('Select pick-up time', 'echelon'); ?></option><?php foreach ($time_options as $value => $label) : ?><option value="<?php echo esc_attr($value); ?>" <?php selected($initial_pickup_time, $value); ?>><?php echo esc_html($label); ?></option><?php endforeach; ?></select></label>
+                                <label><span><?php esc_html_e('Return Time', 'echelon'); ?> *</span><select name="return_time" required><option value=""><?php esc_html_e('Select return time', 'echelon'); ?></option><?php foreach ($time_options as $value => $label) : ?><option value="<?php echo esc_attr($value); ?>" <?php selected($initial_return_time, $value); ?>><?php echo esc_html($label); ?></option><?php endforeach; ?></select></label>
                                 <label><span><?php esc_html_e('Pick-up Location', 'echelon'); ?> *</span><select name="pickup_location_id" required><?php foreach ($locations as $location) : ?><option value="<?php echo esc_attr($location->ID); ?>" <?php selected($initial_location, $location->post_name); ?>><?php echo esc_html(get_the_title($location)); ?></option><?php endforeach; ?></select></label>
                                 <label><span><?php esc_html_e('Return Location', 'echelon'); ?> *</span><select name="return_location_id" required><?php foreach ($locations as $location) : ?><option value="<?php echo esc_attr($location->ID); ?>" <?php selected($initial_location, $location->post_name); ?>><?php echo esc_html(get_the_title($location)); ?></option><?php endforeach; ?></select></label>
                                 <label><span><?php esc_html_e('Estimated Mileage', 'echelon'); ?></span><select name="estimated_mileage"><option value="150">150 mi / day</option><option value="250">250 mi / day</option><option value="unlimited"><?php esc_html_e('Request unlimited', 'echelon'); ?></option></select></label>

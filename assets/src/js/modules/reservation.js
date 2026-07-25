@@ -7,6 +7,7 @@ export function initReservationFlow() {
 
   const steps = Array.from(form.querySelectorAll('[data-step]'));
   const progress = Array.from(form.querySelectorAll('[data-progress-step]'));
+  const actions = form.querySelector('.reservation-actions');
   const back = form.querySelector('[data-reservation-back]');
   const nextButtons = Array.from(form.querySelectorAll('[data-reservation-next]'));
   let current = Number(root.dataset.initialStep) === 2 ? 2 : 1;
@@ -88,6 +89,7 @@ export function initReservationFlow() {
     root.dataset.currentStep = String(current);
     steps.forEach((panel) => { panel.hidden = Number(panel.dataset.step) !== current; panel.classList.toggle('is-active', Number(panel.dataset.step) === current); });
     progress.forEach((item) => { const number = Number(item.dataset.progressStep); item.classList.toggle('is-active', number === current); item.classList.toggle('is-complete', number < current); });
+    actions.hidden = current === 4;
     back.hidden = current === 1;
     nextButtons.forEach((button) => { button.hidden = current === 4; });
     if (current === 4) updateReview();

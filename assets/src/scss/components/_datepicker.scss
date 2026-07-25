@@ -1,20 +1,63 @@
-// Small brand overrides on top of flatpickr's bundled dark theme. Uses
-// !important because flatpickr's own CSS is imported later in the JS
-// module graph (booking-form.js), so load order can't be relied on here.
+// Brand overrides on top of flatpickr's bundled dark theme. Uses !important
+// because flatpickr's CSS is imported later in the JS module graph.
+.flatpickr-calendar,
+.flatpickr-calendar.arrowTop::after,
+.flatpickr-calendar.arrowBottom::after {
+  background: #121212 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.flatpickr-calendar {
+  border-radius: 0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.flatpickr-months {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .flatpickr-day.selected,
 .flatpickr-day.selected:hover,
-.flatpickr-day.today {
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
   background: var(--color-accent) !important;
   border-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+
+.flatpickr-day {
+  border-radius: 0 !important;
+}
+
+.flatpickr-day.today {
+  background: transparent !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day:focus {
+  background: rgba(212, 9, 36, 0.22) !important;
+  border-color: rgba(212, 9, 36, 0.4) !important;
 }
 
 .flatpickr-months .flatpickr-month,
 .flatpickr-current-month .flatpickr-monthDropdown-months,
 span.flatpickr-weekday {
-  background: var(--color-surface) !important;
+  background: #121212 !important;
 }
 
-.flatpickr-calendar {
-  border-radius: var(--radius-md);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+.flatpickr-weekdays {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
+.flatpickr-current-month input.cur-year:hover {
+  background: #1b1b1b !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--color-accent) !important;
 }
