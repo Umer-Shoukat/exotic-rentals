@@ -216,7 +216,7 @@ function echelon_install_sample_fleet() {
             set_post_thumbnail($vehicle_id, $thumbnail_id);
         }
         $fields = [
-            'brand' => $brand, 'price_per_hour' => max(1, round($price / 24)), 'minimum_booking_hours' => 3, 'horsepower' => $horsepower,
+            'brand' => $brand, 'price_per_hour' => max(1, round($price / 24)), 'daily_rental_price' => $price, 'minimum_booking_hours' => 3, 'horsepower' => $horsepower,
             'zero_to_sixty' => $zero_to_sixty, 'seats' => $seats,
             'tagline' => $category . ' performance rental', 'featured' => $featured ? 1 : 0,
         ];

@@ -30,12 +30,13 @@ $booking_locations = get_posts([
 							$gallery = echelon_field('gallery', $vehicle_id, []);
 							$cover = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
 							$search_text = trim($brand . ' ' . get_the_title($vehicle_id) . ' ' . echelon_field('tagline', $vehicle_id, ''));
+							$daily_rate = echelon_field('daily_rental_price', $vehicle_id, '');
 							?>
 							<button type="button" class="vehicle-search-option" id="vehicle-option-<?php echo esc_attr($vehicle_id); ?>" role="option" aria-selected="false" data-vehicle-option data-vehicle-id="<?php echo esc_attr($vehicle_id); ?>" data-vehicle-label="<?php echo esc_attr(get_the_title($vehicle_id)); ?>" data-vehicle-search-text="<?php echo esc_attr(strtolower($search_text)); ?>"<?php echo $index >= 4 ? ' hidden' : ''; ?>>
 								<span class="vehicle-search-option__image"><?php echelon_media($cover, 'thumbnail', '', 'bolt'); ?></span>
 								<span class="vehicle-search-option__copy"><strong><?php echo esc_html($brand ?: get_the_title($vehicle_id)); ?></strong><?php if ($brand) : ?><small><?php echo esc_html(get_the_title($vehicle_id)); ?></small><?php endif; ?></span>
 								<?php $hourly_rate = echelon_field('price_per_hour', $vehicle_id, ''); ?>
-								<?php if ($hourly_rate !== '') : ?><span class="vehicle-search-option__price"><?php echo esc_html(echelon_price($hourly_rate)); ?>/<?php esc_html_e('hour', 'echelon'); ?></span><?php endif; ?>
+								<?php if ($hourly_rate !== '' || $daily_rate !== '') : ?><span class="vehicle-search-option__price"><?php if ($hourly_rate !== '') : ?><?php echo esc_html(echelon_price($hourly_rate)); ?>/<?php esc_html_e('hour', 'echelon'); ?><?php endif; ?><?php if ($hourly_rate !== '' && $daily_rate !== '') : ?><br><?php endif; ?><?php if ($daily_rate !== '') : ?><?php echo esc_html(echelon_price($daily_rate)); ?>/<?php esc_html_e('day', 'echelon'); ?><?php endif; ?></span><?php endif; ?>
 								<span class="vehicle-search-option__arrow" aria-hidden="true">→</span>
 							</button>
 						<?php endforeach; ?>

@@ -8,6 +8,7 @@ $vehicle_id = get_the_ID();
 $gallery    = echelon_field('gallery', $vehicle_id, []);
 $cover      = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
 $price      = echelon_field('price_per_hour', $vehicle_id, '');
+$daily_price = echelon_field('daily_rental_price', $vehicle_id, '');
 $hp         = echelon_field('horsepower', $vehicle_id, '');
 $zero_sixty = echelon_field('zero_to_sixty', $vehicle_id, '');
 $seats      = echelon_field('seats', $vehicle_id, '');
@@ -20,10 +21,10 @@ $featured   = echelon_field('featured', $vehicle_id, false);
 	<div class="vehicle-card__body">
 		<div class="vehicle-card__top">
 			<h3 class="vehicle-card__name"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-			<?php if ($price !== '') : ?>
+			<?php if ($price !== '' || $daily_price !== '') : ?>
 				<span class="vehicle-card__price">
-					<span class="vehicle-card__price-label"><?php esc_html_e('From', 'echelon'); ?></span>
-					<span class="vehicle-card__price-value"><?php echo esc_html(echelon_price($price)); ?>/<?php esc_html_e('hour', 'echelon'); ?></span>
+					<?php if ($price !== '') : ?><span class="vehicle-card__price-value"><?php echo esc_html(echelon_price($price)); ?>/<?php esc_html_e('hour', 'echelon'); ?></span><?php endif; ?>
+					<?php if ($daily_price !== '') : ?><span class="vehicle-card__price-value vehicle-card__price-value--daily"><?php echo esc_html(echelon_price($daily_price)); ?>/<?php esc_html_e('day', 'echelon'); ?></span><?php endif; ?>
 				</span>
 			<?php endif; ?>
 		</div>

@@ -87,7 +87,8 @@ if (!$featured->have_posts()) {
 						</span>
 						<span class="hero__strip-stat">
 							<span class="hero__strip-label"><?php esc_html_e('Starting At', 'echelon'); ?></span>
-							<span class="hero__strip-value"><?php echo esc_html(echelon_price(echelon_field('price_per_hour', get_the_ID(), ''))); ?>/<?php esc_html_e('hour', 'echelon'); ?></span>
+							<?php $hero_hourly_rate = echelon_field('price_per_hour', get_the_ID(), ''); $hero_daily_rate = echelon_field('daily_rental_price', get_the_ID(), ''); ?>
+							<?php if ($hero_hourly_rate !== '' || $hero_daily_rate !== '') : ?><span class="hero__strip-value"><?php if ($hero_hourly_rate !== '') : ?><?php echo esc_html(echelon_price($hero_hourly_rate)); ?>/<?php esc_html_e('hour', 'echelon'); ?><?php endif; ?><?php if ($hero_hourly_rate !== '' && $hero_daily_rate !== '') : ?> · <?php endif; ?><?php if ($hero_daily_rate !== '') : ?><?php echo esc_html(echelon_price($hero_daily_rate)); ?>/<?php esc_html_e('day', 'echelon'); ?><?php endif; ?></span><?php endif; ?>
 						</span>
 					</div>
 				<?php endwhile; ?>

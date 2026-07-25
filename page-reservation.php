@@ -86,15 +86,16 @@ get_header();
                                     $gallery = echelon_field('gallery', $id, []);
                                     $cover = $gallery[0] ?? get_post_thumbnail_id($id);
                                     $price = (float) echelon_field('price_per_hour', $id, 0);
+                                    $daily_price = (float) echelon_field('daily_rental_price', $id, 0);
                                     $minimum_hours = max(3, (int) echelon_field('minimum_booking_hours', $id, 3));
                                     $selected = $has_preselected_vehicle ? $id === $preselected_vehicle : $index === 0;
                                     ?>
                                     <label class="reservation-vehicle<?php echo $selected ? ' is-selected' : ''; ?>" data-vehicle-card>
                                         <input type="radio" name="vehicle_id" value="<?php echo esc_attr($id); ?>" <?php checked($selected); ?> required
-                                            data-vehicle-name="<?php echo esc_attr(get_the_title($id)); ?>" data-vehicle-price="<?php echo esc_attr($price); ?>" data-vehicle-minimum-hours="<?php echo esc_attr($minimum_hours); ?>" data-vehicle-image="<?php echo esc_url(wp_get_attachment_image_url(is_array($cover) ? ($cover['ID'] ?? 0) : $cover, 'vehicle-card') ?: ''); ?>">
+                                            data-vehicle-name="<?php echo esc_attr(get_the_title($id)); ?>" data-vehicle-price="<?php echo esc_attr($price); ?>" data-vehicle-daily-price="<?php echo esc_attr($daily_price); ?>" data-vehicle-minimum-hours="<?php echo esc_attr($minimum_hours); ?>" data-vehicle-image="<?php echo esc_url(wp_get_attachment_image_url(is_array($cover) ? ($cover['ID'] ?? 0) : $cover, 'vehicle-card') ?: ''); ?>">
                                         <div class="reservation-vehicle__media"><?php echelon_media($cover, 'vehicle-card'); ?><span class="reservation-vehicle__check">✓</span></div>
                                         <div class="reservation-vehicle__body">
-                                            <div class="reservation-vehicle__top"><h3><?php echo esc_html(get_the_title($id)); ?></h3><?php if ($price > 0) : ?><span><small><?php esc_html_e('From', 'echelon'); ?></small><?php echo esc_html(echelon_price($price)); ?><em>/<?php esc_html_e('hour', 'echelon'); ?></em></span><?php endif; ?></div>
+                                            <div class="reservation-vehicle__top"><h3><?php echo esc_html(get_the_title($id)); ?></h3><?php if ($price > 0 || $daily_price > 0) : ?><span><?php if ($price > 0) : ?><?php echo esc_html(echelon_price($price)); ?><em>/<?php esc_html_e('hour', 'echelon'); ?></em><?php endif; ?><?php if ($daily_price > 0) : ?><small><?php echo esc_html(echelon_price($daily_price)); ?>/<?php esc_html_e('day', 'echelon'); ?></small><?php endif; ?></span><?php endif; ?></div>
                                             <div class="reservation-vehicle__specs"><span><?php echelon_icon('bolt'); ?><?php echo esc_html(echelon_field('horsepower', $id, '—')); ?> HP</span><span><?php echelon_icon('gauge'); ?>0–60 <?php echo esc_html(echelon_field('zero_to_sixty', $id, '—')); ?></span><span><?php echelon_icon('seat'); ?><?php echo esc_html(echelon_field('seats', $id, '—')); ?> <?php esc_html_e('Seats', 'echelon'); ?></span></div>
                                             <span class="reservation-vehicle__select"><?php esc_html_e('Reserve', 'echelon'); ?> <b>→</b></span>
                                         </div>

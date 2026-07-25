@@ -76,10 +76,16 @@
 }
 
 .vehicle-card__price-value {
+  display: block;
   font-family: var(--font-display);
   color: var(--color-accent);
   font-size: 12px;
   line-height: 12px;
+}
+
+.vehicle-card__price-value--daily {
+  margin-top: 4px;
+  color: var(--color-text);
 }
 
 .vehicle-card__meta {
