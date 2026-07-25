@@ -34,7 +34,8 @@ $booking_locations = get_posts([
 							<button type="button" class="vehicle-search-option" id="vehicle-option-<?php echo esc_attr($vehicle_id); ?>" role="option" aria-selected="false" data-vehicle-option data-vehicle-id="<?php echo esc_attr($vehicle_id); ?>" data-vehicle-label="<?php echo esc_attr(get_the_title($vehicle_id)); ?>" data-vehicle-search-text="<?php echo esc_attr(strtolower($search_text)); ?>"<?php echo $index >= 4 ? ' hidden' : ''; ?>>
 								<span class="vehicle-search-option__image"><?php echelon_media($cover, 'thumbnail', '', 'bolt'); ?></span>
 								<span class="vehicle-search-option__copy"><strong><?php echo esc_html($brand ?: get_the_title($vehicle_id)); ?></strong><?php if ($brand) : ?><small><?php echo esc_html(get_the_title($vehicle_id)); ?></small><?php endif; ?></span>
-								<span class="vehicle-search-option__price"><?php echo esc_html(echelon_price(echelon_field('price_per_day', $vehicle_id, 0))); ?>/<?php esc_html_e('day', 'echelon'); ?></span>
+								<?php $hourly_rate = echelon_field('price_per_hour', $vehicle_id, ''); ?>
+								<?php if ($hourly_rate !== '') : ?><span class="vehicle-search-option__price"><?php echo esc_html(echelon_price($hourly_rate)); ?>/<?php esc_html_e('hour', 'echelon'); ?></span><?php endif; ?>
 								<span class="vehicle-search-option__arrow" aria-hidden="true">→</span>
 							</button>
 						<?php endforeach; ?>
@@ -58,6 +59,14 @@ $booking_locations = get_posts([
 						<input class="field__control" type="text" id="return-date" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off">
 						<?php echelon_icon('calendar'); ?>
 					</div>
+				</div>
+				<div class="field booking-widget__field">
+					<label class="field__label" for="pickup-time"><?php esc_html_e('Pick-up Time', 'echelon'); ?></label>
+					<div class="field__control-wrap"><input class="field__control" type="time" id="pickup-time" name="pickup_time"></div>
+				</div>
+				<div class="field booking-widget__field">
+					<label class="field__label" for="return-time"><?php esc_html_e('Return Time', 'echelon'); ?></label>
+					<div class="field__control-wrap"><input class="field__control" type="time" id="return-time" name="return_time"></div>
 				</div>
 				<div class="field booking-widget__field">
 					<label class="field__label" for="pickup-location"><?php esc_html_e('Location', 'echelon'); ?></label>

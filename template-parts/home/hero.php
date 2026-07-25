@@ -87,7 +87,7 @@ if (!$featured->have_posts()) {
 						</span>
 						<span class="hero__strip-stat">
 							<span class="hero__strip-label"><?php esc_html_e('Starting At', 'echelon'); ?></span>
-							<span class="hero__strip-value"><?php echo esc_html(echelon_price(echelon_field('price_per_day', get_the_ID(), 0))); ?>/<?php esc_html_e('day', 'echelon'); ?></span>
+							<span class="hero__strip-value"><?php echo esc_html(echelon_price(echelon_field('price_per_hour', get_the_ID(), ''))); ?>/<?php esc_html_e('hour', 'echelon'); ?></span>
 						</span>
 					</div>
 				<?php endwhile; ?>

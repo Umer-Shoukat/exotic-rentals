@@ -337,7 +337,7 @@ function echelon_filter_fleet_archive($query) {
     if ($brands) {
         $meta_query[] = ['key' => 'brand', 'value' => $brands, 'compare' => 'IN'];
     }
-    foreach (['min_price' => ['price_per_day', '>='], 'max_price' => ['price_per_day', '<='], 'min_hp' => ['horsepower', '>=']] as $parameter => [$key, $compare]) {
+    foreach (['min_price' => ['price_per_hour', '>='], 'max_price' => ['price_per_hour', '<='], 'min_hp' => ['horsepower', '>=']] as $parameter => [$key, $compare]) {
         if (isset($_GET[$parameter]) && $_GET[$parameter] !== '') {
             $meta_query[] = ['key' => $key, 'value' => (float) $_GET[$parameter], 'compare' => $compare, 'type' => 'NUMERIC'];
         }
@@ -352,7 +352,7 @@ function echelon_filter_fleet_archive($query) {
 
     $sort = sanitize_key($_GET['fleet_sort'] ?? 'recommended');
     if (in_array($sort, ['price_asc', 'price_desc', 'horsepower'], true)) {
-        $query->set('meta_key', $sort === 'horsepower' ? 'horsepower' : 'price_per_day');
+        $query->set('meta_key', $sort === 'horsepower' ? 'horsepower' : 'price_per_hour');
         $query->set('orderby', 'meta_value_num');
         $query->set('order', $sort === 'price_desc' ? 'DESC' : ($sort === 'horsepower' ? 'DESC' : 'ASC'));
     }

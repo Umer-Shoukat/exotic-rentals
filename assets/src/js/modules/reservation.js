@@ -13,12 +13,13 @@ export function initReservationFlow() {
 
   const pickup = form.elements.pickup_date;
   const returnDate = form.elements.return_date;
+  const pickupTime = form.elements.pickup_time;
+  const returnTime = form.elements.return_time;
   const pickupPicker = flatpickr(pickup, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
-  const returnPicker = flatpickr(returnDate, { dateFormat: 'd/m/Y', minDate: new Date(Date.now() + 86400000), disableMobile: true });
+  const returnPicker = flatpickr(returnDate, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
   pickup.addEventListener('change', () => {
     if (pickupPicker.selectedDates[0]) {
       const minimum = new Date(pickupPicker.selectedDates[0]);
-      minimum.setDate(minimum.getDate() + 1);
       returnPicker.set('minDate', minimum);
     }
     updateSummary();
@@ -35,6 +36,18 @@ export function initReservationFlow() {
   };
   const selectedText = (control) => control?.options?.[control.selectedIndex]?.text || '—';
   const currency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+  const dateTime = (dateValue, timeValue) => {
+    const date = parseDate(dateValue);
+    const [hours, minutes] = (timeValue || '').split(':').map(Number);
+    if (!date || Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  };
+  const bookingHours = () => {
+    const start = dateTime(pickup.value, pickupTime.value);
+    const end = dateTime(returnDate.value, returnTime.value);
+    return start && end ? Math.max(0, Math.ceil((end - start) / 3600000)) : 0;
+  };
 
   function updateSummary() {
     const vehicle = selectedVehicle();
@@ -43,23 +56,22 @@ export function initReservationFlow() {
     image.src = vehicle.dataset.vehicleImage || '';
     image.closest('.reservation-summary__media').hidden = !vehicle.dataset.vehicleImage;
     root.querySelector('[data-summary-vehicle]').textContent = vehicle.dataset.vehicleName;
-    const start = parseDate(pickup.value);
-    const end = parseDate(returnDate.value);
-    const days = start && end ? Math.max(0, Math.round((end - start) / 86400000)) : 0;
-    root.querySelector('[data-summary-dates]').textContent = pickup.value && returnDate.value ? `${pickup.value} → ${returnDate.value}` : '—';
-    root.querySelector('[data-summary-days]').textContent = days || '—';
+    const hours = bookingHours();
+    root.querySelector('[data-summary-dates]').textContent = pickup.value && returnDate.value && pickupTime.value && returnTime.value ? `${pickup.value} ${pickupTime.value} → ${returnDate.value} ${returnTime.value}` : '—';
+    root.querySelector('[data-summary-hours]').textContent = hours || '—';
     root.querySelector('[data-summary-pickup]').textContent = selectedText(form.elements.pickup_location_id);
     root.querySelector('[data-summary-return]').textContent = selectedText(form.elements.return_location_id);
-    root.querySelector('[data-summary-total]').textContent = days ? currency(Number(vehicle.dataset.vehiclePrice) * days) : currency(Number(vehicle.dataset.vehiclePrice));
+    root.querySelector('[data-summary-total]').textContent = hours ? currency(Number(vehicle.dataset.vehiclePrice) * hours) : currency(Number(vehicle.dataset.vehiclePrice) * Number(vehicle.dataset.vehicleMinimumHours || 3));
   }
 
   function updateReview() {
     const vehicle = selectedVehicle();
-    const days = Math.max(1, Math.round((parseDate(returnDate.value) - parseDate(pickup.value)) / 86400000));
-    const total = Number(vehicle.dataset.vehiclePrice) * days;
+    const hours = bookingHours();
+    const total = Number(vehicle.dataset.vehiclePrice) * hours;
     root.querySelector('[data-reservation-review]').innerHTML = `
       <div><span>Vehicle</span><strong>${escapeHtml(vehicle.dataset.vehicleName)}</strong></div>
-      <div><span>Dates</span><strong>${escapeHtml(pickup.value)} → ${escapeHtml(returnDate.value)}</strong></div>
+      <div><span>Schedule</span><strong>${escapeHtml(pickup.value)} ${escapeHtml(pickupTime.value)} → ${escapeHtml(returnDate.value)} ${escapeHtml(returnTime.value)}</strong></div>
+      <div><span>Duration</span><strong>${hours} hours</strong></div>
       <div><span>Name</span><strong>${escapeHtml(form.elements.customer_name.value)}</strong></div>
       <div><span>Contact</span><strong>${escapeHtml(form.elements.customer_phone.value)}</strong></div>
       <div class="reservation-review__total"><span>Estimated total</span><strong>${currency(total)}</strong></div>`;
@@ -102,7 +114,17 @@ export function initReservationFlow() {
       if (!value) return 'Enter a return date.';
       const end = parseDate(value); const start = parseDate(pickup.value);
       if (!end) return 'Enter a valid return date in DD/MM/YYYY format.';
-      if (start && end <= start) return 'Return date must be after the pick-up date.';
+      if (start && end < start) return 'Return date cannot be before the pick-up date.';
+    }
+    if (field.name === 'pickup_time' || field.name === 'return_time') {
+      if (!value) return `Enter a ${field.name === 'pickup_time' ? 'pick-up' : 'return'} time.`;
+      const start = dateTime(pickup.value, pickupTime.value);
+      const end = dateTime(returnDate.value, returnTime.value);
+      if (start && end) {
+        const minimum = Number(selectedVehicle()?.dataset.vehicleMinimumHours || 3);
+        if (end <= start) return 'Return must be after pick-up.';
+        if ((end - start) / 3600000 < minimum) return `This vehicle requires a minimum booking of ${minimum} hours.`;
+      }
     }
     if ((field.name === 'pickup_location_id' || field.name === 'return_location_id') && !value) return 'Select a location.';
     if (field.name === 'customer_name' && value.length < 2) return 'Enter your full name.';
@@ -179,7 +201,7 @@ export function initReservationFlow() {
     form.querySelectorAll('[data-vehicle-card]').forEach((card) => card.classList.toggle('is-selected', card.contains(radio)));
     updateSummary();
   }));
-  [form.elements.pickup_location_id, form.elements.return_location_id].forEach((select) => select.addEventListener('change', updateSummary));
+  [pickupTime, returnTime, form.elements.pickup_location_id, form.elements.return_location_id].forEach((control) => control.addEventListener('change', updateSummary));
   form.querySelectorAll('input, select').forEach((field) => {
     const eventName = field.type === 'radio' || field.type === 'checkbox' || field.tagName === 'SELECT' ? 'change' : 'input';
     field.addEventListener(eventName, () => {

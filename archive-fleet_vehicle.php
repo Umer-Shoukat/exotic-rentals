@@ -74,7 +74,7 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 				</div>
 
 				<fieldset><legend><?php esc_html_e('Search', 'echelon'); ?></legend><input type="search" name="fleet_search" placeholder="<?php esc_attr_e('Search for a car…', 'echelon'); ?>" value="<?php echo esc_attr($_GET['fleet_search'] ?? ''); ?>"></fieldset>
-				<fieldset><legend><?php esc_html_e('Daily rental', 'echelon'); ?></legend><div class="fleet-filter-pair"><input type="number" min="0" name="min_price" placeholder="<?php esc_attr_e('Min $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['min_price'] ?? ''); ?>"><input type="number" min="0" name="max_price" placeholder="<?php esc_attr_e('Max $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['max_price'] ?? ''); ?>"></div></fieldset>
+				<fieldset><legend><?php esc_html_e('Hourly rental', 'echelon'); ?></legend><div class="fleet-filter-pair"><input type="number" min="0" name="min_price" placeholder="<?php esc_attr_e('Min $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['min_price'] ?? ''); ?>"><input type="number" min="0" name="max_price" placeholder="<?php esc_attr_e('Max $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['max_price'] ?? ''); ?>"></div></fieldset>
 
 				<?php if (!is_wp_error($categories) && $categories) : ?>
 					<fieldset><legend><?php esc_html_e('Body type', 'echelon'); ?></legend>

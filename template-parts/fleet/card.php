@@ -7,7 +7,7 @@
 $vehicle_id = get_the_ID();
 $gallery    = echelon_field('gallery', $vehicle_id, []);
 $cover      = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
-$price      = echelon_field('price_per_day', $vehicle_id, '');
+$price      = echelon_field('price_per_hour', $vehicle_id, '');
 $hp         = echelon_field('horsepower', $vehicle_id, '');
 $zero_sixty = echelon_field('zero_to_sixty', $vehicle_id, '');
 $seats      = echelon_field('seats', $vehicle_id, '');
@@ -23,7 +23,7 @@ $featured   = echelon_field('featured', $vehicle_id, false);
 			<?php if ($price !== '') : ?>
 				<span class="vehicle-card__price">
 					<span class="vehicle-card__price-label"><?php esc_html_e('From', 'echelon'); ?></span>
-					<span class="vehicle-card__price-value"><?php echo esc_html(echelon_price($price)); ?>/<?php esc_html_e('day', 'echelon'); ?></span>
+					<span class="vehicle-card__price-value"><?php echo esc_html(echelon_price($price)); ?>/<?php esc_html_e('hour', 'echelon'); ?></span>
 				</span>
 			<?php endif; ?>
 		</div>

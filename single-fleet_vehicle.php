@@ -26,7 +26,26 @@ while (have_posts()) : the_post();
     $brand = echelon_field('brand', $vehicle_id, 'Lamborghini');
     $year = echelon_field('year', $vehicle_id, '2018');
     $doors = echelon_field('doors', $vehicle_id, '2');
-    $price = echelon_field('price_per_day', $vehicle_id, '1600');
+    $price = echelon_field('price_per_hour', $vehicle_id, '');
+    $minimum_hours = max(3, (int) echelon_field('minimum_booking_hours', $vehicle_id, 3));
+    $rate_note = echelon_field('hourly_rate_note', $vehicle_id, '');
+    $addons = array_values(array_filter((array) echelon_field('vehicle_addons', $vehicle_id, []), static function ($addon) {
+        return !empty($addon['name']) && isset($addon['price']) && $addon['price'] !== '';
+    }));
+    if (!$addons) {
+        $addon_count = absint(get_post_meta($vehicle_id, 'vehicle_addons', true));
+        for ($addon_index = 0; $addon_index < $addon_count; $addon_index++) {
+            $addon_name = get_post_meta($vehicle_id, "vehicle_addons_{$addon_index}_name", true);
+            $addon_price = get_post_meta($vehicle_id, "vehicle_addons_{$addon_index}_price", true);
+            if ($addon_name !== '' && $addon_price !== '') {
+                $addons[] = ['name' => $addon_name, 'price' => $addon_price];
+            }
+        }
+    }
+    $toll_policy = echelon_field('toll_policy', $vehicle_id, '');
+    $travel_policy = echelon_field('travel_policy', $vehicle_id, '');
+    $daily_rental_price = echelon_field('daily_rental_price', $vehicle_id, '');
+    $daily_deposit = echelon_field('daily_rental_security_deposit', $vehicle_id, '');
     $hp = echelon_field('horsepower', $vehicle_id, '630');
     $zero_to_sixty = echelon_field('zero_to_sixty', $vehicle_id, '2.9s');
     $seats = echelon_field('seats', $vehicle_id, '2');
@@ -72,9 +91,10 @@ while (have_posts()) : the_post();
             <p><?php esc_html_e('Every rental is prepared by our team, inspected before delivery, and supported by a dedicated concierge throughout your reservation.', 'echelon'); ?></p>
         </div>
         <aside class="vehicle-detail__booking" aria-label="<?php esc_attr_e('Vehicle reservation summary', 'echelon'); ?>">
-            <div class="vehicle-detail__rate"><span><?php esc_html_e('From', 'echelon'); ?></span><strong><?php echo esc_html(echelon_price($price)); ?><small>/<?php esc_html_e('day', 'echelon'); ?></small></strong></div>
+            <?php if ($price !== '') : ?><div class="vehicle-detail__rate"><span><?php esc_html_e('From', 'echelon'); ?></span><strong><?php echo esc_html(echelon_price($price)); ?><small>/<?php esc_html_e('hour', 'echelon'); ?></small></strong><?php if ($rate_note !== '') : ?><small><?php echo esc_html($rate_note); ?></small><?php endif; ?></div><?php endif; ?>
             <dl>
-                <div><dt><?php esc_html_e('Security Deposit', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_price(echelon_field('security_deposit', $vehicle_id, 2500))); ?></dd></div>
+                <div><dt><?php esc_html_e('Minimum Booking', 'echelon'); ?></dt><dd><?php echo esc_html(sprintf(_n('%d hour', '%d hours', $minimum_hours, 'echelon'), $minimum_hours)); ?></dd></div>
+                <?php $security_deposit = echelon_field('security_deposit', $vehicle_id, ''); if ($security_deposit !== '') : ?><div><dt><?php esc_html_e('Security Deposit', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_price($security_deposit)); ?></dd></div><?php endif; ?>
                 <div><dt><?php esc_html_e('Included Miles', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_field('included_miles', $vehicle_id, 100)); ?>/<?php esc_html_e('day', 'echelon'); ?></dd></div>
                 <div><dt><?php esc_html_e('Minimum Age', 'echelon'); ?></dt><dd>25+</dd></div>
             </dl>
@@ -82,6 +102,19 @@ while (have_posts()) : the_post();
             <small><?php esc_html_e('Final availability is confirmed by our concierge.', 'echelon'); ?></small>
         </aside>
     </section>
+
+    <?php if ($addons || $toll_policy !== '' || $travel_policy !== '' || $daily_rental_price !== '') : ?>
+        <section class="container vehicle-detail__benefits vehicle-detail__rental-details">
+            <p class="eyebrow"><?php esc_html_e('Rental Details', 'echelon'); ?></p>
+            <h2><?php esc_html_e('Options &', 'echelon'); ?> <span><?php esc_html_e('Policies', 'echelon'); ?></span></h2>
+            <div class="vehicle-detail__benefit-grid">
+                <?php if ($addons) : ?><div><?php echelon_icon('star'); ?><h3><?php esc_html_e('Add-ons', 'echelon'); ?></h3><?php foreach ($addons as $addon) : ?><p><?php echo esc_html($addon['name'] . ' — ' . echelon_price($addon['price'])); ?></p><?php endforeach; ?></div><?php endif; ?>
+                <?php if ($toll_policy !== '') : ?><div><?php echelon_icon('truck'); ?><h3><?php esc_html_e('Toll Policy', 'echelon'); ?></h3><p><?php echo esc_html($toll_policy); ?></p></div><?php endif; ?>
+                <?php if ($travel_policy !== '') : ?><div><?php echelon_icon('pin'); ?><h3><?php esc_html_e('Travel Policy', 'echelon'); ?></h3><p><?php echo esc_html($travel_policy); ?></p></div><?php endif; ?>
+                <?php if ($daily_rental_price !== '') : ?><div><?php echelon_icon('calendar'); ?><h3><?php esc_html_e('Daily Rental Option', 'echelon'); ?></h3><p><?php echo esc_html(echelon_price($daily_rental_price)); ?> / <?php esc_html_e('day', 'echelon'); ?><?php if ($daily_deposit !== '') : ?><br><?php echo esc_html(sprintf(__('Security deposit: %s', 'echelon'), echelon_price($daily_deposit))); ?><?php endif; ?></p></div><?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <section class="container vehicle-detail__specifications">
         <p class="eyebrow"><?php esc_html_e('At A Glance', 'echelon'); ?></p>

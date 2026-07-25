@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 const ECHELON_RESERVATION_META = [
-    'reference', 'status', 'vehicle_id', 'pickup_date', 'return_date',
+    'reference', 'status', 'vehicle_id', 'pickup_date', 'return_date', 'pickup_time', 'return_time', 'pickup_at', 'return_at',
     'pickup_location_id', 'return_location_id', 'estimated_mileage',
     'customer_name', 'customer_email', 'customer_phone', 'licence_number',
     'date_of_birth', 'occasion', 'estimated_total', 'submitted_at',
@@ -21,6 +21,19 @@ function echelon_reservation_page_url($args = []) {
 function echelon_parse_reservation_date($value) {
     $value = sanitize_text_field(wp_unslash($value));
     foreach (['Y-m-d', 'd/m/Y'] as $format) {
+        $date = DateTimeImmutable::createFromFormat('!' . $format, $value, wp_timezone());
+        if ($date && $date->format($format) === $value) {
+            return $date;
+        }
+    }
+    return false;
+}
+
+function echelon_parse_reservation_datetime($date_value, $time_value) {
+    $date_value = sanitize_text_field(wp_unslash($date_value));
+    $time_value = sanitize_text_field(wp_unslash($time_value));
+    foreach (['Y-m-d H:i', 'd/m/Y H:i'] as $format) {
+        $value = $date_value . ' ' . $time_value;
         $date = DateTimeImmutable::createFromFormat('!' . $format, $value, wp_timezone());
         if ($date && $date->format($format) === $value) {
             return $date;
@@ -47,8 +60,8 @@ function echelon_handle_reservation_submission() {
     $vehicle_id = isset($_POST['vehicle_id']) ? absint($_POST['vehicle_id']) : 0;
     $pickup_location_id = isset($_POST['pickup_location_id']) ? absint($_POST['pickup_location_id']) : 0;
     $return_location_id = isset($_POST['return_location_id']) ? absint($_POST['return_location_id']) : 0;
-    $pickup_date = echelon_parse_reservation_date($_POST['pickup_date'] ?? '');
-    $return_date = echelon_parse_reservation_date($_POST['return_date'] ?? '');
+    $pickup_date = echelon_parse_reservation_datetime($_POST['pickup_date'] ?? '', $_POST['pickup_time'] ?? '');
+    $return_date = echelon_parse_reservation_datetime($_POST['return_date'] ?? '', $_POST['return_time'] ?? '');
     $email = sanitize_email(wp_unslash($_POST['customer_email'] ?? ''));
     $name = trim(sanitize_text_field(wp_unslash($_POST['customer_name'] ?? '')));
     $phone = trim(sanitize_text_field(wp_unslash($_POST['customer_phone'] ?? '')));
@@ -63,7 +76,9 @@ function echelon_handle_reservation_submission() {
         get_post_type($return_location_id) !== 'location' || get_post_status($return_location_id) !== 'publish') {
         echelon_reservation_error('location');
     }
-    if (!$pickup_date || !$return_date || $return_date <= $pickup_date || $pickup_date < new DateTimeImmutable('today', wp_timezone())) {
+    $minimum_hours = max(3, (int) echelon_field('minimum_booking_hours', $vehicle_id, 3));
+    $duration_seconds = $pickup_date && $return_date ? $return_date->getTimestamp() - $pickup_date->getTimestamp() : 0;
+    if (!$pickup_date || !$return_date || $return_date <= $pickup_date || $pickup_date < new DateTimeImmutable('now', wp_timezone()) || $duration_seconds < $minimum_hours * HOUR_IN_SECONDS) {
         echelon_reservation_error('dates');
     }
     if (strlen($name) < 2 || strlen($name) > 100) echelon_reservation_error('name');
@@ -83,9 +98,9 @@ function echelon_handle_reservation_submission() {
     }
     set_transient('echelon_reservation_' . $token, 1, 10 * MINUTE_IN_SECONDS);
 
-    $days = max(1, (int) $pickup_date->diff($return_date)->days);
-    $daily_rate = (float) echelon_field('price_per_day', $vehicle_id, 0);
-    $estimated_total = $daily_rate * $days;
+    $hours = (int) ceil($duration_seconds / HOUR_IN_SECONDS);
+    $hourly_rate = (float) echelon_field('price_per_hour', $vehicle_id, 0);
+    $estimated_total = $hourly_rate * $hours;
     $reference = 'ER-' . gmdate('ymd') . '-' . strtoupper(wp_generate_password(6, false, false));
     $post_id = wp_insert_post([
         'post_type'   => 'rental_reservation',
@@ -105,6 +120,10 @@ function echelon_handle_reservation_submission() {
         'vehicle_id'           => $vehicle_id,
         'pickup_date'          => $pickup_date->format('Y-m-d'),
         'return_date'          => $return_date->format('Y-m-d'),
+        'pickup_time'          => $pickup_date->format('H:i'),
+        'return_time'          => $return_date->format('H:i'),
+        'pickup_at'            => $pickup_date->format('Y-m-d H:i:s'),
+        'return_at'            => $return_date->format('Y-m-d H:i:s'),
         'pickup_location_id'   => $pickup_location_id,
         'return_location_id'   => $return_location_id,
         'estimated_mileage'    => in_array(wp_unslash($_POST['estimated_mileage'] ?? '150'), ['150', '250', 'unlimited'], true) ? wp_unslash($_POST['estimated_mileage']) : '150',
@@ -136,7 +155,7 @@ function echelon_reservation_email_summary($post_id) {
     return implode("\n", [
         'Reference: ' . $get('reference'),
         'Vehicle: ' . $vehicle,
-        'Dates: ' . $get('pickup_date') . ' to ' . $get('return_date'),
+        'Schedule: ' . $get('pickup_date') . ' ' . $get('pickup_time') . ' to ' . $get('return_date') . ' ' . $get('return_time'),
         'Pick-up: ' . $pickup,
         'Return: ' . $return,
         'Customer: ' . $get('customer_name'),
@@ -150,7 +169,9 @@ function echelon_reservation_email_summary($post_id) {
  * Confirmed reservations are the source of truth for availability. Pending
  * requests may overlap because a concierge still needs to approve them.
  */
-function echelon_reservation_has_confirmed_conflict($vehicle_id, $pickup_date, $return_date, $exclude_id = 0) {
+function echelon_reservation_has_confirmed_conflict($vehicle_id, $pickup_date, $return_date, $exclude_id = 0, $pickup_time = '00:00', $return_time = '23:59') {
+    $pickup_at = $pickup_date . ' ' . ($pickup_time ?: '00:00');
+    $return_at = $return_date . ' ' . ($return_time ?: '23:59');
     $conflicts = get_posts([
         'post_type' => 'rental_reservation', 'post_status' => 'publish',
         'posts_per_page' => 1, 'fields' => 'ids', 'post__not_in' => $exclude_id ? [$exclude_id] : [],
@@ -158,8 +179,8 @@ function echelon_reservation_has_confirmed_conflict($vehicle_id, $pickup_date, $
             'relation' => 'AND',
             ['key' => '_echelon_status', 'value' => 'confirmed'],
             ['key' => '_echelon_vehicle_id', 'value' => (int) $vehicle_id, 'type' => 'NUMERIC'],
-            ['key' => '_echelon_pickup_date', 'value' => $return_date, 'compare' => '<', 'type' => 'DATE'],
-            ['key' => '_echelon_return_date', 'value' => $pickup_date, 'compare' => '>', 'type' => 'DATE'],
+            ['key' => '_echelon_pickup_at', 'value' => $return_at, 'compare' => '<', 'type' => 'DATETIME'],
+            ['key' => '_echelon_return_at', 'value' => $pickup_at, 'compare' => '>', 'type' => 'DATETIME'],
         ],
     ]);
     return !empty($conflicts);
@@ -209,7 +230,9 @@ function echelon_save_reservation_status($post_id) {
         get_post_meta($post_id, '_echelon_vehicle_id', true),
         get_post_meta($post_id, '_echelon_pickup_date', true),
         get_post_meta($post_id, '_echelon_return_date', true),
-        $post_id
+        $post_id,
+        get_post_meta($post_id, '_echelon_pickup_time', true),
+        get_post_meta($post_id, '_echelon_return_time', true)
     )) {
         set_transient('echelon_reservation_conflict_' . get_current_user_id() . '_' . $post_id, 1, MINUTE_IN_SECONDS);
         $new_status = 'pending';
