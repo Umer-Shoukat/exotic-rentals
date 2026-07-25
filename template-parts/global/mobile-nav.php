@@ -13,11 +13,22 @@
 			'walker'         => new Echelon_Mobile_Nav_Walker(),
 		]);
 	} else {
+		$fallback_items = [
+			['Fleet', '/fleet/', 'gauge'],
+			['Services', '/services/', 'star'],
+			['Locations', '/locations/', 'pin'],
+			['About', '/about/', 'shield-check'],
+			['Contact', '/contact/', 'mail'],
+		];
 		?>
 		<ul class="mobile-nav__list">
-			<li class="mobile-nav__item"><a class="mobile-nav__link" href="<?php echo esc_url(home_url('/fleet')); ?>"><span><?php esc_html_e('Fleet', 'echelon'); ?></span></a></li>
-			<li class="mobile-nav__item"><a class="mobile-nav__link" href="<?php echo esc_url(home_url('/about')); ?>"><span><?php esc_html_e('About', 'echelon'); ?></span></a></li>
-			<li class="mobile-nav__item"><a class="mobile-nav__link" href="<?php echo esc_url(home_url('/contact')); ?>"><span><?php esc_html_e('Contact', 'echelon'); ?></span></a></li>
+			<?php foreach ($fallback_items as [$label, $path, $icon]) : ?>
+				<li class="mobile-nav__item">
+					<a class="mobile-nav__link" href="<?php echo esc_url(home_url($path)); ?>">
+						<span class="mobile-nav__link-main"><span class="mobile-nav__link-icon"><?php echelon_icon($icon); ?></span><span><?php echo esc_html__($label, 'echelon'); ?></span></span>
+					</a>
+				</li>
+			<?php endforeach; ?>
 		</ul>
 		<?php
 	}

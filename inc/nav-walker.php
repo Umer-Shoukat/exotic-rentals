@@ -116,22 +116,56 @@ class Echelon_Mobile_Nav_Walker extends Walker_Nav_Menu {
 
         if (0 === $depth) {
             $output .= '<li class="mobile-nav__item"' . ($has_children ? ' data-mobile-nav-item' : '') . '>';
+            $icon = echelon_mobile_nav_icon($item->title, $item->url);
+            $label = '<span class="mobile-nav__link-main"><span class="mobile-nav__link-icon">' . echelon_icon_string($icon) . '</span><span>' . esc_html($item->title) . '</span></span>';
+            $active_class = $item->current || in_array('current-menu-ancestor', $item->classes, true) ? ' is-active' : '';
+
             if ($has_children) {
-                $output .= '<button type="button" class="mobile-nav__link" data-mobile-submenu-toggle aria-expanded="false">';
-                $output .= '<span>' . esc_html($item->title) . '</span>';
+                $output .= '<div class="mobile-nav__row">';
+                $output .= '<a class="mobile-nav__link' . $active_class . '" href="' . esc_url($item->url) . '">' . $label . '</a>';
+                $output .= '<button type="button" class="mobile-nav__submenu-toggle" data-mobile-submenu-toggle aria-expanded="false" aria-label="' . esc_attr(sprintf(__('Toggle %s submenu', 'echelon'), $item->title)) . '">';
                 $output .= echelon_icon_string('chevron-down');
-                $output .= '</button>';
+                $output .= '</button></div>';
             } else {
-                $output .= '<a class="mobile-nav__link" href="' . esc_url($item->url) . '"><span>' . esc_html($item->title) . '</span></a>';
+                $output .= '<a class="mobile-nav__link' . $active_class . '" href="' . esc_url($item->url) . '">' . $label . '</a>';
             }
         } else {
-            $output .= '<li><a href="' . esc_url($item->url) . '">' . esc_html($item->title) . '</a>';
+            $output .= '<li><a href="' . esc_url($item->url) . '"><span class="mobile-nav__submenu-icon">' . echelon_icon_string('arrow-right') . '</span>' . esc_html($item->title) . '</a>';
         }
     }
 
     public function end_el(&$output, $item, $depth = 0, $args = null) {
         $output .= '</li>';
     }
+}
+
+/**
+ * Choose a useful icon for a WordPress-managed top-level mobile menu item.
+ * URL matching keeps the mapping stable when editors rename a menu label.
+ */
+function echelon_mobile_nav_icon($title, $url = '') {
+    $path = strtolower(trim((string) wp_parse_url($url, PHP_URL_PATH), '/'));
+    $searchable = strtolower(wp_strip_all_tags($title) . ' ' . str_replace(['-', '_'], ' ', $path));
+    $icons = [
+        'service'     => 'star',
+        'location'    => 'pin',
+        'fleet'       => 'gauge',
+        'vehicle'     => 'gauge',
+        'reservation' => 'calendar',
+        'book'        => 'calendar',
+        'contact'     => 'mail',
+        'concierge'   => 'headset',
+        'about'       => 'shield-check',
+        'home'        => 'logo-mark',
+    ];
+
+    foreach ($icons as $keyword => $icon) {
+        if (false !== strpos($searchable, $keyword)) {
+            return $icon;
+        }
+    }
+
+    return 'arrow-right';
 }
 
 /**
