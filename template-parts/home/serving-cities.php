@@ -15,6 +15,9 @@ $locations = get_posts([
         ['key' => 'is_active', 'value' => '1', 'compare' => '='],
     ],
 ]);
+$locations = array_values(array_filter($locations, static function ($location) {
+    return !preg_match('/\bdemo\b|\bsample\b/i', get_the_title($location));
+}));
 
 if (!$locations) {
     $locations = [

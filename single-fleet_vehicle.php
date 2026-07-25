@@ -6,7 +6,7 @@ get_header();
 
 while (have_posts()) : the_post();
     $vehicle_id = get_the_ID();
-    $gallery = (array) echelon_field('gallery', $vehicle_id, []);
+    $gallery = echelon_vehicle_gallery($vehicle_id);
     $featured_id = get_post_thumbnail_id($vehicle_id);
     if (!$gallery && $featured_id) {
         $gallery = [$featured_id];
@@ -20,7 +20,6 @@ while (have_posts()) : the_post();
     if (!$gallery_urls) {
         $gallery_urls = $fallbacks;
     }
-    $gallery_urls = array_slice(array_pad($gallery_urls, 5, $gallery_urls[0]), 0, 5);
 
     $title = get_the_title();
     $brand = echelon_field('brand', $vehicle_id, 'Lamborghini');

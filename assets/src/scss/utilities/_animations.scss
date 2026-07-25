@@ -3,13 +3,33 @@
 // This guarantees content is never stuck invisible if JS fails to load/run.
 html.reveal-init [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translate3d(0, var(--reveal-distance), 0);
+  will-change: opacity, transform;
 }
 
 html.reveal-init [data-reveal].is-revealed {
   opacity: 1;
   transform: none;
-  transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
+  transition:
+    opacity var(--motion-slow) var(--ease-premium),
+    transform var(--motion-slow) var(--ease-premium);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.reveal-init [data-reveal='left'] {
+  transform: translate3d(calc(var(--reveal-distance) * -1), 0, 0);
+}
+
+html.reveal-init [data-reveal='right'] {
+  transform: translate3d(var(--reveal-distance), 0, 0);
+}
+
+html.reveal-init [data-reveal='zoom'] {
+  transform: scale(0.96);
+}
+
+[data-reveal-group] [data-reveal] {
+  --reveal-delay: calc(var(--reveal-index, 0) * 110ms);
 }
 
 @include reduced-motion {
@@ -17,6 +37,7 @@ html.reveal-init [data-reveal].is-revealed {
     opacity: 1;
     transform: none;
     transition: none;
+    will-change: auto;
   }
 }
 

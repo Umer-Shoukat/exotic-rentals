@@ -13,12 +13,12 @@
 
 .cta-band__img {
   position: absolute;
-  top: -200.59%;
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 461.48%;
+  height: 100%;
   max-width: none;
   object-fit: cover;
+  object-position: center;
 }
 
 .cta-band__scrim {

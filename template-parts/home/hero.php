@@ -7,6 +7,7 @@ $eyebrow    = echelon_field('hero_eyebrow', get_the_ID(), 'New York · New Jerse
 $heading    = echelon_field('hero_heading', get_the_ID(), "Tri-State's Premier\nExotic Rental Experience");
 $subtext    = echelon_field('hero_subtext', get_the_ID(), 'From Lamborghinis and Rolls-Royces to executive chauffeur service, we deliver luxury vehicles across Tri-State Areas. Premium cars, white-glove service, and a seamless booking experience from start to finish.');
 $bg         = echelon_field('hero_background', get_the_ID(), null);
+$bg_mobile  = echelon_field('hero_background_mobile', get_the_ID(), null);
 $cta1       = echelon_field('hero_cta_primary', get_the_ID(), ['title' => 'Browse Our Fleet', 'url' => home_url('/fleet')]);
 $cta2       = echelon_field('hero_cta_secondary', get_the_ID(), ['title' => 'How It Works', 'url' => '#how-it-works']);
 $badges     = echelon_field('hero_badges', get_the_ID(), [
@@ -33,11 +34,16 @@ if (!$featured->have_posts()) {
 ?>
 <section class="hero" data-reveal-group>
 	<div class="hero__media" aria-hidden="true">
-		<?php if ($bg) : ?>
-			<?php echelon_media($bg, 'full', 'hero__bg-img'); ?>
-		<?php else : ?>
-			<img class="hero__bg-img" src="<?php echo esc_url(ECHELON_THEME_URI . '/assets/images/figma/hero-homepage-v3.jpg'); ?>" alt="" width="2675" height="4005" fetchpriority="high">
-		<?php endif; ?>
+		<?php
+		$desktop_url = is_array($bg) && !empty($bg['ID']) ? wp_get_attachment_image_url($bg['ID'], 'full') : (is_numeric($bg) ? wp_get_attachment_image_url((int) $bg, 'full') : '');
+		$mobile_url = is_array($bg_mobile) && !empty($bg_mobile['ID']) ? wp_get_attachment_image_url($bg_mobile['ID'], 'full') : (is_numeric($bg_mobile) ? wp_get_attachment_image_url((int) $bg_mobile, 'full') : '');
+		$desktop_url = $desktop_url ?: ECHELON_THEME_URI . '/assets/images/generated/home-hero-desktop.webp';
+		$mobile_url = $mobile_url ?: ECHELON_THEME_URI . '/assets/images/generated/home-hero-mobile.webp';
+		?>
+		<picture>
+			<source media="(max-width: 767px)" srcset="<?php echo esc_url($mobile_url); ?>">
+			<img class="hero__bg-img" src="<?php echo esc_url($desktop_url); ?>" alt="" width="1672" height="941" fetchpriority="high" decoding="async">
+		</picture>
 		<div class="hero__scrim"></div>
 	</div>
 

@@ -72,6 +72,9 @@ function echelon_locations_mega_menu() {
     ]);
     $groups = ['New York' => [], 'New Jersey' => [], 'Connecticut' => [], 'Long Island' => []];
     foreach ($locations as $location) {
+        if (preg_match('/\bdemo\b|\bsample\b/i', get_the_title($location))) {
+            continue;
+        }
         $region = echelon_field('menu_region', $location->ID, '');
         if (!$region || !isset($groups[$region])) {
             $name = strtolower(get_the_title($location));

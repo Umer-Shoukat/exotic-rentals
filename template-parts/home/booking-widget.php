@@ -11,6 +11,9 @@ $booking_locations = get_posts([
 	'post_type' => 'location', 'post_status' => 'publish', 'posts_per_page' => -1,
 	'orderby' => ['menu_order' => 'ASC', 'title' => 'ASC'],
 ]);
+$booking_locations = array_values(array_filter($booking_locations, static function ($location) {
+	return !preg_match('/\bdemo\b|\bsample\b/i', get_the_title($location));
+}));
 ?>
 <section class="booking-widget" data-reveal>
 	<div class="container">
@@ -27,7 +30,7 @@ $booking_locations = get_posts([
 						<?php foreach ($booking_vehicles as $index => $vehicle) :
 							$vehicle_id = $vehicle->ID;
 							$brand = echelon_field('brand', $vehicle_id, '');
-							$gallery = echelon_field('gallery', $vehicle_id, []);
+							$gallery = echelon_vehicle_gallery($vehicle_id);
 							$cover = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
 							$search_text = trim($brand . ' ' . get_the_title($vehicle_id) . ' ' . echelon_field('tagline', $vehicle_id, ''));
 							$daily_rate = echelon_field('daily_rental_price', $vehicle_id, '');

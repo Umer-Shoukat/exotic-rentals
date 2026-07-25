@@ -1,0 +1,89 @@
+const reducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function initSectionProgress() {
+  const section = document.querySelector('[data-scroll-progress-section]');
+  const progress = section?.querySelector('[data-scroll-progress]');
+  if (!section || !progress) return;
+
+  let ticking = false;
+  const update = () => {
+    const rect = section.getBoundingClientRect();
+    const start = window.innerHeight * 0.72;
+    const distance = rect.height + start - (window.innerHeight * 0.28);
+    const value = Math.max(0, Math.min(1, (start - rect.top) / distance));
+    progress.style.transform = `scaleY(${value.toFixed(4)})`;
+    progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
+    ticking = false;
+  };
+
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate, { passive: true });
+  update();
+}
+
+function initConciergeChat() {
+  const chat = document.querySelector('[data-concierge-chat]');
+  if (!chat) return;
+
+  const messages = [...chat.querySelectorAll('[data-chat-message]')];
+  const typing = chat.querySelector('[data-chat-typing]');
+  const replay = chat.querySelector('[data-chat-replay]');
+  if (!messages.length) return;
+
+  let timers = [];
+  const clear = () => {
+    timers.forEach(window.clearTimeout);
+    timers = [];
+  };
+
+  const showAll = () => {
+    messages.forEach((message) => message.classList.add('is-visible'));
+    typing?.classList.remove('is-visible');
+  };
+
+  const play = () => {
+    clear();
+    messages.forEach((message) => message.classList.remove('is-visible'));
+    typing?.classList.remove('is-visible');
+
+    if (reducedMotion()) {
+      showAll();
+      return;
+    }
+
+    messages.forEach((message, index) => {
+      timers.push(window.setTimeout(() => {
+        typing?.classList.toggle('is-visible', index > 0);
+      }, Math.max(0, (index * 1300) - 650)));
+      timers.push(window.setTimeout(() => {
+        typing?.classList.remove('is-visible');
+        message.classList.add('is-visible');
+      }, index * 1300));
+    });
+  };
+
+  replay?.addEventListener('click', play);
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      play();
+      observer.disconnect();
+    }, { threshold: 0.35 });
+    observer.observe(chat);
+  } else {
+    play();
+  }
+}
+
+export function initHomepageMotion() {
+  initSectionProgress();
+  initConciergeChat();
+}

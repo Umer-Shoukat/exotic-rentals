@@ -5,7 +5,7 @@
  */
 
 $vehicle_id = get_the_ID();
-$gallery    = echelon_field('gallery', $vehicle_id, []);
+$gallery    = echelon_vehicle_gallery($vehicle_id);
 $cover      = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
 $price      = echelon_field('price_per_hour', $vehicle_id, '');
 $daily_price = echelon_field('daily_rental_price', $vehicle_id, '');

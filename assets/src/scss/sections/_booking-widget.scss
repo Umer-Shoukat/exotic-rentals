@@ -1,5 +1,5 @@
 .booking-widget {
-  padding-top: 60px;
+  padding-top: 72px;
   padding-bottom: var(--space-7);
   background: var(--color-bg-alt);
 
@@ -9,17 +9,17 @@
 }
 
 .booking-widget__form {
-  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 3px);
+  padding: 30px 30px 30px 34px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-accent);
+  border-left: 4px solid var(--color-accent);
   border-radius: var(--radius-md);
 }
 
 .booking-widget__field-vehicle {
   position: relative;
-  margin-bottom: var(--space-5);
-  padding-bottom: var(--space-5);
+  margin-bottom: 28px;
+  padding-bottom: 22px;
   border-bottom: 1px solid var(--color-border);
 
   .field__control-wrap,
@@ -42,7 +42,9 @@
     padding-left: 40px;
     background: transparent;
     border: none;
-    padding-block: 4px;
+    min-height: 46px;
+    padding-block: 10px;
+    font-size: 17px;
   }
 }
 
@@ -168,8 +170,8 @@
 .booking-widget__row {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  gap: 18px;
+  margin-bottom: 22px;
 
   @include down(lg) {
     flex-wrap: wrap;
@@ -224,18 +226,18 @@
   }
 
   .booking-widget__form {
-    padding: 10px 21px;
+    padding: 24px 28px 28px 32px;
     border-radius: 0;
   }
 
   .booking-widget__field-vehicle {
-    gap: 4px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
 
     .field__control {
-      height: 23px;
-      padding-block: 2px;
+      height: 44px;
+      padding-block: 9px;
     }
 
     .vehicle-search-results {
@@ -244,25 +246,25 @@
   }
 
   .booking-widget__row {
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
   .booking-widget__field {
     gap: 4px;
 
     .field__control {
-      height: 31px;
-      padding-block: 6px;
+      height: 46px;
+      padding-block: 10px;
     }
   }
 
   .booking-widget__actions {
-    gap: 0;
+    gap: 12px;
 
     .btn {
-      height: 31px;
-      padding-block: 5px;
+      height: 48px;
+      padding-block: 11px;
     }
   }
 }

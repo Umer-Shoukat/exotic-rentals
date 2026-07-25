@@ -1,6 +1,6 @@
 <?php
 /**
- * Home: "Trusted, Quietly." — paginated testimonial grid (3 cols x 2 rows).
+ * Home: "Trusted, Quietly." — three continuously moving testimonial columns.
  */
 
 $testimonials = new WP_Query([
@@ -41,6 +41,31 @@ function echelon_testimonial_card($quote, $name, $title, $rating, $photo) {
     </div>
     <?php
 }
+
+$testimonial_items = [];
+if ($testimonials->have_posts()) {
+    while ($testimonials->have_posts()) {
+        $testimonials->the_post();
+        $tid = get_the_ID();
+        $testimonial_items[] = [
+            'quote'  => echelon_field('quote', $tid, get_the_title()),
+            'name'   => echelon_field('author_name', $tid, ''),
+            'title'  => echelon_field('author_title', $tid, ''),
+            'rating' => echelon_field('rating', $tid, 5),
+            'photo'  => echelon_field('author_photo', $tid, null),
+        ];
+    }
+    wp_reset_postdata();
+} else {
+    for ($i = 0; $i < 9; $i++) {
+        $testimonial_items[] = $fallback + ['photo' => null];
+    }
+}
+
+$testimonial_columns = [[], [], []];
+foreach ($testimonial_items as $index => $item) {
+    $testimonial_columns[$index % 3][] = $item;
+}
 ?>
 <section class="section testimonials" id="testimonials" data-reveal>
 	<div class="container">
@@ -51,35 +76,20 @@ function echelon_testimonial_card($quote, $name, $title, $rating, $photo) {
 	</div>
 
 	<div class="container">
-		<div class="testimonials__slider swiper" data-swiper>
-			<div class="swiper-wrapper">
-				<?php if ($testimonials->have_posts()) : ?>
-					<?php while ($testimonials->have_posts()) : $testimonials->the_post();
-						$tid = get_the_ID();
-						?>
-						<div class="swiper-slide">
-							<?php
-							echelon_testimonial_card(
-								echelon_field('quote', $tid, get_the_title()),
-								echelon_field('author_name', $tid, ''),
-								echelon_field('author_title', $tid, ''),
-								echelon_field('rating', $tid, 5),
-								echelon_field('author_photo', $tid, null)
-							);
-							?>
-						</div>
-					<?php endwhile;
-					wp_reset_postdata();
-					?>
-				<?php else : ?>
-					<?php for ($i = 0; $i < 6; $i++) : ?>
-						<div class="swiper-slide">
-							<?php echelon_testimonial_card($fallback['quote'], $fallback['name'], $fallback['title'], $fallback['rating'], null); ?>
-						</div>
-					<?php endfor; ?>
-				<?php endif; ?>
-			</div>
+		<div class="testimonials__columns" aria-label="<?php esc_attr_e('Customer testimonials', 'echelon'); ?>">
+			<?php foreach ($testimonial_columns as $column_index => $column) : ?>
+				<div class="testimonials__column" style="--column-duration: <?php echo esc_attr(28 + ($column_index * 5)); ?>s;">
+					<div class="testimonials__track">
+						<?php for ($copy = 0; $copy < 2; $copy++) : ?>
+							<div class="testimonials__group"<?php echo $copy ? ' aria-hidden="true"' : ''; ?>>
+								<?php foreach ($column as $item) : ?>
+									<?php echelon_testimonial_card($item['quote'], $item['name'], $item['title'], $item['rating'], $item['photo']); ?>
+								<?php endforeach; ?>
+							</div>
+						<?php endfor; ?>
+					</div>
+				</div>
+			<?php endforeach; ?>
 		</div>
-		<div class="dots testimonials__dots" data-swiper-pagination></div>
 	</div>
 </section>

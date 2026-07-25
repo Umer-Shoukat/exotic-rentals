@@ -6,6 +6,11 @@ export function initReveal() {
   if (!elements.length) return;
 
   document.documentElement.classList.add('reveal-init');
+  document.querySelectorAll('[data-reveal-group]').forEach((group) => {
+    group.querySelectorAll('[data-reveal]').forEach((el, index) => {
+      el.style.setProperty('--reveal-index', index);
+    });
+  });
 
   if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
     elements.forEach((el) => el.classList.add('is-revealed'));
@@ -14,11 +19,9 @@ export function initReveal() {
 
   const observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry, index) => {
+      entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const el = entry.target;
-        const delay = (index % 4) * 90;
-        el.style.transitionDelay = `${delay}ms`;
         el.classList.add('is-revealed');
         observer.unobserve(el);
       });

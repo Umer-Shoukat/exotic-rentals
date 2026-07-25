@@ -16,7 +16,7 @@
   --color-text-dim: #6b6b6b;
 
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -36,6 +36,11 @@
   --header-height: 88px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 240ms;
+  --motion-base: 600ms;
+  --motion-slow: 900ms;
+  --reveal-distance: 32px;
   --transition-fast: 200ms var(--ease-out);
   --transition-base: 350ms var(--ease-out);
 }

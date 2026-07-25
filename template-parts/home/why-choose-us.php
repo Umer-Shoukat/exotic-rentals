@@ -15,7 +15,7 @@ $stats   = echelon_field('stats', get_the_ID(), [
 
 $heading_parts = preg_split('/(over anyone else)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 ?>
-<section class="section section--alt why-choose-us" id="why-choose-us" data-reveal>
+<section class="section section--alt why-choose-us" id="why-choose-us" data-reveal data-scroll-progress-section>
 	<div class="container why-choose-us__grid">
 		<div class="why-choose-us__intro">
 			<p class="eyebrow"><?php esc_html_e('The Exotic Rental Difference', 'echelon'); ?></p>
@@ -34,6 +34,7 @@ $heading_parts = preg_split('/(over anyone else)/i', $heading, -1, PREG_SPLIT_DE
 		</div>
 
 		<div class="stat-grid" data-stat-stack>
+			<div class="stat-grid__progress" data-scroll-progress role="progressbar" aria-label="<?php esc_attr_e('Section progress', 'echelon'); ?>" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
 			<?php foreach ($stats as $index => $stat) : ?>
 				<div class="stat-card" style="--stack-index: <?php echo esc_attr($index); ?>;">
 					<?php echelon_icon($stat['icon'] ?? 'check', 'stat-card__icon'); ?>

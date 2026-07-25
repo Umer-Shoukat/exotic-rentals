@@ -26,11 +26,14 @@
     width: 383px;
     margin: 24px 0;
     color: rgba(255, 255, 255, .5);
-    font-size: 16px;
-    line-height: 18px;
+    font-size: 17px;
+    line-height: 25px;
   }
 
-  .btn { width: 191px; }
+  .btn {
+    width: 210px;
+    min-height: 48px;
+  }
 }
 
 .concierge__checklist {
@@ -43,8 +46,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 16px;
+    line-height: 22px;
   }
 
   svg {
@@ -82,7 +85,11 @@
 }
 
 .concierge__chat-close {
-  font: 300 25px/1 Inter, sans-serif;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
   color: #fff;
 }
 
@@ -97,10 +104,18 @@
   width: 263px;
   padding: 11px 7px;
   border-radius: 8px 8px 8px 0;
-  font-size: 12px;
-  line-height: 12px;
+  font-size: 14px;
+  line-height: 18px;
   letter-spacing: .02em;
   text-transform: capitalize;
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+  transition: opacity 420ms var(--ease-premium), transform 420ms var(--ease-premium);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .concierge__bubble--agent {
@@ -116,7 +131,7 @@
 }
 
 .concierge__typing {
-  display: flex;
+  display: none;
   gap: 3px;
   width: 38px;
   padding: 6px;
@@ -128,7 +143,23 @@
     height: 5px;
     border-radius: 50%;
     background: #aaa;
+    animation: concierge-dot 900ms ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 120ms; }
+    &:nth-child(3) { animation-delay: 240ms; }
   }
+
+  &.is-visible { display: flex; }
+}
+
+@keyframes concierge-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concierge__bubble { opacity: 1; transform: none; transition: none; }
+  .concierge__typing span { animation: none; }
 }
 
 @include down(lg) {

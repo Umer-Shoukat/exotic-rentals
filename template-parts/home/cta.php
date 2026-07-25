@@ -15,7 +15,7 @@ $button  = echelon_field('cta_button', $page_id, ['title' => 'Start Your Reserva
 		<?php if ($image) : ?>
 			<?php echelon_media($image, 'full', 'cta-band__img'); ?>
 		<?php else : ?>
-			<img class="cta-band__img" src="<?php echo esc_url(ECHELON_THEME_URI . '/assets/images/figma/reservation-cta.jpg'); ?>" alt="" loading="lazy" decoding="async">
+			<img class="cta-band__img" src="<?php echo esc_url(ECHELON_THEME_URI . '/assets/images/generated/home-cta.webp'); ?>" alt="" loading="lazy" decoding="async" width="1915" height="821">
 		<?php endif; ?>
 		<div class="cta-band__scrim"></div>
 	</div>

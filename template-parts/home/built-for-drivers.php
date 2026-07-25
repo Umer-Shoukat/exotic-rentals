@@ -29,7 +29,7 @@ $features = echelon_field('features', get_the_ID(), [
 
 $accent_position = stripos($heading, 'notice');
 ?>
-<section class="section built-for-drivers" data-reveal>
+<section class="section built-for-drivers" id="how-it-works" data-reveal>
 	<div class="container">
 		<header class="section-heading">
 			<p class="eyebrow"><?php esc_html_e('Why Exotic Rental', 'echelon'); ?></p>

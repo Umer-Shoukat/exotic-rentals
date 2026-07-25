@@ -26,13 +26,28 @@
   color: #f5f5f1;
 }
 
+.fleet-brands__marquee {
+  overflow: hidden;
+}
+
 .fleet-brands__strip {
   display: flex;
   gap: 16px;
   width: max-content;
-  padding-inline: 24px;
-  transform: translateX(calc((100vw - 1402px) / 2));
-  animation: brand-marquee 32s linear infinite alternate;
+  animation: brand-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.fleet-brands__group {
+  display: flex;
+  flex: none;
+  gap: 16px;
+  padding-left: 16px;
+}
+
+.fleet-brands__marquee:hover .fleet-brands__strip,
+.fleet-brands__marquee:focus-within .fleet-brands__strip {
+  animation-play-state: paused;
 }
 
 .fleet-brands__logo {
@@ -46,6 +61,7 @@
   background: radial-gradient(circle at 50% 0%, rgba(212, 9, 36, 0.13), transparent 62%), linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.016));
   filter: grayscale(1);
   opacity: .85;
+  transition: filter var(--transition-base), opacity var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
 
   img {
     max-width: 72%;
@@ -58,10 +74,17 @@
     text-transform: uppercase;
     color: var(--color-text-muted);
   }
+
+  &:hover {
+    filter: grayscale(0);
+    opacity: 1;
+    border-color: rgba(220, 20, 48, 0.55);
+    transform: translateY(-4px);
+  }
 }
 
 @keyframes brand-marquee {
-  to { transform: translateX(calc((100vw - 1402px) / 2 - 144px)); }
+  to { transform: translateX(-50%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,9 +102,6 @@
   }
 
   .fleet-brands__strip {
-    max-width: 100%;
-    overflow-x: auto;
-    transform: none;
-    animation: none;
+    animation-duration: 22s;
   }
 }

@@ -83,7 +83,7 @@ get_header();
                             <div class="reservation-fleet">
                                 <?php foreach ($vehicles as $index => $vehicle) :
                                     $id = $vehicle->ID;
-                                    $gallery = echelon_field('gallery', $id, []);
+                                    $gallery = echelon_vehicle_gallery($id);
                                     $cover = $gallery[0] ?? get_post_thumbnail_id($id);
                                     $price = (float) echelon_field('price_per_hour', $id, 0);
                                     $daily_price = (float) echelon_field('daily_rental_price', $id, 0);

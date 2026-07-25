@@ -1,8 +1,7 @@
 import '@fontsource/anton/400.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
+import '@fontsource/lato/900.css';
 import '../scss/main.scss';
 
 import { initNav } from './modules/nav.js';
@@ -16,6 +15,7 @@ import { initMap } from './modules/map.js';
 import { initReservationFlow } from './modules/reservation.js';
 import { initFleetFilters } from './modules/fleet.js';
 import { initVehicleGallery } from './modules/vehicle-gallery.js';
+import { initHomepageMotion } from './modules/homepage-motion.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -30,4 +30,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initReservationFlow();
   initFleetFilters();
   initVehicleGallery();
+  initHomepageMotion();
 });

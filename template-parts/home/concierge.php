@@ -51,19 +51,19 @@ $heading_parts = preg_split('/(exotic car concierge)/i', $heading, -1, PREG_SPLI
 			<?php endif; ?>
 		</div>
 
-		<div class="concierge__chat" aria-hidden="true">
+		<div class="concierge__chat" data-concierge-chat role="region" aria-label="<?php esc_attr_e('Concierge conversation preview', 'echelon'); ?>">
 			<div class="concierge__chat-header">
 				<?php echelon_icon('headset'); ?>
 				<span><?php echo esc_html($chat_title); ?></span>
-				<button type="button" class="concierge__chat-close">&times;</button>
+				<button type="button" class="concierge__chat-close" data-chat-replay aria-label="<?php esc_attr_e('Replay conversation', 'echelon'); ?>"><?php esc_html_e('Replay', 'echelon'); ?></button>
 			</div>
 			<div class="concierge__chat-body">
 				<?php foreach ($messages as $msg) : ?>
-					<div class="concierge__bubble concierge__bubble--<?php echo esc_attr($msg['sender']); ?>">
+					<div class="concierge__bubble concierge__bubble--<?php echo esc_attr($msg['sender']); ?>" data-chat-message>
 						<?php echo esc_html($msg['message']); ?>
 					</div>
 				<?php endforeach; ?>
-				<div class="concierge__typing" aria-hidden="true"><span></span><span></span><span></span></div>
+				<div class="concierge__typing" data-chat-typing aria-hidden="true"><span></span><span></span><span></span></div>
 			</div>
 		</div>
 	</div>
