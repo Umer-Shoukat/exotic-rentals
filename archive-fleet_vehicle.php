@@ -37,8 +37,8 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 
 		<header class="fleet-hero">
 			<p class="fleet-eyebrow"><?php esc_html_e('Our Fleet', 'echelon'); ?></p>
-			<h1><?php esc_html_e('Exotic Car Rental', 'echelon'); ?> <em><?php esc_html_e('Fleet', 'echelon'); ?></em></h1>
-			<p><?php esc_html_e('Browse our live collection, filter by body style, make, or rate, then reserve your exact dates directly from each vehicle page.', 'echelon'); ?></p>
+			<h1><?php esc_html_e('Luxury & Exotic Vehicle', 'echelon'); ?> <em><?php esc_html_e('Fleet', 'echelon'); ?></em></h1>
+			<p><?php esc_html_e('Browse our live collection, filter by body style, make, or rate, then request your exact dates directly from each vehicle page.', 'echelon'); ?></p>
 		</header>
 
 		<div class="fleet-stats" aria-label="<?php esc_attr_e('Fleet summary', 'echelon'); ?>">
@@ -67,10 +67,10 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 			<form id="fleet-filters" class="fleet-filters" method="get" action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>" data-fleet-filters>
 				<input type="hidden" name="fleet_sort" value="<?php echo esc_attr($_GET['fleet_sort'] ?? 'recommended'); ?>">
 				<div class="fleet-filter-dates">
-					<label><?php esc_html_e('Pick-up date', 'echelon'); ?> <b>*</b><input type="date" name="pickup_date" value="<?php echo esc_attr($_GET['pickup_date'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Return date', 'echelon'); ?> <b>*</b><input type="date" name="return_date" value="<?php echo esc_attr($_GET['return_date'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Pick-up time', 'echelon'); ?> <b>*</b><input type="time" name="pickup_time" value="<?php echo esc_attr($_GET['pickup_time'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Return time', 'echelon'); ?> <b>*</b><input type="time" name="return_time" value="<?php echo esc_attr($_GET['return_time'] ?? ''); ?>"></label>
+					<label><?php esc_html_e('Pickup date', 'echelon'); ?> <b>*</b><input type="date" name="pickup_date" value="<?php echo esc_attr($_GET['pickup_date'] ?? ''); ?>"></label>
+					<label><?php esc_html_e('Drop-off date', 'echelon'); ?> <b>*</b><input type="date" name="return_date" value="<?php echo esc_attr($_GET['return_date'] ?? ''); ?>"></label>
+					<label><?php esc_html_e('Pickup time', 'echelon'); ?> <b>*</b><input type="time" name="pickup_time" value="<?php echo esc_attr($_GET['pickup_time'] ?? ''); ?>"></label>
+					<label><?php esc_html_e('Drop-off time', 'echelon'); ?> <b>*</b><input type="time" name="return_time" value="<?php echo esc_attr($_GET['return_time'] ?? ''); ?>"></label>
 				</div>
 
 				<fieldset><legend><?php esc_html_e('Search', 'echelon'); ?></legend><input type="search" name="fleet_search" placeholder="<?php esc_attr_e('Search the fleet...', 'echelon'); ?>" value="<?php echo esc_attr($_GET['fleet_search'] ?? ''); ?>"></fieldset>
