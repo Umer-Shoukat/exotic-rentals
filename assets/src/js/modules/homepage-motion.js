@@ -38,10 +38,29 @@ function initConciergeChat() {
   if (!messages.length) return;
 
   let timers = [];
+  let hasPlayed = false;
+  let observer = null;
+
   const clear = () => {
     timers.forEach(window.clearTimeout);
     timers = [];
   };
+
+  const stopWatching = () => {
+    observer?.disconnect();
+    window.removeEventListener('scroll', checkViewport);
+    window.removeEventListener('resize', checkViewport);
+  };
+
+  const isNearViewport = () => {
+    const rect = chat.getBoundingClientRect();
+    return rect.top < window.innerHeight * 0.9 && rect.bottom > window.innerHeight * 0.1;
+  };
+
+  function checkViewport() {
+    if (!isNearViewport()) return;
+    start();
+  }
 
   const showAll = () => {
     messages.forEach((message) => message.classList.add('is-visible'));
@@ -69,15 +88,25 @@ function initConciergeChat() {
     });
   };
 
+  function start() {
+    if (hasPlayed) return;
+    hasPlayed = true;
+    stopWatching();
+    play();
+  }
+
   replay?.addEventListener('click', play);
 
   if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
+    observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
-      play();
-      observer.disconnect();
-    }, { threshold: 0.35 });
+      start();
+    }, { threshold: 0.05, rootMargin: '0px 0px -10% 0px' });
     observer.observe(chat);
+
+    window.addEventListener('scroll', checkViewport, { passive: true });
+    window.addEventListener('resize', checkViewport, { passive: true });
+    checkViewport();
   } else {
     play();
   }

@@ -69,7 +69,6 @@ while (have_posts()) : the_post();
         <div class="container vehicle-detail__hero-content">
             <h1><?php echo esc_html($title); ?></h1>
             <p><?php echo esc_html($year); ?> · <?php echo esc_html($doors); ?>-<?php esc_html_e('Door', 'echelon'); ?></p>
-            <a class="btn btn--primary" href="<?php echo esc_url($reserve_url); ?>"><?php esc_html_e('Book Now', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a>
         </div>
     </section>
 
