@@ -4,7 +4,7 @@ get_header();
 
 $service_count = (int) wp_count_posts('service')->publish;
 $vehicle_count = (int) wp_count_posts('fleet_vehicle')->publish;
-$hero_eyebrow = echelon_field('services_hero_eyebrow', 'option', 'Premium Automotive Services');
+$hero_eyebrow = echelon_field('services_hero_eyebrow', 'option', 'Chauffeur & Transportation Services');
 $hero_title = echelon_field('services_hero_title', 'option', 'Luxury Service For Every Occasion');
 $hero_description = echelon_field('services_hero_description', 'option', 'From landmark weddings and high-stakes business travel to content production, our concierge team coordinates every vehicle, detail, and arrival.');
 $hero_image = echelon_field('services_hero_image', 'option', null);
@@ -19,11 +19,29 @@ $proof_items = echelon_field('services_proof_items', 'option', [
 	['value' => '100%', 'label' => __('Insured', 'echelon')],
 ]);
 $steps = echelon_field('services_steps', 'option', [
-	['icon' => 'gauge', 'title' => __('Choose Your Vehicle', 'echelon'), 'description' => __('Choose your vehicle from the live fleet.', 'echelon')],
-	['icon' => 'calendar', 'title' => __('Select Your Dates', 'echelon'), 'description' => __('Pick timing, location, and delivery details.', 'echelon')],
-	['icon' => 'shield-check', 'title' => __('Confirm Reservation', 'echelon'), 'description' => __('Review pricing, documents, and coverage.', 'echelon')],
-	['icon' => 'check', 'title' => __('Enjoy The Experience', 'echelon'), 'description' => __('We deliver. You drive. That is the promise.', 'echelon')],
+	['icon' => 'gauge', 'title' => __('Choose Your Vehicle', 'echelon'), 'description' => __('Browse the live fleet and select the vehicle for your occasion.', 'echelon')],
+	['icon' => 'calendar', 'title' => __('Select Your Dates', 'echelon'), 'description' => __('Pick your timing, pickup location, and destination.', 'echelon')],
+	['icon' => 'shield-check', 'title' => __('Confirm Reservation', 'echelon'), 'description' => __('Our concierge team confirms pricing, vehicle, and chauffeur details.', 'echelon')],
+	['icon' => 'check', 'title' => __('Enjoy The Experience', 'echelon'), 'description' => __("Your chauffeur arrives on time and ready. That's the promise.", 'echelon')],
 ]);
+if ($hero_eyebrow === 'Premium Automotive Services') {
+	$hero_eyebrow = 'Chauffeur & Transportation Services';
+}
+foreach ($steps as &$step) {
+	if (($step['description'] ?? '') === 'Choose your vehicle from the live fleet.') {
+		$step['description'] = __('Browse the live fleet and select the vehicle for your occasion.', 'echelon');
+	}
+	if (($step['description'] ?? '') === 'Pick timing, location, and delivery details.') {
+		$step['description'] = __('Pick your timing, pickup location, and destination.', 'echelon');
+	}
+	if (($step['description'] ?? '') === 'Review pricing, documents, and coverage.') {
+		$step['description'] = __('Our concierge team confirms pricing, vehicle, and chauffeur details.', 'echelon');
+	}
+	if (($step['description'] ?? '') === 'We deliver. You drive. That is the promise.') {
+		$step['description'] = __("Your chauffeur arrives on time and ready. That's the promise.", 'echelon');
+	}
+}
+unset($step);
 $hero_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($hero_title));
 $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_title));
 ?>
@@ -70,8 +88,13 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 
 	<section class="section service-steps" data-reveal>
 		<div class="container">
-			<?php $steps_heading = echelon_field('services_steps_heading', 'option', __('Renting Your Dream Car Is Simple', 'echelon')); ?>
-			<header><p class="eyebrow"><?php echo esc_html(echelon_field('services_steps_eyebrow', 'option', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Dream Car', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
+			<?php
+			$steps_heading = echelon_field('services_steps_heading', 'option', __('Booking Your Chauffeur Is Simple', 'echelon'));
+			if ($steps_heading === 'Renting Your Dream Car Is Simple') {
+				$steps_heading = __('Booking Your Chauffeur Is Simple', 'echelon');
+			}
+			?>
+			<header><p class="eyebrow"><?php echo esc_html(echelon_field('services_steps_eyebrow', 'option', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Chauffeur', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
 			<ol>
 				<?php foreach ($steps as $index => $step) : ?>
 					<li><b><?php echo esc_html(sprintf('%02d', $index + 1)); ?></b><?php echelon_icon($step['icon'] ?? 'check'); ?><h3><?php echo esc_html($step['title'] ?? ''); ?></h3><p><?php echo esc_html($step['description'] ?? ''); ?></p></li>

@@ -56,7 +56,7 @@ function echelon_register_acf_fields() {
         'key'    => 'group_echelon_service',
         'title'  => 'Service Details',
         'fields' => [
-            ['key' => 'field_s_kicker', 'name' => 'service_kicker', 'label' => 'Card Kicker', 'type' => 'text', 'placeholder' => 'e.g. Elegant arrival for your big day.'],
+            ['key' => 'field_s_kicker', 'name' => 'service_kicker', 'label' => 'Card Kicker', 'type' => 'text', 'placeholder' => 'e.g. A composed, on-time arrival for your ceremony and reception.'],
             ['key' => 'field_s_menu_icon', 'name' => 'service_menu_icon', 'label' => 'Mega Menu Icon', 'type' => 'select', 'choices' => echelon_icon_choices(), 'default_value' => 'star'],
             ['key' => 'field_s_menu_desc', 'name' => 'service_menu_description', 'label' => 'Mega Menu Description', 'type' => 'text', 'instructions' => 'Short supporting line shown in the desktop Services menu. Defaults to the card kicker or excerpt.'],
             ['key' => 'field_s_cta', 'name' => 'service_cta_label', 'label' => 'CTA Label', 'type' => 'text', 'default_value' => 'Explore Service'],
@@ -118,7 +118,7 @@ function echelon_register_acf_fields() {
         'title'  => 'Services Archive Content',
         'fields' => [
             ['key' => 'field_sa_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
-            ['key' => 'field_sa_eyebrow', 'name' => 'services_hero_eyebrow', 'label' => 'Hero Eyebrow', 'type' => 'text', 'default_value' => 'Premium Automotive Services'],
+            ['key' => 'field_sa_eyebrow', 'name' => 'services_hero_eyebrow', 'label' => 'Hero Eyebrow', 'type' => 'text', 'default_value' => 'Chauffeur & Transportation Services'],
             ['key' => 'field_sa_title', 'name' => 'services_hero_title', 'label' => 'Hero Title', 'type' => 'text', 'default_value' => 'Luxury Service For Every Occasion'],
             ['key' => 'field_sa_desc', 'name' => 'services_hero_description', 'label' => 'Hero Description', 'type' => 'textarea', 'rows' => 3],
             ['key' => 'field_sa_image', 'name' => 'services_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
@@ -139,7 +139,7 @@ function echelon_register_acf_fields() {
             ['key' => 'field_sa_list_desc', 'name' => 'services_list_description', 'label' => 'Services Section Description', 'type' => 'textarea', 'rows' => 3],
             ['key' => 'field_sa_tab_steps', 'label' => 'Process', 'type' => 'tab'],
             ['key' => 'field_sa_steps_eyebrow', 'name' => 'services_steps_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Simple From Start To Finish'],
-            ['key' => 'field_sa_steps_heading', 'name' => 'services_steps_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Renting Your Dream Car Is Simple'],
+            ['key' => 'field_sa_steps_heading', 'name' => 'services_steps_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Booking Your Chauffeur Is Simple'],
             [
                 'key' => 'field_sa_steps', 'name' => 'services_steps', 'label' => 'Steps', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 4,
                 'sub_fields' => [

@@ -196,8 +196,8 @@ function echelon_seed_sample_services() {
     }
 
     $samples = [
-        'wedding-car-rental' => ['Wedding Car Rental', 'Elegant, photo-ready luxury vehicles coordinated around your ceremony and reception.', 'star', 'wedding'],
-        'prom-car-rental' => ['Prom Car Rental', 'Make a memorable entrance with a premium vehicle prepared for the occasion.', 'star', 'prom'],
+        'wedding-car-rental' => ['Wedding Transportation', 'A composed, on-time arrival for your ceremony and reception.', 'star', 'wedding'],
+        'prom-car-rental' => ['Prom Transportation', 'A safe, chauffeured ride your group will remember.', 'star', 'prom'],
         'corporate-car-rental' => ['Corporate Car Rental', 'Professional executive transportation for meetings, events, and client arrivals.', 'id-card', 'corporate'],
         'photoshoot-car-rental' => ['Photoshoot Car Rental', 'Distinctive vehicles prepared for editorial, commercial, and creator productions.', 'star', 'photoshoot'],
     ];
