@@ -12,11 +12,17 @@ while (have_posts()) : the_post();
 	$hero_image = echelon_field('about_hero_image', $page_id, get_post_thumbnail_id());
 	$hero_description = echelon_field('about_hero_description', $page_id, '');
 	if (!$hero_description || stripos($hero_description, 'Team Members') !== false || stripos($hero_description, 'web crawler expert') !== false) {
-		$hero_description = __('Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it is a wedding arrival or an important business engagement.', 'echelon');
+		$hero_description = __("Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown.", 'echelon');
+	}
+	if (stripos($hero_description, 'wedding arrival') !== false || stripos($hero_description, 'important business engagement') !== false) {
+		$hero_description = __("Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown.", 'echelon');
 	}
 	$story_content = echelon_field('about_story_content', $page_id, '');
 	if (!$story_content || stripos($story_content, 'Team Members') !== false || stripos($story_content, 'web crawler expert') !== false || stripos($story_content, 'Our Beloved Partners') !== false) {
-		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product — the vehicle is just one part of getting that right.', 'echelon') . '</p><p>' . __('From the first conversation through the final destination, our team coordinates the chauffeur, vehicle preparation, timing, and details around each client’s occasion.', 'echelon') . '</p>';
+		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon') . '</p>';
+	}
+	if (stripos($story_content, 'final destination') !== false || (stripos($story_content, 'client') !== false && stripos($story_content, 'occasion') !== false)) {
+		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon') . '</p>';
 	}
 	$story_cta = echelon_field('about_story_cta', $page_id, ['title' => __('Explore Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
 	$stats = echelon_field('about_stats', $page_id, [
@@ -31,6 +37,9 @@ while (have_posts()) : the_post();
 		}
 		if ('45M' === ($stat['value'] ?? '')) {
 			$stat['value'] = __('Planned', 'echelon');
+			$stat['label'] = __('Carefully Scheduled Pickups', 'echelon');
+		}
+		if (stripos($stat['label'] ?? '', 'Average Delivery Time') !== false) {
 			$stat['label'] = __('Carefully Scheduled Pickups', 'echelon');
 		}
 	}
@@ -78,8 +87,7 @@ while (have_posts()) : the_post();
 					<div class="entry-content"><?php echo wp_kses_post(apply_filters('the_content', $story_content)); ?></div>
 				<?php else : ?>
 					<div class="entry-content">
-						<p><?php esc_html_e('Echelon Motions was built around a simple belief: an extraordinary vehicle deserves an equally extraordinary experience. From the first conversation to final collection, every detail should feel considered.', 'echelon'); ?></p>
-						<p><?php esc_html_e('Our team brings together a carefully selected fleet, uncompromising preparation, and a real concierge who understands the occasion behind every booking.', 'echelon'); ?></p>
+						<p><?php esc_html_e('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon'); ?></p>
 					</div>
 				<?php endif; ?>
 				<a class="btn btn--primary" href="<?php echo esc_url($story_cta['url'] ?? home_url('/fleet/')); ?>"<?php echo !empty($story_cta['target']) ? ' target="' . esc_attr($story_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($story_cta['title'] ?? __('Explore Our Fleet', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a>

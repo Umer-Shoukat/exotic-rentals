@@ -189,7 +189,7 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_ap_hero_eyebrow', 'name' => 'about_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Driven By The Experience'],
             ['key' => 'field_ap_hero_title', 'name' => 'about_hero_title', 'label' => 'Title', 'type' => 'text', 'default_value' => 'More Than A Car.'],
             ['key' => 'field_ap_hero_accent', 'name' => 'about_hero_accent', 'label' => 'Accent Title', 'type' => 'text', 'default_value' => 'A Standard Of Service.'],
-            ['key' => 'field_ap_hero_desc', 'name' => 'about_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => 'Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it is a wedding arrival or an important business engagement.'],
+            ['key' => 'field_ap_hero_desc', 'name' => 'about_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => "Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown."],
             ['key' => 'field_ap_hero_image', 'name' => 'about_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large', 'instructions' => 'Defaults to the page featured image.'],
             ['key' => 'field_ap_tab_story', 'label' => 'Story', 'type' => 'tab'],
             ['key' => 'field_ap_story_image', 'name' => 'about_story_image', 'label' => 'Image', 'type' => 'image', 'preview_size' => 'large'],
@@ -198,7 +198,7 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_ap_story_eyebrow', 'name' => 'about_story_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Story'],
             ['key' => 'field_ap_story_heading', 'name' => 'about_story_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Luxury Should Feel Effortless'],
             ['key' => 'field_ap_story_accent', 'name' => 'about_story_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Effortless'],
-            ['key' => 'field_ap_story_content', 'name' => 'about_story_content', 'label' => 'Story Copy', 'type' => 'wysiwyg', 'tabs' => 'visual', 'toolbar' => 'basic', 'media_upload' => 0, 'instructions' => 'Use this field for the company story. Legacy page-editor placeholder content is no longer displayed.'],
+            ['key' => 'field_ap_story_content', 'name' => 'about_story_content', 'label' => 'Story Copy', 'type' => 'wysiwyg', 'tabs' => 'visual', 'toolbar' => 'basic', 'media_upload' => 0, 'default_value' => '<p>Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.</p>', 'instructions' => 'Use this field for the company story. Legacy page-editor placeholder content is no longer displayed.'],
             ['key' => 'field_ap_story_cta', 'name' => 'about_story_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Explore Our Fleet', 'url' => '/fleet/']],
             ['key' => 'field_ap_tab_stats', 'label' => 'Statistics', 'type' => 'tab'],
             [
