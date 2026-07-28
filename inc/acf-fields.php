@@ -161,7 +161,8 @@ function echelon_register_acf_fields() {
             ['key' => 'field_cp_hero_eyebrow', 'name' => 'contact_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Contact Us'],
             ['key' => 'field_cp_hero_title', 'name' => 'contact_hero_title', 'label' => 'Title', 'type' => 'text', 'default_value' => "Let's Plan Your Drive"],
             ['key' => 'field_cp_hero_accent', 'name' => 'contact_hero_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Drive', 'instructions' => 'This text is highlighted when it appears in the title.'],
-            ['key' => 'field_cp_hero_desc', 'name' => 'contact_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => "Tell our concierge what you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between."],
+            ['key' => 'field_cp_hero_desc', 'name' => 'contact_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => "Tell our concierge what
+you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between."],
             ['key' => 'field_cp_hero_image', 'name' => 'contact_hero_image', 'label' => 'Hero Image', 'type' => 'image', 'preview_size' => 'large'],
             ['key' => 'field_cp_tab_intro', 'label' => 'Contact Details', 'type' => 'tab'],
             ['key' => 'field_cp_intro_eyebrow', 'name' => 'contact_intro_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Concierge'],

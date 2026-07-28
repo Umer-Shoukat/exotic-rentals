@@ -9,7 +9,7 @@ get_header();
 
 $address = echelon_setting('contact_address', 'New York City & Long Island — By Appointment');
 $email = echelon_setting('contact_email', 'concierge@example.com');
-$phone = echelon_setting('contact_phone', '+1 (212) 555-0100');
+$phone = echelon_setting('contact_phone', '+1 (310) 555-0199');
 $phone_href = preg_replace('/[^0-9+]/', '', $phone);
 $vehicles = get_posts([
     'post_type'      => 'fleet_vehicle',
@@ -21,9 +21,11 @@ $vehicles = get_posts([
 while (have_posts()) : the_post();
     $hero_title = echelon_field('contact_hero_title', get_the_ID(), __("Let's Plan Your Drive", 'echelon'));
     $hero_accent = echelon_field('contact_hero_accent', get_the_ID(), __('Drive', 'echelon'));
-    $hero_description = echelon_field('contact_hero_description', get_the_ID(), __("Tell our concierge what you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between.", 'echelon'));
+    $hero_description = echelon_field('contact_hero_description', get_the_ID(), __("Tell our concierge what
+you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between.", 'echelon'));
     if (stripos($hero_description, 'vehicle, timing, delivery') !== false) {
-        $hero_description = __("Tell our concierge what you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between.", 'echelon');
+        $hero_description = __("Tell our concierge what
+you have in mind. We'll help with the vehicle, chauffeur, timing, and every detail in between.", 'echelon');
     }
     get_template_part('template-parts/global/inner-hero', null, [
         'eyebrow'     => echelon_field('contact_hero_eyebrow', get_the_ID(), __('Contact Us', 'echelon')),
@@ -144,7 +146,8 @@ while (have_posts()) : the_post();
 									<textarea class="field__control" name="additional_details" rows="5" maxlength="3000"></textarea>
 								</label>
 							</div>
-							<p class="contact-inquiry-form__disclaimer"><?php esc_html_e('Submitting this form sends a request only. Your booking is not confirmed until our concierge verifies availability, scheduling, and pricing.', 'echelon'); ?></p>
+							<p class="contact-inquiry-form__disclaimer"><?php esc_html_e('Submit your trip details and our concierge team will confirm vehicle availability,
+chauffeur scheduling, and pricing', 'echelon'); ?></p>
 							<button class="btn btn--primary" type="submit"><?php echo esc_html(echelon_field('contact_form_button_label', get_the_ID(), __('Email Concierge', 'echelon'))); ?><?php echelon_icon('arrow-right'); ?></button>
 						</form>
 					</div>

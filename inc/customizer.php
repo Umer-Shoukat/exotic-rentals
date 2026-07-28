@@ -24,7 +24,7 @@ function echelon_customize_register(WP_Customize_Manager $wp_customize) {
     $contact_fields = [
         'contact_address' => ['label' => __('Service Area / Address', 'echelon'), 'default' => 'New York City & Long Island — By Appointment'],
         'contact_email'   => ['label' => __('Email', 'echelon'), 'default' => 'concierge@example.com'],
-        'contact_phone'   => ['label' => __('Phone', 'echelon'), 'default' => '+1 (212) 555-0100'],
+        'contact_phone'   => ['label' => __('Phone', 'echelon'), 'default' => '+1 (310) 555-0199'],
     ];
     foreach ($contact_fields as $id => $field) {
         $wp_customize->add_setting($id, [
@@ -160,7 +160,7 @@ function echelon_setting($key, $default = '') {
     $contact_defaults = [
         'contact_address' => 'New York City & Long Island — By Appointment',
         'contact_email'   => 'concierge@example.com',
-        'contact_phone'   => '+1 (212) 555-0100',
+        'contact_phone'   => '+1 (310) 555-0199',
     ];
     $legacy_placeholders = [
         'contact_address' => '8500 Beverly Blvd, Los Angeles CA',
