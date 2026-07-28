@@ -2,6 +2,12 @@ body {
   font-size: 17px;
   line-height: 1.65;
   letter-spacing: 0.005em;
+
+  @include down(md) {
+    font-size: 15px;
+    line-height: 1.58;
+    letter-spacing: 0;
+  }
 }
 
 h1,
@@ -15,7 +21,7 @@ h1 {
   font-size: clamp(38px, 4.6vw, 64px);
 
   @include down(md) {
-    font-size: 34px;
+    font-size: 28px;
   }
 }
 
@@ -23,12 +29,16 @@ h2 {
   font-size: clamp(30px, 3.4vw, 44px);
 
   @include down(md) {
-    font-size: 28px;
+    font-size: 25px;
   }
 }
 
 h3 {
   font-size: clamp(20px, 1.8vw, 26px);
+
+  @include down(md) {
+    font-size: 20px;
+  }
 }
 
 p {

@@ -66,11 +66,11 @@ $booking_locations = array_values(array_filter($booking_locations, static functi
 				</div>
 				<div class="field booking-widget__field">
 					<label class="field__label" for="pickup-time"><?php esc_html_e('Pick-up Time', 'echelon'); ?></label>
-					<div class="field__control-wrap"><input class="field__control" type="time" id="pickup-time" name="pickup_time"></div>
+					<div class="field__control-wrap"><input class="field__control" type="time" id="pickup-time" name="pickup_time"><?php echelon_icon('clock'); ?></div>
 				</div>
 				<div class="field booking-widget__field">
 					<label class="field__label" for="return-time"><?php esc_html_e('Return Time', 'echelon'); ?></label>
-					<div class="field__control-wrap"><input class="field__control" type="time" id="return-time" name="return_time"></div>
+					<div class="field__control-wrap"><input class="field__control" type="time" id="return-time" name="return_time"><?php echelon_icon('clock'); ?></div>
 				</div>
 				<div class="field booking-widget__field">
 					<label class="field__label" for="pickup-location"><?php esc_html_e('Location', 'echelon'); ?></label>

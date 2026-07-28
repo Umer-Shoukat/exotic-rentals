@@ -32,6 +32,7 @@
 			<p><?php echo esc_html(echelon_setting('footer_copyright')); ?></p>
 			<div class="legal-links">
 				<a href="<?php echo esc_url(home_url('/privacy-policy')); ?>"><?php esc_html_e('Privacy Policy', 'echelon'); ?></a>
+				<a href="<?php echo esc_url(home_url('/rental-policy')); ?>"><?php esc_html_e('Rental Policy', 'echelon'); ?></a>
 				<?php $terms_page = get_page_by_path('terms-and-conditions'); ?>
 				<?php if ($terms_page) : ?>
 					<a href="<?php echo esc_url(get_permalink($terms_page)); ?>"><?php esc_html_e('Terms & Conditions', 'echelon'); ?></a>

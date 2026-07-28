@@ -1,0 +1,348 @@
+@include down(md) {
+  .hero {
+    padding-bottom: 50px;
+  }
+
+  .hero__content {
+    padding: 156px 18px 56px;
+  }
+
+  .hero__content .eyebrow {
+    margin-bottom: 18px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .hero__heading {
+    max-width: 520px;
+    margin-bottom: 14px;
+    font-size: 28px;
+    line-height: 1.08;
+  }
+
+  .hero__subtext {
+    max-width: 500px;
+    margin-bottom: 22px;
+    font-size: 15px;
+    line-height: 1.58;
+  }
+
+  .hero__badges {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    max-width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    li {
+      min-width: 0;
+      gap: 6px;
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    svg {
+      flex: 0 0 13px;
+      width: 13px;
+      height: 13px;
+      color: var(--color-accent);
+    }
+  }
+
+  .hero__strip {
+    min-height: 152px;
+    margin-top: -56px;
+    padding: 18px;
+  }
+
+  .hero__strip-controls .slider-arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hero__strip-cta {
+    min-height: 44px;
+  }
+
+  .booking-widget {
+    padding-block: 40px;
+  }
+
+  .booking-widget__form {
+    padding: 22px 15px;
+    border-radius: 0;
+  }
+
+  .booking-widget__field-vehicle {
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+  }
+
+  .booking-widget__field-vehicle .field__control {
+    min-height: 44px;
+    padding-left: 40px;
+    font-size: 15px;
+  }
+
+  .booking-widget__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 10px;
+    margin-bottom: 18px;
+  }
+
+  .booking-widget__field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .booking-widget__field:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .booking-widget .field__control,
+  .booking-widget .field__control-wrap,
+  .booking-widget select.field__control {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .booking-widget .field__control {
+    min-height: 46px;
+    padding: 12px 36px 12px 12px;
+    font-size: 14px;
+  }
+
+  .booking-widget__field-vehicle .field__control {
+    padding-left: 40px;
+  }
+
+  .booking-widget input[type="time"].field__control {
+    appearance: auto;
+    color-scheme: dark;
+    cursor: pointer;
+  }
+
+  .booking-widget
+    input[type="time"].field__control::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .booking-widget .field__control-wrap:has(input[type="time"]) svg {
+    color: var(--color-accent);
+    pointer-events: none;
+  }
+
+  .booking-widget__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .booking-widget__actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .section.built-for-drivers,
+  .section.why-choose-us,
+  .section.concierge,
+  .section.rental-terms,
+  .section.more-than-rental,
+  .section.serving-cities,
+  .section.journal,
+  .section.faq,
+  .section.instagram-feed {
+    padding-block: 44px;
+  }
+
+  .section-heading {
+    margin-bottom: 28px;
+  }
+
+  .built-for-drivers .section-heading__title,
+  .why-choose-us__intro .section-heading__title,
+  .fleet-brands__header .section-heading__title,
+  .concierge__intro .section-heading__title,
+  .rental-terms__intro .section-heading__title,
+  .more-than-rental__header .section-heading__title,
+  .instagram-feed__header .section-heading__title,
+  .serving-cities__heading .section-heading__title,
+  .journal__heading .section-heading__title,
+  .faq__intro .section-heading__title {
+    width: auto;
+    max-width: 100%;
+    font-size: 25px;
+    line-height: 1.12;
+    letter-spacing: 0;
+  }
+
+  .why-choose-us__intro > p:not(.eyebrow),
+  .concierge__intro > p:not(.eyebrow),
+  .rental-terms__intro > p:not(.eyebrow),
+  .more-than-rental__desc,
+  .fleet-brands__desc,
+  .serving-cities__intro,
+  .journal__desc,
+  .faq__description,
+  .cta-band__desc {
+    width: auto;
+    max-width: 100%;
+    font-size: 15px;
+    line-height: 1.58;
+  }
+
+  .built-for-drivers .section-heading {
+    max-width: 100%;
+  }
+
+  .feature-card {
+    height: auto;
+    min-height: 276px;
+    padding: 20px 15px;
+  }
+
+  .feature-card__number {
+    font-size: 44px;
+    line-height: 1.05;
+  }
+
+  .feature-card__title {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .feature-card__desc,
+  .stat-card__label,
+  .requirement-card__label,
+  .occasion-card__desc {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .why-choose-us {
+    min-height: 0;
+  }
+
+  .why-choose-us__grid,
+  .concierge__grid,
+  .rental-terms__grid {
+    gap: 32px;
+  }
+
+  .stat-grid .stat-card {
+    min-height: 150px;
+    padding-inline: 15px;
+  }
+
+  .stat-grid .stat-card__value,
+  .requirement-card__value {
+    font-size: 34px;
+    line-height: 1;
+  }
+
+  .fleet-brands {
+    padding-block: 36px;
+  }
+
+  .fleet-brands__header {
+    margin-bottom: 24px;
+  }
+
+  .concierge__checklist {
+    grid-template-columns: 1fr;
+  }
+
+  .concierge__checklist li {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .concierge__chat {
+    width: 100%;
+    height: auto;
+    min-height: 280px;
+  }
+
+  .rental-terms__requirements {
+    gap: 12px;
+  }
+
+  .requirement-card {
+    height: auto;
+    min-height: 128px;
+    padding-inline: 15px;
+  }
+
+  .more-than-rental__header {
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .occasion-card__title {
+    font-size: 20px;
+    line-height: 1.08;
+  }
+
+  .occasion-card .content-card__overlay,
+  .journal .content-card__body,
+  .testimonial-card,
+  .vehicle-card__body {
+    padding-inline: 15px;
+  }
+
+  .choose-ride__category-title {
+    font-size: 20px;
+    line-height: 1.1;
+  }
+
+  .vehicle-card__body > .btn,
+  .choose-ride__tab,
+  .btn {
+    min-height: 44px;
+  }
+
+  .vehicle-card__body > .btn {
+    padding: 10px 12px;
+  }
+
+  .btn--sm {
+    min-height: 44px;
+  }
+}
+
+@include down(sm) {
+  .hero__heading {
+    font-size: 28px;
+  }
+
+  .booking-widget__form {
+    padding-inline: 15px;
+  }
+
+  .booking-widget__row {
+    gap: 12px 8px;
+  }
+
+  .built-for-drivers .section-heading__title,
+  .why-choose-us__intro .section-heading__title,
+  .fleet-brands__header .section-heading__title,
+  .concierge__intro .section-heading__title,
+  .rental-terms__intro .section-heading__title,
+  .more-than-rental__header .section-heading__title,
+  .instagram-feed__header .section-heading__title,
+  .serving-cities__heading .section-heading__title,
+  .journal__heading .section-heading__title,
+  .faq__intro .section-heading__title {
+    font-size: 25px;
+  }
+}
