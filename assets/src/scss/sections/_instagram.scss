@@ -52,6 +52,12 @@
   > a {
     display: block;
   }
+
+  img,
+  .media-placeholder {
+    filter: blur(6px);
+    transition: filter var(--transition-base);
+  }
 }
 
 .instagram-feed__slider .swiper-slide-active.instagram-feed__slide {
@@ -60,6 +66,11 @@
   box-shadow: 0 9px 21px rgba(212, 9, 36, .3);
   opacity: 1;
   transform: scale(1.147, 1.237);
+
+  img,
+  .media-placeholder {
+    filter: blur(0);
+  }
 }
 
 .instagram-feed__footer {

@@ -33,10 +33,13 @@ function initInstagramSlider() {
   if (!el) return;
 
   const slides = el.querySelectorAll('.swiper-slide');
+  const shouldLoop = slides.length > 1;
 
   new Swiper(el, {
     slidesPerView: 'auto',
     centeredSlides: true,
+    loop: shouldLoop,
+    loopPreventsSliding: false,
     initialSlide: Math.floor(slides.length / 2),
     spaceBetween: 16,
     a11y: { enabled: true },

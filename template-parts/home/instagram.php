@@ -25,6 +25,14 @@ if (!$feed_items) {
 		$feed_items[] = ['image' => $image, 'url' => $link, 'label' => sprintf(__('Instagram photo %d', 'echelon'), $index + 1)];
 	}
 }
+
+$real_feed_count = count($feed_items);
+if ($real_feed_count > 1 && $real_feed_count < 12) {
+	$loop_feed_items = $feed_items;
+	while (count($feed_items) < 12) {
+		$feed_items[] = $loop_feed_items[count($feed_items) % $real_feed_count];
+	}
+}
 ?>
 <section class="section instagram-feed" id="instagram" data-reveal>
 	<div class="container">

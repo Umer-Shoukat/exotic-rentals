@@ -62,12 +62,12 @@
 
 .hero__content {
   position: absolute;
-  top: 299px;
+  top: 50%;
   left: 50%;
   width: 1200px;
   max-width: calc(100% - 48px);
   padding: 0;
-  transform: translateX(-50%);
+  transform: translateX(-50%, -50%);
 
   .eyebrow {
     display: flex;

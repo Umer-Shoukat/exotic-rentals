@@ -385,24 +385,24 @@ p {
 }
 @media (min-width: 1280px) {
   .site-header__inner {
-    position: relative;
-    display: block;
+    /* position: relative; */
+    /* display: block; */
     height: 100%;
     max-width: 1262px;
     padding-inline: 0;
   }
   .site-header__inner .site-logo {
-    position: absolute;
+    /* position: absolute; */
     top: 35px;
     left: 0;
   }
   .site-header__inner .primary-nav {
-    position: absolute;
+    /* position: absolute; */
     top: 44px;
     left: 400px;
   }
   .site-header__inner .site-header__actions {
-    position: absolute;
+    /* position: absolute; */
     top: 40px;
     right: 7px;
   }
@@ -2192,12 +2192,12 @@ html.reveal-init [data-reveal="zoom"] {
 }
 .hero__content {
   position: absolute;
-  top: 299px;
+  top: 50%;
   left: 50%;
   width: 1200px;
   max-width: calc(100% - 48px);
   padding: 0;
-  transform: translate(-50%);
+  transform: translate(-50%, -50%);
 }
 .hero__content .eyebrow {
   display: flex;
@@ -2742,7 +2742,8 @@ html.reveal-init [data-reveal="zoom"] {
   color: #fff;
 }
 .choose-ride__category-intro {
-  margin-bottom: 36px;
+  margin-top: 36px;
+  margin-bottom: 24px;
 }
 .choose-ride__category-title {
   margin-bottom: 8px;
@@ -3352,12 +3353,23 @@ html.reveal-init [data-reveal="zoom"] {
 .instagram-feed__slider .instagram-feed__slide > a {
   display: block;
 }
+.instagram-feed__slider .instagram-feed__slide img,
+.instagram-feed__slider .instagram-feed__slide .media-placeholder {
+  filter: blur(6px);
+  transition: filter var(--transition-base);
+}
 .instagram-feed__slider .swiper-slide-active.instagram-feed__slide {
   z-index: 2;
   border: 1px solid var(--color-accent);
   box-shadow: 0 9px 21px #d409244d;
   opacity: 1;
   transform: scale(1.147, 1.237);
+}
+.instagram-feed__slider .swiper-slide-active.instagram-feed__slide img,
+.instagram-feed__slider
+  .swiper-slide-active.instagram-feed__slide
+  .media-placeholder {
+  filter: blur(0);
 }
 .instagram-feed__footer {
   display: flex;
@@ -6264,7 +6276,7 @@ html.reveal-init [data-reveal="zoom"] {
     line-height: 36px;
   }
   .vehicle-detail__hero {
-    height: 300px;
+    height: 500px;
   }
   .vehicle-detail__hero > img {
     object-position: center;

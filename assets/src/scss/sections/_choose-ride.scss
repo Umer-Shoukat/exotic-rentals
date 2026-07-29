@@ -34,7 +34,10 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 
   @include focus-ring;
 
@@ -51,7 +54,8 @@
 }
 
 .choose-ride__category-intro {
-  margin-bottom: 36px;
+  margin-top: 36px;
+  margin-bottom: 24px;
 }
 
 .choose-ride__category-title {
