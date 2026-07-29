@@ -541,6 +541,8 @@ p {
   position: absolute;
   top: 100%;
   left: 0;
+  opacity: 0;
+  pointer-events: none;
   min-width: 220px;
   padding: var(--space-2);
   background: var(--color-surface);
@@ -6033,6 +6035,7 @@ html.reveal-init [data-reveal="zoom"] {
 .vehicle-detail__overview {
   display: grid;
   grid-template-columns: minmax(0, 608px) 448px;
+  align-items: center;
   justify-content: space-between;
   gap: 80px;
   padding-top: 72px;
