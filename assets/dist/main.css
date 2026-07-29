@@ -385,26 +385,9 @@ p {
 }
 @media (min-width: 1280px) {
   .site-header__inner {
-    position: relative;
-    display: block;
     height: 100%;
     max-width: 1262px;
     padding-inline: 0;
-  }
-  .site-header__inner .site-logo {
-    position: absolute;
-    top: 35px;
-    left: 0;
-  }
-  .site-header__inner .primary-nav {
-    position: absolute;
-    top: 44px;
-    left: 400px;
-  }
-  .site-header__inner .site-header__actions {
-    position: absolute;
-    top: 40px;
-    right: 7px;
   }
 }
 .site-logo {
