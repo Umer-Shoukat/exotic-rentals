@@ -243,6 +243,9 @@
   font-size: 13px;
   line-height: 1.6;
 }
+.service-steps__progress {
+  display: none;
+}
 @media (max-width: 767px) {
   .services-hero {
     min-height: 650px;

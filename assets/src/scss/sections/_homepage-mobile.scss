@@ -23,7 +23,7 @@
   .hero__subtext {
     max-width: 500px;
     margin-bottom: 22px;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.58;
   }
 
@@ -52,9 +52,64 @@
   }
 
   .hero__strip {
-    min-height: 152px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-items: start;
+    min-height: 248px;
     margin-top: -56px;
-    padding: 18px;
+    padding: 18px 18px 16px;
+    gap: 0 18px;
+    background: rgba(8, 8, 8, 0.96);
+    border-top-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .hero__strip-slides {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%;
+    height: 154px;
+    pointer-events: none;
+  }
+
+  .hero__strip-slide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(92px, auto);
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 14px 18px;
+  }
+
+  .hero__strip-stat {
+    min-width: 0;
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .hero__strip-image {
+    display: block;
+    grid-column: 1;
+    width: min(151px, 45vw);
+    aspect-ratio: 151 / 85;
+    overflow: hidden;
+  }
+
+  .hero__strip-image img,
+  .hero__strip-image .media-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__strip-controls {
+    position: relative;
+    z-index: 1;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    justify-self: end;
+    margin-bottom: 36px;
+    gap: 12px;
   }
 
   .hero__strip-controls .slider-arrow {
@@ -63,6 +118,11 @@
   }
 
   .hero__strip-cta {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
     min-height: 44px;
   }
 
@@ -129,9 +189,11 @@
   .booking-widget
     input[type="time"].field__control::-webkit-calendar-picker-indicator {
     position: absolute;
-    inset: 0;
-    width: auto;
-    height: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 40px;
+    height: 100%;
     margin: 0;
     opacity: 0;
     cursor: pointer;
@@ -206,8 +268,7 @@
   }
 
   .feature-card {
-    height: auto;
-    min-height: 276px;
+    height: 100%;
     padding: 20px 15px;
   }
 
@@ -305,6 +366,21 @@
     line-height: 1.1;
   }
 
+  .choose-ride__slider {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .choose-ride__slider .swiper-wrapper {
+    gap: 0;
+  }
+
+  .choose-ride__slider .swiper-slide {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .vehicle-card__body > .btn,
   .choose-ride__tab,
   .btn {
@@ -322,7 +398,7 @@
 
 @include down(sm) {
   .hero__heading {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   .booking-widget__form {

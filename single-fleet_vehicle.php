@@ -133,7 +133,7 @@ while (have_posts()) : the_post();
         </div>
     </section>
 
-    <section class="container vehicle-detail__benefits">
+    <section class="container vehicle-detail__benefits" data-reveal>
         <p class="eyebrow"><?php esc_html_e('Why This Car', 'echelon'); ?></p>
         <h2><?php esc_html_e('Built For The', 'echelon'); ?> <span><?php esc_html_e('Moment', 'echelon'); ?></span></h2>
         <div class="vehicle-detail__benefit-grid">

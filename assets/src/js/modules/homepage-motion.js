@@ -2,18 +2,22 @@ const reducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function initSectionProgress() {
-  const section = document.querySelector('[data-scroll-progress-section]');
-  const progress = section?.querySelector('[data-scroll-progress]');
-  if (!section || !progress) return;
+  const sections = [...document.querySelectorAll('[data-scroll-progress-section]')];
+  if (!sections.length) return;
 
   let ticking = false;
   const update = () => {
-    const rect = section.getBoundingClientRect();
-    const start = window.innerHeight * 0.72;
-    const distance = rect.height + start - (window.innerHeight * 0.28);
-    const value = Math.max(0, Math.min(1, (start - rect.top) / distance));
-    progress.style.transform = `scaleY(${value.toFixed(4)})`;
-    progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
+    sections.forEach((section) => {
+      const progress = section.querySelector('[data-scroll-progress]');
+      if (!progress) return;
+
+      const rect = section.getBoundingClientRect();
+      const start = window.innerHeight * 0.72;
+      const distance = rect.height + start - (window.innerHeight * 0.28);
+      const value = Math.max(0, Math.min(1, (start - rect.top) / distance));
+      progress.style.transform = `scaleY(${value.toFixed(4)})`;
+      progress.setAttribute('aria-valuenow', String(Math.round(value * 100)));
+    });
     ticking = false;
   };
 

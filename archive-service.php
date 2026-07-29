@@ -86,7 +86,7 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 		</div>
 	</section>
 
-	<section class="section service-steps" data-reveal>
+	<section class="section service-steps" data-reveal data-scroll-progress-section>
 		<div class="container">
 			<?php
 			$steps_heading = echelon_field('services_steps_heading', 'option', __('Booking Your Chauffeur Is Simple', 'echelon'));
@@ -96,6 +96,7 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 			?>
 			<header><p class="eyebrow"><?php echo esc_html(echelon_field('services_steps_eyebrow', 'option', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Chauffeur', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
 			<ol>
+				<li class="service-steps__progress" data-scroll-progress aria-hidden="true"></li>
 				<?php foreach ($steps as $index => $step) : ?>
 					<li><b><?php echo esc_html(sprintf('%02d', $index + 1)); ?></b><?php echelon_icon($step['icon'] ?? 'check'); ?><h3><?php echo esc_html($step['title'] ?? ''); ?></h3><p><?php echo esc_html($step['description'] ?? ''); ?></p></li>
 				<?php endforeach; ?>

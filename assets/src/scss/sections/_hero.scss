@@ -231,6 +231,10 @@
   }
 }
 
+.hero__strip-image {
+  display: none;
+}
+
 .hero__strip-stat {
   display: flex;
   flex-direction: column;
@@ -285,7 +289,7 @@
   }
 
   .hero__content {
-    top: 220px;
+    top: 50%;
   }
 
   .hero__heading {

@@ -213,3 +213,28 @@
 .reservation-success__reference { padding: 20px; background: #121212; strong { color: #d40924; } }
 @media (max-width: 1023px) { .reservation__brand { margin-bottom: 56px; } .reservation-progress { width: 100%; } .reservation__layout { grid-template-columns: 1fr; } .reservation-summary { min-height: 0; order: -1; } .reservation-summary__media { height: 320px; } }
 @media (max-width: 767px) { .reservation { padding-top: 18px; } .reservation__shell { width: min(100% - 32px, 560px); } .reservation__intro h1, .reservation-step__heading h2 { font-size: 32px; } .reservation-progress li strong { font-size: 9px; } .reservation-progress { gap: 8px; } .reservation-fleet, .reservation-fields { grid-template-columns: 1fr; } .reservation-summary { order: 0; margin-top: 40px; } .reservation-summary__media { height: 230px; } .reservation-step[data-step="1"] { padding-bottom: 72px; } .reservation-step__vehicle-action { position: fixed; right: 16px; bottom: 12px; left: 16px; z-index: 20; margin: 0; padding: 10px; background: rgba(9,9,9,.94); box-shadow: 0 -8px 24px rgba(0,0,0,.35); .btn { width: 100%; min-width: 0; } } .reservation[data-current-step="1"] .reservation-actions { display: none; } .reservation-actions { position: sticky; bottom: 0; z-index: 5; padding: 12px 0; background: #090909; } .reservation-success h1 { font-size: 40px; } }
+@media (max-width: 767px) {
+  .reservation-terms {
+    align-items: flex-start;
+    gap: 12px;
+
+    input[type="checkbox"] {
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      margin: 1px 0 0;
+      accent-color: var(--color-accent);
+    }
+
+    span {
+      flex: 1 1 auto;
+      min-width: 0;
+      line-height: 1.35;
+    }
+  }
+
+  .reservation-terms.has-error .reservation-field-error {
+    margin-left: 32px;
+  }
+}
