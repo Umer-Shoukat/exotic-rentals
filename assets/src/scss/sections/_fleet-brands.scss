@@ -27,7 +27,10 @@
 }
 
 .fleet-brands__marquee {
-  overflow: hidden;
+  margin-block: -8px;
+  padding-block: 8px;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .fleet-brands__strip {

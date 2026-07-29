@@ -28,29 +28,12 @@
   gap: var(--space-5);
 
   @include up(xl) {
-    position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     height: 100%;
     max-width: 1262px;
     padding-inline: 0;
-
-    .site-logo {
-      position: absolute;
-      top: 35px;
-      left: 0;
-    }
-
-    .primary-nav {
-      position: absolute;
-      top: 44px;
-      left: 400px;
-    }
-
-    .site-header__actions {
-      position: absolute;
-      top: 40px;
-      right: 7px;
-    }
   }
 }
 
