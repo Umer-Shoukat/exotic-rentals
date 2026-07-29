@@ -73,11 +73,22 @@ while (have_posts()) : the_post();
     </section>
 
     <div class="container vehicle-detail__gallery" data-vehicle-gallery>
-        <div class="vehicle-detail__gallery-main"><img data-gallery-hero src="<?php echo esc_url($gallery_urls[0]); ?>" alt="<?php echo esc_attr($title); ?>"></div>
+        <div class="vehicle-detail__gallery-main">
+            <button class="vehicle-detail__gallery-arrow vehicle-detail__gallery-arrow--prev" type="button" data-gallery-prev aria-label="<?php esc_attr_e('Previous vehicle image', 'echelon'); ?>"><span aria-hidden="true">&larr;</span></button>
+            <button class="vehicle-detail__gallery-open" type="button" data-gallery-open aria-label="<?php echo esc_attr(sprintf(__('Open %s gallery', 'echelon'), $title)); ?>"><img data-gallery-hero src="<?php echo esc_url($gallery_urls[0]); ?>" alt="<?php echo esc_attr($title); ?>"></button>
+            <button class="vehicle-detail__gallery-arrow vehicle-detail__gallery-arrow--next" type="button" data-gallery-next aria-label="<?php esc_attr_e('Next vehicle image', 'echelon'); ?>"><span aria-hidden="true">&rarr;</span></button>
+        </div>
         <div class="vehicle-detail__thumbs">
             <?php foreach ($gallery_urls as $index => $url) : ?>
                 <button class="vehicle-detail__thumb<?php echo $index === 0 ? ' is-active' : ''; ?>" type="button" data-gallery-thumb data-gallery-src="<?php echo esc_url($url); ?>" aria-label="<?php echo esc_attr(sprintf(__('View %1$s image %2$d', 'echelon'), $title, $index + 1)); ?>"><img src="<?php echo esc_url($url); ?>" alt="<?php echo esc_attr($title); ?>"></button>
             <?php endforeach; ?>
+        </div>
+        <div class="vehicle-detail__lightbox" data-gallery-lightbox role="dialog" aria-modal="true" aria-label="<?php echo esc_attr(sprintf(__('%s image gallery', 'echelon'), $title)); ?>" hidden>
+            <button class="vehicle-detail__lightbox-close" type="button" data-gallery-close aria-label="<?php esc_attr_e('Close gallery', 'echelon'); ?>"><span aria-hidden="true">&times;</span></button>
+            <button class="vehicle-detail__lightbox-arrow vehicle-detail__lightbox-arrow--prev" type="button" data-gallery-prev aria-label="<?php esc_attr_e('Previous vehicle image', 'echelon'); ?>"><span aria-hidden="true">&larr;</span></button>
+            <img data-gallery-lightbox-image src="<?php echo esc_url($gallery_urls[0]); ?>" alt="<?php echo esc_attr($title); ?>">
+            <button class="vehicle-detail__lightbox-arrow vehicle-detail__lightbox-arrow--next" type="button" data-gallery-next aria-label="<?php esc_attr_e('Next vehicle image', 'echelon'); ?>"><span aria-hidden="true">&rarr;</span></button>
+            <p class="vehicle-detail__lightbox-count" data-gallery-count>1 / <?php echo esc_html((string) count($gallery_urls)); ?></p>
         </div>
     </div>
 
