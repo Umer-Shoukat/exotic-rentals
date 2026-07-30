@@ -27,6 +27,12 @@
 
   &:focus {
     border-color: var(--color-accent);
+    outline: none;
+  }
+
+  &:focus-visible {
+    border-color: var(--color-accent);
+    outline: none;
   }
 }
 

@@ -1,10 +1,10 @@
 <?php
 /**
- * Home: "Built For Drivers Who Notice Everything" — 4-col numbered features.
+ * Home: "Built For Drivers Who Notice Everything" - 4-col numbered features.
  */
 
 $heading  = echelon_field('features_heading', get_the_ID(), 'Built For Drivers Who Notice Everything.');
-$features = echelon_field('features', get_the_ID(), [
+$features = [
     [
         'icon'        => 'gauge',
         'title'       => 'PERFORMANCE MEETS PRESENCE',
@@ -13,7 +13,7 @@ $features = echelon_field('features', get_the_ID(), [
     [
         'icon'        => 'headset',
         'title'       => 'Expert Support At Every Step',
-        'description' => "Real guidance from first inquiry to pickup — whether you're selecting a vehicle, coordinating a route, or planning a full event.",
+        'description' => "Real guidance from first inquiry to pickup - whether you're selecting a vehicle, coordinating a route, or planning a full event.",
     ],
     [
         'icon'        => 'truck',
@@ -23,10 +23,9 @@ $features = echelon_field('features', get_the_ID(), [
     [
         'icon'        => 'wrench',
         'title'       => 'TAILORED EXPERIENCES',
-        'description' => 'From a single airport pickup to a
-full weekend itinerary, our team tailors the vehicle and the schedule to your event.',
+        'description' => 'From a single airport pickup to a full weekend itinerary, our team tailors the vehicle and the schedule to your event.',
     ],
-]);
+];
 
 $accent_position = stripos($heading, 'notice');
 ?>
