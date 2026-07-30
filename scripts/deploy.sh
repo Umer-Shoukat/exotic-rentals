@@ -28,15 +28,38 @@ command -v npm >/dev/null || {
   exit 1
 }
 
-command -v rsync >/dev/null || {
-  printf 'rsync is required locally to deploy the theme.\n' >&2
-  exit 1
-}
-
 cd "$THEME_DIR"
 npm run build
 
-rsync "${RSYNC_OPTIONS[@]}" \
-  -e "ssh -p $REMOTE_PORT" \
-  "$THEME_DIR/" \
-  "$REMOTE_HOST:$REMOTE_THEME_DIR"
+if command -v rsync >/dev/null; then
+  rsync "${RSYNC_OPTIONS[@]}" \
+    -e "ssh -p $REMOTE_PORT" \
+    "$THEME_DIR/" \
+    "$REMOTE_HOST:$REMOTE_THEME_DIR"
+else
+  command -v tar >/dev/null || {
+    printf 'rsync is not installed, and tar is required for the fallback deploy.\n' >&2
+    exit 1
+  }
+
+  command -v ssh >/dev/null || {
+    printf 'rsync is not installed, and ssh is required for the fallback deploy.\n' >&2
+    exit 1
+  }
+
+  TAR_OPTIONS=(
+    --exclude=.git
+    --exclude=node_modules
+    --exclude=.DS_Store
+  )
+
+  if [[ "${1:-}" == "--dry-run" ]]; then
+    printf 'rsync is not installed; validating fallback archive only.\n'
+    tar -czf /dev/null "${TAR_OPTIONS[@]}" -C "$THEME_DIR" .
+    exit 0
+  fi
+
+  printf 'rsync is not installed; deploying with tar over ssh.\n'
+  ssh -p "$REMOTE_PORT" "$REMOTE_HOST" "mkdir -p '$REMOTE_THEME_DIR'"
+  tar -czf - "${TAR_OPTIONS[@]}" -C "$THEME_DIR" . | ssh -p "$REMOTE_PORT" "$REMOTE_HOST" "tar -xzf - -C '$REMOTE_THEME_DIR'"
+fi
