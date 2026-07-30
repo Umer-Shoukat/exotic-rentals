@@ -212,14 +212,14 @@
 
   .testimonials__columns {
     display: block;
-    height: auto;
-    overflow: visible;
-    mask-image: none;
+    height: 590px;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
   }
 
   .testimonials__column {
     display: none;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .testimonials__column:first-child {
@@ -227,7 +227,7 @@
   }
 
   .testimonials__track {
-    animation: none;
+    animation: testimonial-marquee var(--column-duration, 32s) linear infinite;
   }
 
   .testimonials__group {
@@ -235,7 +235,7 @@
   }
 
   .testimonials__group[aria-hidden='true'] {
-    display: none;
+    display: grid;
   }
 
   .testimonial-card {

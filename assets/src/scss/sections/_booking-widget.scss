@@ -46,6 +46,14 @@
     padding-block: 10px;
     font-size: 17px;
   }
+
+  .field__control[type="time"] {
+    width: 100%;
+  }
+  #pickup-time,
+  #return-time {
+    width: 100%;
+  }
 }
 
 .vehicle-search-results {
@@ -86,7 +94,7 @@
 
   &:hover,
   &.is-active,
-  &[aria-selected='true'] {
+  &[aria-selected="true"] {
     background: #191919;
   }
 }

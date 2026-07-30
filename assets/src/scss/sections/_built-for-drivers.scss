@@ -48,12 +48,14 @@
 
 .feature-card {
   min-width: 0;
-  height: 343px;
+  height: auto;
   padding: 24px 29px;
   border: 1px solid var(--color-border);
   border-radius: 0;
   background: #0d0d0d;
-  transition: border-color var(--transition-base), background var(--transition-base);
+  transition:
+    border-color var(--transition-base),
+    background var(--transition-base);
 
   &:hover {
     border-color: var(--color-border-strong);
@@ -91,7 +93,7 @@
   line-height: 18px;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: 0;

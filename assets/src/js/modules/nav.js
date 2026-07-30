@@ -94,24 +94,42 @@ export function initNav() {
     const trigger = root.querySelector('[data-mega-menu-trigger]');
     const panel = root.querySelector('[data-mega-menu-panel]');
     if (!trigger) return;
+    let closeTimer = null;
+    const openMega = () => {
+      clearTimeout(closeTimer);
+      alignMegaAnchor();
+      closeMegaMenus(root);
+      root.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+    };
+    const closeMega = () => {
+      clearTimeout(closeTimer);
+      root.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+    const queueCloseMega = () => {
+      clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(closeMega, 160);
+    };
     const alignMegaAnchor = () => {
       if (!panel) return;
       const triggerRect = trigger.getBoundingClientRect();
       panel.style.setProperty('--mega-menu-anchor-x', `${triggerRect.left + (triggerRect.width / 2)}px`);
     };
     alignMegaAnchor();
-    root.addEventListener('mouseenter', () => { alignMegaAnchor(); closeMegaMenus(root); root.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); });
-    root.addEventListener('mouseleave', () => { root.classList.remove('is-open'); trigger.setAttribute('aria-expanded', 'false'); });
-    root.addEventListener('focusin', () => { alignMegaAnchor(); closeMegaMenus(root); root.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); });
-    root.addEventListener('focusout', (event) => { if (!root.contains(event.relatedTarget)) { root.classList.remove('is-open'); trigger.setAttribute('aria-expanded', 'false'); } });
+    root.addEventListener('mouseenter', openMega);
+    root.addEventListener('mouseleave', queueCloseMega);
+    if (panel) {
+      panel.addEventListener('mouseenter', openMega);
+      panel.addEventListener('mouseleave', queueCloseMega);
+    }
+    root.addEventListener('focusin', openMega);
+    root.addEventListener('focusout', (event) => { if (!root.contains(event.relatedTarget)) closeMega(); });
     trigger.addEventListener('click', (event) => {
       if (window.innerWidth < 1024) return;
       if (!root.classList.contains('is-open')) {
         event.preventDefault();
-        alignMegaAnchor();
-        closeMegaMenus(root);
-        root.classList.add('is-open');
-        trigger.setAttribute('aria-expanded', 'true');
+        openMega();
       }
     });
     window.addEventListener('resize', alignMegaAnchor, { passive: true });

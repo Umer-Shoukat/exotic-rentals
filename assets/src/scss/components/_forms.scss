@@ -30,6 +30,20 @@
   }
 }
 
+.field__control[type="time"] {
+  width: 100%;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  opacity: 0;
+}
+
+#pickup-time,
+#return-time {
+  width: 100%;
+}
+
 select.field__control {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239A9A9A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
