@@ -108,15 +108,15 @@ function echelon_accent_heading($heading, $accent = '') {
  * Build the branded Google Static Maps URL used behind the interactive
  * location overlay. Returns an empty string until an API key is configured.
  */
-function echelon_google_static_map_url($width = 640, $height = 480) {
+function echelon_google_static_map_url($width = 640, $height = 480, $viewport = []) {
     $api_key = trim((string) echelon_setting('google_maps_api_key', ''));
     if ($api_key === '') {
         return '';
     }
 
-    $center_lat = (float) echelon_setting('google_maps_center_lat', '40.730610');
-    $center_lng = (float) echelon_setting('google_maps_center_lng', '-74.006000');
-    $zoom = echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));
+    $center_lat = isset($viewport['latitude']) ? (float) $viewport['latitude'] : (float) echelon_setting('google_maps_center_lat', '40.730610');
+    $center_lng = isset($viewport['longitude']) ? (float) $viewport['longitude'] : (float) echelon_setting('google_maps_center_lng', '-74.006000');
+    $zoom = isset($viewport['zoom']) ? echelon_sanitize_map_zoom($viewport['zoom']) : echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));
     $params = [
         'center' => $center_lat . ',' . $center_lng,
         'zoom'   => $zoom,
@@ -158,6 +158,47 @@ function echelon_google_static_map_url($width = 640, $height = 480) {
     }
 
     return 'https://maps.googleapis.com' . $path;
+}
+
+/**
+ * Calculate a Web Mercator viewport that contains every supplied coordinate.
+ * The returned values are shared by the Static Maps image and HTML pin overlay.
+ */
+function echelon_map_viewport_for_locations($coordinates, $width = 640, $height = 480, $padding = 56) {
+    $points = [];
+    foreach ((array) $coordinates as $coordinate) {
+        $latitude = isset($coordinate['latitude']) ? (float) $coordinate['latitude'] : null;
+        $longitude = isset($coordinate['longitude']) ? (float) $coordinate['longitude'] : null;
+        if ($latitude === null || $longitude === null || $latitude < -85 || $latitude > 85 || $longitude < -180 || $longitude > 180) {
+            continue;
+        }
+        $sin = sin(deg2rad($latitude));
+        $points[] = [
+            ($longitude + 180) / 360,
+            0.5 - log((1 + $sin) / (1 - $sin)) / (4 * M_PI),
+        ];
+    }
+    if (!$points) {
+        return [];
+    }
+
+    $xs = array_column($points, 0);
+    $ys = array_column($points, 1);
+    $min_x = min($xs);
+    $max_x = max($xs);
+    $min_y = min($ys);
+    $max_y = max($ys);
+    $available_width = max(1, (int) $width - (2 * (int) $padding));
+    $available_height = max(1, (int) $height - (2 * (int) $padding));
+    $longitude_zoom = $max_x > $min_x ? log($available_width / (256 * ($max_x - $min_x)), 2) : 20;
+    $latitude_zoom = $max_y > $min_y ? log($available_height / (256 * ($max_y - $min_y)), 2) : 20;
+    $zoom = max(1, min(20, (int) floor(min($longitude_zoom, $latitude_zoom))));
+    $center_x = ($min_x + $max_x) / 2;
+    $center_y = ($min_y + $max_y) / 2;
+    $center_lng = ($center_x * 360) - 180;
+    $center_lat = rad2deg(atan(sinh(M_PI * (1 - (2 * $center_y)))));
+
+    return ['latitude' => $center_lat, 'longitude' => $center_lng, 'zoom' => $zoom];
 }
 
 /**

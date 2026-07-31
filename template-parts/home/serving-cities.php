@@ -60,12 +60,23 @@ if (is_array($map_image) && !empty($map_image['ID'])) {
     $map_url = wp_get_attachment_image_url((int) $map_image, 'full');
 }
 
-$google_map_url = echelon_google_static_map_url(640, 481);
+$map_coordinates = [];
+if (!$is_fallback) {
+    foreach ($locations as $location) {
+        $latitude = echelon_field('latitude', $location->ID, '');
+        $longitude = echelon_field('longitude', $location->ID, '');
+        if ($latitude !== '' && $longitude !== '') {
+            $map_coordinates[] = ['latitude' => $latitude, 'longitude' => $longitude];
+        }
+    }
+}
+$map_viewport = echelon_map_viewport_for_locations($map_coordinates, 640, 481);
+$google_map_url = echelon_google_static_map_url(640, 481, $map_viewport);
 $map_url = $google_map_url ?: ($map_url ?: ECHELON_THEME_URI . '/assets/images/figma/serving-cities-map.png');
 $using_google_map = $google_map_url !== '';
-$map_center_lat = (float) echelon_setting('google_maps_center_lat', '40.730610');
-$map_center_lng = (float) echelon_setting('google_maps_center_lng', '-74.006000');
-$map_zoom = echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));
+$map_center_lat = isset($map_viewport['latitude']) ? (float) $map_viewport['latitude'] : (float) echelon_setting('google_maps_center_lat', '40.730610');
+$map_center_lng = isset($map_viewport['longitude']) ? (float) $map_viewport['longitude'] : (float) echelon_setting('google_maps_center_lng', '-74.006000');
+$map_zoom = isset($map_viewport['zoom']) ? (int) $map_viewport['zoom'] : echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));
 $heading_parts = preg_split('/(?=and Long Island)/i', $heading, 2);
 $heading_primary = trim($heading_parts[0] ?? $heading);
 $heading_accent = trim($heading_parts[1] ?? '');
