@@ -13,6 +13,13 @@ $hp         = echelon_field('horsepower', $vehicle_id, '');
 $zero_sixty = echelon_field('zero_to_sixty', $vehicle_id, '');
 $seats      = echelon_field('seats', $vehicle_id, '');
 $featured   = echelon_field('featured', $vehicle_id, false);
+$reservation_args = ['vehicle' => $vehicle_id];
+foreach (['pickup_date', 'return_date', 'pickup_time', 'return_time'] as $parameter) {
+	if (isset($_GET[$parameter]) && $_GET[$parameter] !== '') {
+		$reservation_args[$parameter] = sanitize_text_field(wp_unslash($_GET[$parameter]));
+	}
+}
+$reservation_url = add_query_arg($reservation_args, home_url('/reservation/'));
 ?>
 <article class="vehicle-card<?php echo $featured ? ' is-featured' : ''; ?>">
 	<a class="vehicle-card__media" href="<?php the_permalink(); ?>" tabindex="-1">
@@ -50,7 +57,7 @@ $featured   = echelon_field('featured', $vehicle_id, false);
 			<?php endif; ?>
 		</div>
 
-		<a class="btn <?php echo $featured ? 'btn--primary' : 'btn--outline'; ?> btn--block" href="<?php echo esc_url(add_query_arg('vehicle', $vehicle_id, home_url('/reservation/'))); ?>">
+		<a class="btn <?php echo $featured ? 'btn--primary' : 'btn--outline'; ?> btn--block" href="<?php echo esc_url($reservation_url); ?>">
 			<?php esc_html_e('Reserve', 'echelon'); ?>
 			<?php echelon_icon('arrow-right'); ?>
 		</a>

@@ -48,6 +48,13 @@ while (have_posts()) : the_post();
     $hp = echelon_field('horsepower', $vehicle_id, '630');
     $zero_to_sixty = echelon_field('zero_to_sixty', $vehicle_id, '2.9s');
     $seats = echelon_field('seats', $vehicle_id, '2');
+    $engine = echelon_field('engine', $vehicle_id, 'V10');
+    $exterior = echelon_field('exterior_color', $vehicle_id, 'Black');
+    $interior = echelon_field('interior_color', $vehicle_id, 'Black Leather');
+    $vehicle_categories = wp_get_post_terms($vehicle_id, 'vehicle_category', ['fields' => 'names']);
+    $vehicle_category = !is_wp_error($vehicle_categories) && $vehicle_categories ? $vehicle_categories[0] : $doors . '-Door';
+    $hero_rate = $daily_rental_price !== '' ? $daily_rental_price : $price;
+    $hero_rate_period = $daily_rental_price !== '' ? __('day', 'echelon') : __('hour', 'echelon');
     $reserve_url = add_query_arg('vehicle', $vehicle_id, home_url('/reservation/'));
     $description = has_excerpt() ? get_the_excerpt() : __('Built for presence and engineered for exhilaration, this exotic delivers an unmistakable driving experience with concierge-level service from pickup to return.', 'echelon');
     $specs = [
@@ -55,20 +62,40 @@ while (have_posts()) : the_post();
         ['gauge', __('Acceleration', 'echelon'), '0–60 in ' . $zero_to_sixty],
         ['seat', __('Seating', 'echelon'), $seats . ' ' . __('Seats', 'echelon')],
         ['wrench', __('Transmission', 'echelon'), echelon_field('transmission', $vehicle_id, 'Automatic')],
-        ['bolt', __('Engine', 'echelon'), echelon_field('engine', $vehicle_id, 'V10')],
+        ['bolt', __('Engine', 'echelon'), $engine],
         ['truck', __('Drivetrain', 'echelon'), echelon_field('drivetrain', $vehicle_id, 'All-Wheel Drive')],
-        ['star', __('Exterior', 'echelon'), echelon_field('exterior_color', $vehicle_id, 'Black')],
-        ['star', __('Interior', 'echelon'), echelon_field('interior_color', $vehicle_id, 'Black Leather')],
+        ['star', __('Exterior', 'echelon'), $exterior],
+        ['star', __('Interior', 'echelon'), $interior],
         ['gauge', __('Fuel', 'echelon'), echelon_field('fuel_type', $vehicle_id, 'Premium')],
     ];
 ?>
 <article class="vehicle-detail">
     <section class="vehicle-detail__hero">
-        <img src="<?php echo esc_url($gallery_urls[0]); ?>" alt="<?php echo esc_attr($title); ?>">
-        <div class="vehicle-detail__hero-scrim"></div>
         <div class="container vehicle-detail__hero-content">
-            <h1><?php echo esc_html($title); ?></h1>
-            <p><?php echo esc_html($year); ?> · <?php echo esc_html($doors); ?>-<?php esc_html_e('Door', 'echelon'); ?></p>
+            <div class="vehicle-detail__hero-main">
+                <p class="vehicle-detail__hero-brand"><?php echo esc_html($brand); ?></p>
+                <h1><?php echo esc_html($title); ?></h1>
+                <p class="vehicle-detail__hero-meta"><?php echo esc_html(implode(' · ', [$year, $vehicle_category, $exterior])); ?></p>
+            </div>
+            <div class="vehicle-detail__hero-stats" aria-label="<?php esc_attr_e('Vehicle highlights', 'echelon'); ?>">
+                <div><strong><?php echo esc_html($year); ?></strong><span><?php esc_html_e('Year', 'echelon'); ?></span></div>
+                <div><strong><?php echo esc_html($hp); ?> HP</strong><span><?php esc_html_e('Power', 'echelon'); ?></span></div>
+                <div><strong><?php echo esc_html($engine); ?></strong><span><?php esc_html_e('Engine', 'echelon'); ?></span></div>
+            </div>
+            <div class="vehicle-detail__hero-summary">
+                <div>
+                    <span><?php esc_html_e('Rental', 'echelon'); ?></span>
+                    <strong><?php echo esc_html(sprintf(_n('%d hour', '%d hours', $minimum_hours, 'echelon'), $minimum_hours)); ?></strong>
+                </div>
+                <div>
+                    <span><?php esc_html_e('Starting At', 'echelon'); ?></span>
+                    <strong><?php echo $hero_rate !== '' ? esc_html(echelon_price($hero_rate) . '/' . $hero_rate_period) : esc_html__('Contact Us', 'echelon'); ?></strong>
+                </div>
+                <a class="btn btn--primary" href="<?php echo esc_url($reserve_url); ?>">
+                    <?php esc_html_e('Check Availability', 'echelon'); ?>
+                    <?php echelon_icon('arrow-right'); ?>
+                </a>
+            </div>
         </div>
     </section>
 

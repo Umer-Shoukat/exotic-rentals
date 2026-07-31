@@ -11,8 +11,16 @@ function initVehicleSlider(panel) {
 
   new Swiper(el, {
     modules: [Navigation],
-    slidesPerView: 'auto',
+    slidesPerView: 1,
     spaceBetween: 24,
+    breakpoints: {
+      768: {
+        slidesPerView: 2,
+      },
+      1280: {
+        slidesPerView: 3,
+      },
+    },
     navigation: {
       prevEl: panel.querySelector('[data-swiper-prev]'),
       nextEl: panel.querySelector('[data-swiper-next]'),

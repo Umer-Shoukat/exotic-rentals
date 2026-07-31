@@ -25,6 +25,8 @@ ksort($brand_counts, SORT_NATURAL | SORT_FLAG_CASE);
 $selected_categories = array_map('sanitize_title', (array) ($_GET['body_type'] ?? []));
 $selected_brands     = array_map('sanitize_text_field', (array) ($_GET['make'] ?? []));
 $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
+$pickup_date         = echelon_parse_reservation_date($_GET['pickup_date'] ?? '');
+$return_date         = echelon_parse_reservation_date($_GET['return_date'] ?? '');
 ?>
 
 <section class="fleet-page">
@@ -54,7 +56,7 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 			</button>
 			<label class="fleet-sort">
 				<span class="screen-reader-text"><?php esc_html_e('Sort vehicles', 'echelon'); ?></span>
-				<select name="fleet_sort" onchange="this.form.submit()">
+				<select name="fleet_sort" data-fleet-sort>
 					<option value="recommended"><?php esc_html_e('Sort: Recommended', 'echelon'); ?></option>
 					<option value="price_asc" <?php selected($_GET['fleet_sort'] ?? '', 'price_asc'); ?>><?php esc_html_e('Price: Low to High', 'echelon'); ?></option>
 					<option value="price_desc" <?php selected($_GET['fleet_sort'] ?? '', 'price_desc'); ?>><?php esc_html_e('Price: High to Low', 'echelon'); ?></option>
@@ -66,14 +68,14 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 		<div class="fleet-layout">
 			<form id="fleet-filters" class="fleet-filters" method="get" action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>" data-fleet-filters>
 				<input type="hidden" name="fleet_sort" value="<?php echo esc_attr($_GET['fleet_sort'] ?? 'recommended'); ?>">
+				<?php foreach (['fleet_search', 'pickup_time', 'return_time', 'service'] as $preserved_parameter) : ?>
+					<?php if (isset($_GET[$preserved_parameter]) && $_GET[$preserved_parameter] !== '') : ?><input type="hidden" name="<?php echo esc_attr($preserved_parameter); ?>" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET[$preserved_parameter]))); ?>"><?php endif; ?>
+				<?php endforeach; ?>
 				<div class="fleet-filter-dates">
-					<label><?php esc_html_e('Pickup date', 'echelon'); ?> <b>*</b><input type="date" name="pickup_date" value="<?php echo esc_attr($_GET['pickup_date'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Drop-off date', 'echelon'); ?> <b>*</b><input type="date" name="return_date" value="<?php echo esc_attr($_GET['return_date'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Pickup time', 'echelon'); ?> <b>*</b><input type="time" name="pickup_time" value="<?php echo esc_attr($_GET['pickup_time'] ?? ''); ?>"></label>
-					<label><?php esc_html_e('Drop-off time', 'echelon'); ?> <b>*</b><input type="time" name="return_time" value="<?php echo esc_attr($_GET['return_time'] ?? ''); ?>"></label>
+					<label><?php esc_html_e('Pickup date', 'echelon'); ?> <b>*</b><input type="text" name="pickup_date" value="<?php echo esc_attr($pickup_date ? $pickup_date->format('d/m/Y') : ''); ?>" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label>
+					<label><?php esc_html_e('Drop-off date', 'echelon'); ?> <b>*</b><input type="text" name="return_date" value="<?php echo esc_attr($return_date ? $return_date->format('d/m/Y') : ''); ?>" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label>
 				</div>
 
-				<fieldset><legend><?php esc_html_e('Search', 'echelon'); ?></legend><input type="search" name="fleet_search" placeholder="<?php esc_attr_e('Search the fleet...', 'echelon'); ?>" value="<?php echo esc_attr($_GET['fleet_search'] ?? ''); ?>"></fieldset>
 				<fieldset><legend><?php esc_html_e('Hourly rental', 'echelon'); ?></legend><div class="fleet-filter-pair"><input type="number" min="0" name="min_price" placeholder="<?php esc_attr_e('Min $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['min_price'] ?? ''); ?>"><input type="number" min="0" name="max_price" placeholder="<?php esc_attr_e('Max $', 'echelon'); ?>" value="<?php echo esc_attr($_GET['max_price'] ?? ''); ?>"></div></fieldset>
 
 				<?php if (!is_wp_error($categories) && $categories) : ?>
@@ -90,13 +92,12 @@ $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 					</fieldset>
 				<?php endif; ?>
 
-				<fieldset><legend><?php esc_html_e('Minimum horsepower', 'echelon'); ?></legend><input type="number" min="0" step="50" name="min_hp" placeholder="<?php esc_attr_e('Any horsepower', 'echelon'); ?>" value="<?php echo esc_attr($_GET['min_hp'] ?? ''); ?>"></fieldset>
 				<fieldset><legend><?php esc_html_e('Seats', 'echelon'); ?></legend><div class="fleet-seat-options"><?php foreach (['' => __('Any', 'echelon'), '2' => '2', '4' => '4', '5' => '5+'] as $value => $label) : ?><label><input type="radio" name="seats" value="<?php echo esc_attr($value); ?>" <?php checked($selected_seats, $value); ?>><span><?php echo esc_html($label); ?></span></label><?php endforeach; ?></div></fieldset>
 
 				<div class="fleet-filter-actions"><a class="btn btn--outline" href="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>"><?php esc_html_e('Clear all', 'echelon'); ?></a><button class="btn btn--primary" type="submit"><?php esc_html_e('Apply filters', 'echelon'); ?></button></div>
 			</form>
 
-			<div class="fleet-results">
+			<div class="fleet-results" data-fleet-results aria-live="polite">
 				<?php if (have_posts()) : ?>
 					<div class="fleet-grid"><?php while (have_posts()) : the_post(); get_template_part('template-parts/fleet/card'); endwhile; ?></div>
 					<?php the_posts_pagination(['prev_text' => __('Previous', 'echelon'), 'next_text' => __('Next', 'echelon')]); ?>

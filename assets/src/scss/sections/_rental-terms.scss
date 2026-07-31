@@ -1,6 +1,6 @@
 .rental-terms {
-  height: 384px;
-  padding-block: 0 80px;
+  height: 464px;
+  padding-block: 80px;
   background: #090909;
 }
 
@@ -149,5 +149,26 @@
 
   .rental-terms__requirements {
     grid-template-columns: 1fr;
+  }
+}
+
+@include down(md) {
+  html.reveal-init .rental-terms[data-reveal].is-revealed {
+    will-change: auto;
+  }
+
+  .rental-terms__requirements {
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .requirement-card {
+    position: sticky;
+    top: calc(72px + (var(--stack-index) * 10px));
+    z-index: calc(1 + var(--stack-index));
+    min-height: 150px;
+    margin-bottom: 32px;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .28);
   }
 }

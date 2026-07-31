@@ -381,6 +381,15 @@
     max-width: 100%;
   }
 
+  .choose-ride__slider .vehicle-card,
+  .choose-ride__slider .vehicle-card__body {
+    height: auto;
+  }
+
+  .choose-ride__slider .vehicle-card__body {
+    padding-bottom: 15px;
+  }
+
   .vehicle-card__body > .btn,
   .choose-ride__tab,
   .btn {

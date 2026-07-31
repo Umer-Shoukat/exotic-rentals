@@ -320,7 +320,21 @@ function echelon_filter_fleet_archive($query) {
     $query->set('posts_per_page', 9);
     $search = sanitize_text_field(wp_unslash($_GET['fleet_search'] ?? ''));
     if ($search !== '') {
-        $query->set('s', $search);
+        $title_matches = get_posts([
+            'post_type' => 'fleet_vehicle', 'post_status' => 'publish',
+            'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true,
+            's' => $search,
+        ]);
+        $meta_matches = get_posts([
+            'post_type' => 'fleet_vehicle', 'post_status' => 'publish',
+            'posts_per_page' => -1, 'fields' => 'ids', 'no_found_rows' => true,
+            'meta_query' => [
+                'relation' => 'OR',
+                ['key' => 'brand', 'value' => $search, 'compare' => 'LIKE'],
+                ['key' => 'tagline', 'value' => $search, 'compare' => 'LIKE'],
+            ],
+        ]);
+        $query->set('post__in', array_values(array_unique(array_merge($title_matches, $meta_matches))) ?: [0]);
     }
 
     $tax_query = [];
@@ -348,6 +362,31 @@ function echelon_filter_fleet_archive($query) {
     }
     if ($meta_query) {
         $query->set('meta_query', $meta_query);
+    }
+
+    $pickup = echelon_parse_reservation_datetime($_GET['pickup_date'] ?? '', $_GET['pickup_time'] ?? '');
+    $return = echelon_parse_reservation_datetime($_GET['return_date'] ?? '', $_GET['return_time'] ?? '');
+    if ($pickup && $return && $return > $pickup) {
+        $conflicts = get_posts([
+            'post_type' => 'rental_reservation',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_query' => [
+                'relation' => 'AND',
+                ['key' => '_echelon_status', 'value' => 'confirmed'],
+                ['key' => '_echelon_pickup_at', 'value' => $return->format('Y-m-d H:i:s'), 'compare' => '<', 'type' => 'DATETIME'],
+                ['key' => '_echelon_return_at', 'value' => $pickup->format('Y-m-d H:i:s'), 'compare' => '>', 'type' => 'DATETIME'],
+            ],
+        ]);
+        $unavailable_vehicle_ids = array_values(array_unique(array_filter(array_map(
+            static fn($reservation_id) => absint(get_post_meta($reservation_id, '_echelon_vehicle_id', true)),
+            $conflicts
+        ))));
+        if ($unavailable_vehicle_ids) {
+            $query->set('post__not_in', $unavailable_vehicle_ids);
+        }
     }
 
     $sort = sanitize_key($_GET['fleet_sort'] ?? 'recommended');

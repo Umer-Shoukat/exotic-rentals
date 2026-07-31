@@ -36,6 +36,12 @@ while (have_posts()) : the_post();
         ['label' => __('Fast reservation handoff', 'echelon')],
         ['label' => __('Concierge support when needed', 'echelon')],
     ]);
+    $search_vehicles = get_posts([
+        'post_type' => 'fleet_vehicle',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
+    ]);
     $final_primary_cta = echelon_field('service_final_cta_primary', $service_id, ['title' => __('Check Availability', 'echelon'), 'url' => $cta_url, 'target' => '']);
     $final_secondary_cta = echelon_field('service_final_cta_secondary', $service_id, ['title' => __('Contact Us', 'echelon'), 'url' => home_url('/contact/'), 'target' => '']);
     $ancestors = array_reverse(get_post_ancestors($service_id));
@@ -117,11 +123,33 @@ while (have_posts()) : the_post();
                 <p><?php echo esc_html(echelon_field('service_availability_description', $service_id, __('Choose your rental window and continue to the fleet with your dates already loaded.', 'echelon'))); ?></p>
                 <ul><?php foreach ($availability_benefits as $benefit) : ?><li><?php echo esc_html($benefit['label'] ?? ''); ?></li><?php endforeach; ?></ul>
             </div>
-            <form action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>" method="get">
+            <form action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>" method="get" data-availability-form>
                 <input type="hidden" name="service" value="<?php echo esc_attr(get_post_field('post_name', $service_id)); ?>">
-                <label class="service-detail__search"><span><?php echo esc_html(echelon_field('service_search_label', $service_id, __('Search the fleet', 'echelon'))); ?></span><input type="search" name="fleet_search" placeholder="<?php echo esc_attr(echelon_field('service_search_placeholder', $service_id, __('Search the fleet…', 'echelon'))); ?>"></label>
-                <div><label><span><?php echo esc_html(echelon_field('service_pickup_date_label', $service_id, __('Pick-up Date', 'echelon'))); ?></span><input type="text" name="pickup_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php echo esc_html(echelon_field('service_pickup_time_label', $service_id, __('Pick-up Time', 'echelon'))); ?></span><input type="time" name="pickup_time"></label></div>
-                <div><label><span><?php echo esc_html(echelon_field('service_return_date_label', $service_id, __('Drop-off Date', 'echelon'))); ?></span><input type="text" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off"></label><label><span><?php echo esc_html(echelon_field('service_return_time_label', $service_id, __('Return Time', 'echelon'))); ?></span><input type="time" name="return_time"></label></div>
+                <div class="service-detail__search" data-vehicle-combobox>
+                    <label for="service-fleet-search"><span><?php echo esc_html(echelon_field('service_search_label', $service_id, __('Search the fleet', 'echelon'))); ?></span></label>
+                    <input id="service-fleet-search" type="search" name="fleet_search" placeholder="<?php echo esc_attr(echelon_field('service_search_placeholder', $service_id, __('Search the fleet…', 'echelon'))); ?>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="service-fleet-search-results" aria-expanded="false" data-vehicle-search>
+                    <div class="vehicle-search-results" id="service-fleet-search-results" role="listbox" aria-label="<?php esc_attr_e('Matching fleet vehicles', 'echelon'); ?>" data-vehicle-results hidden>
+                        <div class="vehicle-search-results__items">
+                            <?php foreach ($search_vehicles as $index => $vehicle) :
+                                $vehicle_id = $vehicle->ID;
+                                $brand = echelon_field('brand', $vehicle_id, '');
+                                $gallery = echelon_vehicle_gallery($vehicle_id);
+                                $cover = $gallery[0] ?? get_post_thumbnail_id($vehicle_id);
+                                $search_text = trim($brand . ' ' . get_the_title($vehicle_id) . ' ' . echelon_field('tagline', $vehicle_id, ''));
+                                ?>
+                                <button type="button" class="vehicle-search-option" id="service-vehicle-option-<?php echo esc_attr($vehicle_id); ?>" role="option" aria-selected="false" data-vehicle-option data-vehicle-id="<?php echo esc_attr($vehicle_id); ?>" data-vehicle-label="<?php echo esc_attr(get_the_title($vehicle_id)); ?>" data-vehicle-search-text="<?php echo esc_attr(strtolower($search_text)); ?>"<?php echo $index >= 4 ? ' hidden' : ''; ?>>
+                                    <span class="vehicle-search-option__image"><?php echelon_media($cover, 'thumbnail', '', 'bolt'); ?></span>
+                                    <span class="vehicle-search-option__copy"><strong><?php echo esc_html($brand ?: get_the_title($vehicle_id)); ?></strong><?php if ($brand) : ?><small><?php echo esc_html(get_the_title($vehicle_id)); ?></small><?php endif; ?></span>
+                                    <span class="vehicle-search-option__arrow" aria-hidden="true">→</span>
+                                </button>
+                            <?php endforeach; ?>
+                            <p class="vehicle-search-results__empty" data-vehicle-empty hidden><?php esc_html_e('No vehicles match your search.', 'echelon'); ?></p>
+                        </div>
+                        <a class="vehicle-search-results__all" href="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>"><?php esc_html_e('Browse Full Fleet', 'echelon'); ?><span aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+                <div><label><span><?php echo esc_html(echelon_field('service_pickup_date_label', $service_id, __('Pick-up Date', 'echelon'))); ?></span><input type="text" name="pickup_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off" required></label><label><span><?php echo esc_html(echelon_field('service_pickup_time_label', $service_id, __('Pick-up Time', 'echelon'))); ?></span><input type="time" name="pickup_time" required></label></div>
+                <div><label><span><?php echo esc_html(echelon_field('service_return_date_label', $service_id, __('Drop-off Date', 'echelon'))); ?></span><input type="text" name="return_date" placeholder="dd/mm/yyyy" data-datepicker autocomplete="off" required></label><label><span><?php echo esc_html(echelon_field('service_return_time_label', $service_id, __('Return Time', 'echelon'))); ?></span><input type="time" name="return_time" required></label></div>
                 <button class="btn btn--primary btn--block" type="submit"><?php echo esc_html(echelon_field('service_availability_button_label', $service_id, __('Check Availability', 'echelon'))); ?><?php echelon_icon('arrow-right'); ?></button>
             </form>
         </div>

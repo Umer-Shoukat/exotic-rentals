@@ -12,7 +12,7 @@
     }
 
     .section-heading {
-      margin-bottom: 113px;
+      margin-bottom: 64px;
     }
   }
 }
@@ -95,6 +95,10 @@
 .choose-ride__slider .swiper-wrapper {
   display: flex;
   gap: 24px;
+}
+
+.choose-ride__slider.swiper-initialized .swiper-wrapper {
+  gap: 0;
 }
 
 .choose-ride__slider .swiper-slide {

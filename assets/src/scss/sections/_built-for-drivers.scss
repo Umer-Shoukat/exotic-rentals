@@ -116,3 +116,25 @@
   margin-inline: auto;
   padding: 9px 24px;
 }
+
+@include down(md) {
+  html.reveal-init .built-for-drivers[data-reveal].is-revealed {
+    will-change: auto;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .feature-grid .feature-card {
+    position: sticky;
+    top: calc(72px + (var(--stack-index) * 10px));
+    z-index: calc(1 + var(--stack-index));
+    height: auto;
+    min-height: 250px;
+    margin-bottom: 32px;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .28);
+  }
+}

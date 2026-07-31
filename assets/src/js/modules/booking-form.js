@@ -13,6 +13,34 @@ export function initBookingForm() {
     });
   });
 
+  document.querySelectorAll('[data-availability-form]').forEach((form) => {
+    const pickupDate = form.elements.pickup_date;
+    const returnDate = form.elements.return_date;
+    const pickupTime = form.elements.pickup_time;
+    const returnTime = form.elements.return_time;
+    if (!pickupDate || !returnDate || !pickupTime || !returnTime) return;
+
+    const parseDateTime = (date, time) => {
+      const match = date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (!match || !time) return null;
+      const value = new Date(`${match[3]}-${match[2]}-${match[1]}T${time}:00`);
+      return Number.isNaN(value.getTime()) ? null : value;
+    };
+    const validateWindow = () => {
+      const pickup = parseDateTime(pickupDate.value, pickupTime.value);
+      const dropoff = parseDateTime(returnDate.value, returnTime.value);
+      returnDate.setCustomValidity(pickup && dropoff && dropoff <= pickup
+        ? 'Drop-off must be after pick-up.'
+        : '');
+    };
+
+    [pickupDate, returnDate, pickupTime, returnTime].forEach((input) => {
+      input.addEventListener('change', validateWindow);
+      input.addEventListener('input', validateWindow);
+    });
+    form.addEventListener('submit', validateWindow);
+  });
+
   document.querySelectorAll('input[type="time"]').forEach((input) => {
     input.addEventListener('click', () => {
       if (typeof input.showPicker !== 'function') return;
@@ -31,7 +59,7 @@ export function initBookingForm() {
     const results = combobox.querySelector('[data-vehicle-results]');
     const empty = combobox.querySelector('[data-vehicle-empty]');
     const options = Array.from(combobox.querySelectorAll('[data-vehicle-option]'));
-    if (!search || !value || !results || !options.length) return;
+    if (!search || !results || !options.length) return;
 
     let visibleOptions = [];
     let activeIndex = -1;
@@ -66,7 +94,7 @@ export function initBookingForm() {
     };
 
     const selectOption = (option) => {
-      value.value = option.dataset.vehicleId;
+      if (value) value.value = option.dataset.vehicleId;
       search.value = option.dataset.vehicleLabel;
       options.forEach((item) => item.setAttribute('aria-selected', String(item === option)));
       setOpen(false);
@@ -75,7 +103,7 @@ export function initBookingForm() {
     search.addEventListener('focus', () => { filterOptions(); setOpen(true); });
     search.addEventListener('click', () => { filterOptions(); setOpen(true); });
     search.addEventListener('input', () => {
-      value.value = '';
+      if (value) value.value = '';
       options.forEach((option) => option.setAttribute('aria-selected', 'false'));
       filterOptions();
       setOpen(true);

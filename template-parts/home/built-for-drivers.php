@@ -44,7 +44,7 @@ $accent_position = stripos($heading, 'notice');
 
 		<div class="feature-grid">
 			<?php foreach ($features as $index => $feature) : ?>
-				<div class="feature-card">
+				<div class="feature-card" style="--stack-index: <?php echo esc_attr($index); ?>;">
 					<div class="feature-card__top">
 						<span class="feature-card__number"><?php echo esc_html(sprintf('%02d', $index + 1)); ?></span>
 						<img class="feature-card__brand" src="<?php echo esc_url(ECHELON_THEME_URI . '/assets/images/figma/feature-card-logo.png'); ?>" alt="" width="72" height="16">

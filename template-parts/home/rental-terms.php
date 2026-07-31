@@ -71,7 +71,7 @@ $heading_parts = preg_split('/(details)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTU
 
 		<div class="rental-terms__requirements">
 			<?php foreach ($terms as $index => $term) : ?>
-				<div class="requirement-card<?php echo 0 === $index % 2 ? ' requirement-card--accent' : ''; ?>">
+				<div class="requirement-card<?php echo 0 === $index % 2 ? ' requirement-card--accent' : ''; ?>" style="--stack-index: <?php echo esc_attr($index); ?>;">
 					<?php echelon_icon($term['icon'] ?? 'check', 'requirement-card__icon'); ?>
 					<div class="requirement-card__value"><?php echo esc_html($term['value']); ?></div>
 					<div class="requirement-card__label"><?php echo esc_html($term['label']); ?></div>

@@ -134,10 +134,22 @@
 @include down(md) {
   .why-choose-us {
     padding-block: 56px;
+    overflow: visible;
+  }
+
+  html.reveal-init .why-choose-us[data-reveal].is-revealed {
+    will-change: auto;
+  }
+
+  .why-choose-us__grid,
+  .stat-grid {
+    overflow: visible;
   }
 
   .stat-grid .stat-card {
+    position: sticky;
     top: calc(72px + (var(--stack-index) * 10px));
     min-height: 170px;
+    margin-bottom: 32px;
   }
 }
