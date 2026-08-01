@@ -16,27 +16,27 @@ $fallback_locations = [
     ['title' => 'Connecticut', 'description' => 'Gold Coast estates, Greenwich drives, Yale Bowl events.', 'areas' => ['Manhattan', 'Brooklyn', 'Bronx', 'Queens', 'Staten Island'], 'image' => 'connecticut.jpg'],
     ['title' => 'Nassau County', 'description' => 'Manhasset, Great Neck, Old Westbury delivery.', 'areas' => ['Manhattan', 'Brooklyn', 'Bronx', 'Queens', 'Staten Island'], 'image' => 'nassau-county.jpg'],
 ];
-$hero_title = echelon_field('locations_hero_title', 'option', __('Exotic Car Rentals Across New Jersey & Connecticut', 'echelon'));
-$hero_accent = echelon_field('locations_hero_accent', 'option', __('New Jersey & Connecticut', 'echelon'));
-$hero_image = echelon_field('locations_hero_image', 'option', null);
-$primary_cta = echelon_field('locations_hero_primary_cta', 'option', ['title' => __('Book Your Vehicle', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
-$secondary_cta = echelon_field('locations_hero_secondary_cta', 'option', ['title' => __('View Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
-$trust_items = echelon_field('locations_hero_trust_items', 'option', [
+$hero_title = echelon_archive_field('locations', 'locations_hero_title', __('Exotic Car Rentals Across New Jersey & Connecticut', 'echelon'));
+$hero_accent = echelon_archive_field('locations', 'locations_hero_accent', __('New Jersey & Connecticut', 'echelon'));
+$hero_image = echelon_archive_field('locations', 'locations_hero_image', null);
+$primary_cta = echelon_archive_field('locations', 'locations_hero_primary_cta', ['title' => __('Book Your Vehicle', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
+$secondary_cta = echelon_archive_field('locations', 'locations_hero_secondary_cta', ['title' => __('View Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
+$trust_items = echelon_archive_field('locations', 'locations_hero_trust_items', [
 	['icon' => 'star', 'label' => __('5-Star Rated', 'echelon')],
 	['icon' => 'shield-check', 'label' => __('Fully Insured', 'echelon')],
 	['icon' => 'headset', 'label' => __('24/7 Concierge', 'echelon')],
 ]);
-$proof_items = echelon_field('locations_proof_items', 'option', [
+$proof_items = echelon_archive_field('locations', 'locations_proof_items', [
 	['icon' => 'pin', 'label' => __('NYC 5 Boroughs Covered', 'echelon')],
 	['icon' => 'truck', 'label' => __('Long Island Delivery', 'echelon')],
 	['icon' => 'star', 'label' => __('Airport & Event Delivery', 'echelon')],
 	['icon' => 'headset', 'label' => __('Concierge Booking Support', 'echelon')],
 ]);
-$list_heading = echelon_field('locations_list_heading', 'option', __('White-Glove Access Where Luxury Clients Move', 'echelon'));
-$list_accent = echelon_field('locations_list_accent', 'option', __('Luxury Clients Move', 'echelon'));
-$view_label = echelon_field('locations_view_label', 'option', __('View', 'echelon'));
-$book_label = echelon_field('locations_book_label', 'option', __('Book Now', 'echelon'));
-$benefits = echelon_field('locations_benefits', 'option', [
+$list_heading = echelon_archive_field('locations', 'locations_list_heading', __('White-Glove Access Where Luxury Clients Move', 'echelon'));
+$list_accent = echelon_archive_field('locations', 'locations_list_accent', __('Luxury Clients Move', 'echelon'));
+$view_label = echelon_archive_field('locations', 'locations_view_label', __('View', 'echelon'));
+$book_label = echelon_archive_field('locations', 'locations_book_label', __('Book Now', 'echelon'));
+$benefits = echelon_archive_field('locations', 'locations_benefits', [
 	['icon' => 'truck', 'title' => __('Curated Luxury Fleet', 'echelon'), 'description' => __('Every vehicle handpicked and mechanically vetted.', 'echelon')],
 	['icon' => 'pin', 'title' => __('White-Glove Service', 'echelon'), 'description' => __('Detailed, fueled, delivered — every single time.', 'echelon')],
 	['icon' => 'calendar', 'title' => __('Transparent Pricing', 'echelon'), 'description' => __('No hidden fees. What you see is what you pay.', 'echelon')],
@@ -50,9 +50,9 @@ $benefits = echelon_field('locations_benefits', 'option', [
 		<?php if ($hero_image) : echelon_media($hero_image, 'full', ''); else : ?><img class="locations-hero__image" src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/locations/hero.jpg')); ?>" alt="" aria-hidden="true"><?php endif; ?>
 		<div class="locations-hero__scrim"></div>
 		<div class="container locations-hero__content">
-			<p class="eyebrow"><?php echo esc_html(echelon_field('locations_hero_eyebrow', 'option', __('Service Areas', 'echelon'))); ?></p>
+			<p class="eyebrow"><?php echo esc_html(echelon_archive_field('locations', 'locations_hero_eyebrow', __('Service Areas', 'echelon'))); ?></p>
 			<h1><?php echo wp_kses(echelon_accent_heading($hero_title, $hero_accent), ['span' => ['class' => true]]); ?></h1>
-			<p><?php echo esc_html(echelon_field('locations_hero_description', 'option', __('Concierge delivery across the tri-state — from Manhattan skylines to Montauk cliffs, vineyard roads to Hamptons estates. Wherever the moment is, the car arrives.', 'echelon'))); ?></p>
+			<p><?php echo esc_html(echelon_archive_field('locations', 'locations_hero_description', __('Concierge delivery across the tri-state — from Manhattan skylines to Montauk cliffs, vineyard roads to Hamptons estates. Wherever the moment is, the car arrives.', 'echelon'))); ?></p>
 			<div class="locations-hero__actions">
 				<a class="btn btn--primary" href="<?php echo esc_url($primary_cta['url'] ?? home_url('/fleet/')); ?>"<?php echo !empty($primary_cta['target']) ? ' target="' . esc_attr($primary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($primary_cta['title'] ?? __('Book Your Vehicle', 'echelon')); ?><?php echelon_icon('arrow-right'); ?></a>
 				<a class="btn btn--outline" href="<?php echo esc_url($secondary_cta['url'] ?? home_url('/fleet/')); ?>"<?php echo !empty($secondary_cta['target']) ? ' target="' . esc_attr($secondary_cta['target']) . '" rel="noopener noreferrer"' : ''; ?>><?php echo esc_html($secondary_cta['title'] ?? __('View Our Fleet', 'echelon')); ?></a>
@@ -69,7 +69,7 @@ $benefits = echelon_field('locations_benefits', 'option', [
 
 	<section class="section featured-locations" data-reveal>
 		<div class="container">
-			<header class="section-heading"><p class="eyebrow"><?php echo esc_html(echelon_field('locations_list_eyebrow', 'option', __('Featured Locations', 'echelon'))); ?></p><h2 class="section-heading__title"><?php echo wp_kses(echelon_accent_heading($list_heading, $list_accent), ['span' => ['class' => true]]); ?></h2></header>
+			<header class="section-heading"><p class="eyebrow"><?php echo esc_html(echelon_archive_field('locations', 'locations_list_eyebrow', __('Featured Locations', 'echelon'))); ?></p><h2 class="section-heading__title"><?php echo wp_kses(echelon_accent_heading($list_heading, $list_accent), ['span' => ['class' => true]]); ?></h2></header>
 			<div class="location-card-grid">
 				<?php if ($locations) : foreach ($locations as $location) :
 					$description = echelon_field('description', $location->ID, get_the_excerpt($location));
@@ -92,7 +92,7 @@ $benefits = echelon_field('locations_benefits', 'option', [
 
 	<div id="locations-map"><?php get_template_part('template-parts/home/serving-cities'); ?></div>
 
-	<section class="section location-benefits" data-reveal><div class="container"><header class="section-heading"><p class="eyebrow"><?php echo esc_html(echelon_field('locations_benefits_eyebrow', 'option', __('Why Rent With Us', 'echelon'))); ?></p><h2 class="section-heading__title"><?php echo wp_kses(echelon_accent_heading(echelon_field('locations_benefits_heading', 'option', __('Built For Clients Who Expect The Details Handled', 'echelon')), echelon_field('locations_benefits_accent', 'option', __('Details Handled', 'echelon'))), ['span' => ['class' => true]]); ?></h2></header><div class="location-benefits__grid">
+	<section class="section location-benefits" data-reveal><div class="container"><header class="section-heading"><p class="eyebrow"><?php echo esc_html(echelon_archive_field('locations', 'locations_benefits_eyebrow', __('Why Rent With Us', 'echelon'))); ?></p><h2 class="section-heading__title"><?php echo wp_kses(echelon_accent_heading(echelon_archive_field('locations', 'locations_benefits_heading', __('Built For Clients Who Expect The Details Handled', 'echelon')), echelon_archive_field('locations', 'locations_benefits_accent', __('Details Handled', 'echelon'))), ['span' => ['class' => true]]); ?></h2></header><div class="location-benefits__grid">
 		<?php foreach ($benefits as $benefit) : ?><article><?php echelon_icon($benefit['icon'] ?? 'check'); ?><h3><?php echo esc_html($benefit['title'] ?? ''); ?></h3><p><?php echo esc_html($benefit['description'] ?? ''); ?></p></article><?php endforeach; ?>
 	</div></div></section>
 

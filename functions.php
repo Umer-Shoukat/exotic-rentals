@@ -16,6 +16,7 @@ require ECHELON_THEME_DIR . '/inc/enqueue.php';
 require ECHELON_THEME_DIR . '/inc/helpers.php';
 require ECHELON_THEME_DIR . '/inc/nav-walker.php';
 require ECHELON_THEME_DIR . '/inc/post-types.php';
+require ECHELON_THEME_DIR . '/inc/archive-content.php';
 require ECHELON_THEME_DIR . '/inc/acf-fields.php';
 require ECHELON_THEME_DIR . '/inc/customizer.php';
 require ECHELON_THEME_DIR . '/inc/reservations.php';

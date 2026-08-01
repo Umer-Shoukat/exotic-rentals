@@ -4,21 +4,21 @@ get_header();
 
 $service_count = (int) wp_count_posts('service')->publish;
 $vehicle_count = (int) wp_count_posts('fleet_vehicle')->publish;
-$hero_eyebrow = echelon_field('services_hero_eyebrow', 'option', 'Chauffeur & Transportation Services');
-$hero_title = echelon_field('services_hero_title', 'option', 'Luxury Service For Every Occasion');
-$hero_description = echelon_field('services_hero_description', 'option', 'From landmark weddings and high-stakes business travel to content production, our concierge team coordinates every vehicle, detail, and arrival.');
-$hero_image = echelon_field('services_hero_image', 'option', null);
-$list_title = echelon_field('services_list_title', 'option', 'Luxury, Tailored To Every Occasion');
-$list_description = echelon_field('services_list_description', 'option', 'Select the experience that matches the moment. Every service is tailored around your schedule, route, vehicle preferences, and guest requirements.');
-$primary_cta = echelon_field('services_hero_primary_cta', 'option', ['title' => __('Explore Services', 'echelon'), 'url' => '#service-list', 'target' => '']);
-$secondary_cta = echelon_field('services_hero_secondary_cta', 'option', ['title' => __('Plan Your Experience', 'echelon'), 'url' => home_url('/contact/'), 'target' => '']);
-$proof_items = echelon_field('services_proof_items', 'option', [
+$hero_eyebrow = echelon_archive_field('services', 'services_hero_eyebrow', 'Chauffeur & Transportation Services');
+$hero_title = echelon_archive_field('services', 'services_hero_title', 'Luxury Service For Every Occasion');
+$hero_description = echelon_archive_field('services', 'services_hero_description', 'From landmark weddings and high-stakes business travel to content production, our concierge team coordinates every vehicle, detail, and arrival.');
+$hero_image = echelon_archive_field('services', 'services_hero_image', null);
+$list_title = echelon_archive_field('services', 'services_list_title', 'Luxury, Tailored To Every Occasion');
+$list_description = echelon_archive_field('services', 'services_list_description', 'Select the experience that matches the moment. Every service is tailored around your schedule, route, vehicle preferences, and guest requirements.');
+$primary_cta = echelon_archive_field('services', 'services_hero_primary_cta', ['title' => __('Explore Services', 'echelon'), 'url' => '#service-list', 'target' => '']);
+$secondary_cta = echelon_archive_field('services', 'services_hero_secondary_cta', ['title' => __('Plan Your Experience', 'echelon'), 'url' => home_url('/contact/'), 'target' => '']);
+$proof_items = echelon_archive_field('services', 'services_proof_items', [
 	['value' => '5.0', 'label' => __('Google Reviews', 'echelon')],
 	['value' => $vehicle_count ? $vehicle_count . '+' : '40+', 'label' => __('Vehicles', 'echelon')],
 	['value' => $service_count ? $service_count . '+' : '6+', 'label' => __('Luxury Services', 'echelon')],
 	['value' => '100%', 'label' => __('Insured', 'echelon')],
 ]);
-$steps = echelon_field('services_steps', 'option', [
+$steps = echelon_archive_field('services', 'services_steps', [
 	['icon' => 'gauge', 'title' => __('Choose Your Vehicle', 'echelon'), 'description' => __('Browse the live fleet and select the vehicle for your occasion.', 'echelon')],
 	['icon' => 'calendar', 'title' => __('Select Your Dates', 'echelon'), 'description' => __('Pick your timing, pickup location, and destination.', 'echelon')],
 	['icon' => 'shield-check', 'title' => __('Confirm Reservation', 'echelon'), 'description' => __('Our concierge team confirms pricing, vehicle, and chauffeur details.', 'echelon')],
@@ -74,7 +74,7 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 	<section class="section services-list" id="service-list" data-reveal>
 		<div class="container">
 			<header class="services-list__header">
-				<div><p class="eyebrow"><?php echo esc_html(echelon_field('services_list_eyebrow', 'option', __('Our Premium Services', 'echelon'))); ?></p><h2><?php echo wp_kses($list_title_html, ['span' => []]); ?></h2></div>
+				<div><p class="eyebrow"><?php echo esc_html(echelon_archive_field('services', 'services_list_eyebrow', __('Our Premium Services', 'echelon'))); ?></p><h2><?php echo wp_kses($list_title_html, ['span' => []]); ?></h2></div>
 				<p><?php echo esc_html($list_description); ?></p>
 			</header>
 			<?php if (have_posts()) : ?>
@@ -89,12 +89,12 @@ $list_title_html = preg_replace('/(\S+)$/u', '<span>$1</span>', esc_html($list_t
 	<section class="section service-steps" data-reveal data-scroll-progress-section>
 		<div class="container">
 			<?php
-			$steps_heading = echelon_field('services_steps_heading', 'option', __('Booking Your Chauffeur Is Simple', 'echelon'));
+			$steps_heading = echelon_archive_field('services', 'services_steps_heading', __('Booking Your Chauffeur Is Simple', 'echelon'));
 			if ($steps_heading === 'Renting Your Dream Car Is Simple') {
 				$steps_heading = __('Booking Your Chauffeur Is Simple', 'echelon');
 			}
 			?>
-			<header><p class="eyebrow"><?php echo esc_html(echelon_field('services_steps_eyebrow', 'option', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Chauffeur', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
+			<header><p class="eyebrow"><?php echo esc_html(echelon_archive_field('services', 'services_steps_eyebrow', __('Simple From Start To Finish', 'echelon'))); ?></p><h2><?php echo wp_kses(echelon_accent_heading($steps_heading, __('Chauffeur', 'echelon')), ['span' => ['class' => true]]); ?></h2></header>
 			<ol>
 				<li class="service-steps__progress" data-scroll-progress aria-hidden="true"></li>
 				<?php foreach ($steps as $index => $step) : ?>

@@ -9,26 +9,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function echelon_register_service_options_page() {
-    if (function_exists('acf_add_options_sub_page')) {
-        acf_add_options_sub_page([
-            'page_title'  => __('Services Archive', 'echelon'),
-            'menu_title'  => __('Archive Settings', 'echelon'),
-            'parent_slug' => 'edit.php?post_type=service',
-            'menu_slug'   => 'service-archive',
-            'capability'  => 'edit_theme_options',
-        ]);
-        acf_add_options_sub_page([
-            'page_title'  => __('Locations Archive', 'echelon'),
-            'menu_title'  => __('Archive Settings', 'echelon'),
-            'parent_slug' => 'edit.php?post_type=location',
-            'menu_slug'   => 'location-archive',
-            'capability'  => 'edit_theme_options',
-        ]);
-    }
-}
-add_action('acf/init', 'echelon_register_service_options_page', 5);
-
 function echelon_register_acf_fields() {
     if (!function_exists('acf_add_local_field_group')) {
         return;
@@ -50,6 +30,33 @@ function echelon_register_acf_fields() {
             $about_locations[] = [['param' => 'page', 'operator' => '==', 'value' => (string) $about_page->ID]];
         }
     }
+
+    // ---- Fleet archive -------------------------------------------------
+    acf_add_local_field_group([
+        'key'    => 'group_echelon_fleet_archive',
+        'title'  => 'Fleet Archive Content',
+        'fields' => [
+            ['key' => 'field_fa_tab_hero', 'label' => 'Hero', 'type' => 'tab'],
+            ['key' => 'field_fa_breadcrumb', 'name' => 'fleet_breadcrumb_label', 'label' => 'Breadcrumb Label', 'type' => 'text', 'default_value' => 'Fleet'],
+            ['key' => 'field_fa_eyebrow', 'name' => 'fleet_hero_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Our Fleet'],
+            ['key' => 'field_fa_title', 'name' => 'fleet_hero_title', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Luxury & Exotic Vehicle Fleet'],
+            ['key' => 'field_fa_accent', 'name' => 'fleet_hero_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Fleet', 'instructions' => 'Text within the heading that should use the accent style.'],
+            ['key' => 'field_fa_desc', 'name' => 'fleet_hero_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3, 'default_value' => 'Browse our live collection, filter by body style, make, or rate, then request your exact dates directly from each vehicle page.'],
+            ['key' => 'field_fa_tab_stats', 'label' => 'Summary', 'type' => 'tab'],
+            ['key' => 'field_fa_vehicles_label', 'name' => 'fleet_vehicles_label', 'label' => 'Vehicles Label', 'type' => 'text', 'default_value' => 'Vehicles'],
+            ['key' => 'field_fa_makes_label', 'name' => 'fleet_makes_label', 'label' => 'Makes Label', 'type' => 'text', 'default_value' => 'Makes'],
+            ['key' => 'field_fa_availability_value', 'name' => 'fleet_availability_value', 'label' => 'Availability Value', 'type' => 'text', 'default_value' => 'Live'],
+            ['key' => 'field_fa_availability_label', 'name' => 'fleet_availability_label', 'label' => 'Availability Label', 'type' => 'text', 'default_value' => 'Synced Availability'],
+            ['key' => 'field_fa_tab_filters', 'label' => 'Filters & Empty State', 'type' => 'tab'],
+            ['key' => 'field_fa_refine_label', 'name' => 'fleet_refine_label', 'label' => 'Filter Eyebrow', 'type' => 'text', 'default_value' => 'Refine'],
+            ['key' => 'field_fa_filters_label', 'name' => 'fleet_filters_label', 'label' => 'Filter Button Label', 'type' => 'text', 'default_value' => 'Filters'],
+            ['key' => 'field_fa_clear_label', 'name' => 'fleet_clear_label', 'label' => 'Clear Button Label', 'type' => 'text', 'default_value' => 'Clear all'],
+            ['key' => 'field_fa_apply_label', 'name' => 'fleet_apply_label', 'label' => 'Apply Button Label', 'type' => 'text', 'default_value' => 'Apply filters'],
+            ['key' => 'field_fa_empty_heading', 'name' => 'fleet_empty_heading', 'label' => 'No Results Heading', 'type' => 'text', 'default_value' => 'No vehicles match those filters.'],
+            ['key' => 'field_fa_empty_desc', 'name' => 'fleet_empty_description', 'label' => 'No Results Description', 'type' => 'text', 'default_value' => 'Clear a filter or try a broader search.'],
+        ],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'fleet_archive']]],
+    ]);
 
     // ---- Services ------------------------------------------------------
     acf_add_local_field_group([
@@ -149,7 +156,7 @@ function echelon_register_acf_fields() {
                 ],
             ],
         ],
-        'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'service-archive']]],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'service_archive']]],
     ]);
 
     // ---- Contact page -------------------------------------------------
@@ -363,7 +370,7 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
                 ],
             ],
         ],
-        'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'location-archive']]],
+        'location' => [[['param' => 'post_type', 'operator' => '==', 'value' => 'location_archive']]],
     ]);
 
     // ---- Curated Instagram feed -----------------------------------------

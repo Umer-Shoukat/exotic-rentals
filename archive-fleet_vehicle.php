@@ -27,6 +27,21 @@ $selected_brands     = array_map('sanitize_text_field', (array) ($_GET['make'] ?
 $selected_seats      = sanitize_text_field(wp_unslash($_GET['seats'] ?? ''));
 $pickup_date         = echelon_parse_reservation_date($_GET['pickup_date'] ?? '');
 $return_date         = echelon_parse_reservation_date($_GET['return_date'] ?? '');
+$breadcrumb_label    = echelon_archive_field('fleet', 'fleet_breadcrumb_label', __('Fleet', 'echelon'));
+$hero_eyebrow        = echelon_archive_field('fleet', 'fleet_hero_eyebrow', __('Our Fleet', 'echelon'));
+$hero_title          = echelon_archive_field('fleet', 'fleet_hero_title', __('Luxury & Exotic Vehicle Fleet', 'echelon'));
+$hero_accent         = echelon_archive_field('fleet', 'fleet_hero_accent', __('Fleet', 'echelon'));
+$hero_description    = echelon_archive_field('fleet', 'fleet_hero_description', __('Browse our live collection, filter by body style, make, or rate, then request your exact dates directly from each vehicle page.', 'echelon'));
+$vehicles_label      = echelon_archive_field('fleet', 'fleet_vehicles_label', __('Vehicles', 'echelon'));
+$makes_label         = echelon_archive_field('fleet', 'fleet_makes_label', __('Makes', 'echelon'));
+$availability_value  = echelon_archive_field('fleet', 'fleet_availability_value', __('Live', 'echelon'));
+$availability_label  = echelon_archive_field('fleet', 'fleet_availability_label', __('Synced Availability', 'echelon'));
+$refine_label        = echelon_archive_field('fleet', 'fleet_refine_label', __('Refine', 'echelon'));
+$filters_label       = echelon_archive_field('fleet', 'fleet_filters_label', __('Filters', 'echelon'));
+$clear_label         = echelon_archive_field('fleet', 'fleet_clear_label', __('Clear all', 'echelon'));
+$apply_label         = echelon_archive_field('fleet', 'fleet_apply_label', __('Apply filters', 'echelon'));
+$empty_heading       = echelon_archive_field('fleet', 'fleet_empty_heading', __('No vehicles match those filters.', 'echelon'));
+$empty_description   = echelon_archive_field('fleet', 'fleet_empty_description', __('Clear a filter or try a broader search.', 'echelon'));
 ?>
 
 <section class="fleet-page">
@@ -34,24 +49,24 @@ $return_date         = echelon_parse_reservation_date($_GET['return_date'] ?? ''
 		<nav class="fleet-breadcrumb" aria-label="<?php esc_attr_e('Breadcrumb', 'echelon'); ?>">
 			<a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'echelon'); ?></a>
 			<span aria-hidden="true">›</span>
-			<span><?php esc_html_e('Fleet', 'echelon'); ?></span>
+			<span><?php echo esc_html($breadcrumb_label); ?></span>
 		</nav>
 
 		<header class="fleet-hero">
-			<p class="fleet-eyebrow"><?php esc_html_e('Our Fleet', 'echelon'); ?></p>
-			<h1><?php esc_html_e('Luxury & Exotic Vehicle', 'echelon'); ?> <em><?php esc_html_e('Fleet', 'echelon'); ?></em></h1>
-			<p><?php esc_html_e('Browse our live collection, filter by body style, make, or rate, then request your exact dates directly from each vehicle page.', 'echelon'); ?></p>
+			<p class="fleet-eyebrow"><?php echo esc_html($hero_eyebrow); ?></p>
+			<h1><?php echo wp_kses(echelon_accent_heading($hero_title, $hero_accent), ['span' => ['class' => true]]); ?></h1>
+			<p><?php echo esc_html($hero_description); ?></p>
 		</header>
 
 		<div class="fleet-stats" aria-label="<?php esc_attr_e('Fleet summary', 'echelon'); ?>">
-			<div><strong><?php echo esc_html($vehicle_count); ?></strong><span><?php esc_html_e('Vehicles', 'echelon'); ?></span></div>
-			<div><strong><?php echo esc_html(count($brand_counts)); ?></strong><span><?php esc_html_e('Makes', 'echelon'); ?></span></div>
-			<div><strong><?php esc_html_e('Live', 'echelon'); ?></strong><span><?php esc_html_e('Synced Availability', 'echelon'); ?></span></div>
+			<div><strong><?php echo esc_html($vehicle_count); ?></strong><span><?php echo esc_html($vehicles_label); ?></span></div>
+			<div><strong><?php echo esc_html(count($brand_counts)); ?></strong><span><?php echo esc_html($makes_label); ?></span></div>
+			<div><strong><?php echo esc_html($availability_value); ?></strong><span><?php echo esc_html($availability_label); ?></span></div>
 		</div>
 
 		<form class="fleet-toolbar" method="get" action="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>">
 			<button class="fleet-filter-toggle" type="button" aria-expanded="false" aria-controls="fleet-filters" data-fleet-filter-toggle>
-				<span><small><?php esc_html_e('Refine', 'echelon'); ?></small><?php esc_html_e('Filters', 'echelon'); ?></span>
+				<span><small><?php echo esc_html($refine_label); ?></small><?php echo esc_html($filters_label); ?></span>
 				<span aria-hidden="true">＋</span>
 			</button>
 			<label class="fleet-sort">
@@ -94,7 +109,7 @@ $return_date         = echelon_parse_reservation_date($_GET['return_date'] ?? ''
 
 				<fieldset><legend><?php esc_html_e('Seats', 'echelon'); ?></legend><div class="fleet-seat-options"><?php foreach (['' => __('Any', 'echelon'), '2' => '2', '4' => '4', '5' => '5+'] as $value => $label) : ?><label><input type="radio" name="seats" value="<?php echo esc_attr($value); ?>" <?php checked($selected_seats, $value); ?>><span><?php echo esc_html($label); ?></span></label><?php endforeach; ?></div></fieldset>
 
-				<div class="fleet-filter-actions"><a class="btn btn--outline" href="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>"><?php esc_html_e('Clear all', 'echelon'); ?></a><button class="btn btn--primary" type="submit"><?php esc_html_e('Apply filters', 'echelon'); ?></button></div>
+				<div class="fleet-filter-actions"><a class="btn btn--outline" href="<?php echo esc_url(get_post_type_archive_link('fleet_vehicle')); ?>"><?php echo esc_html($clear_label); ?></a><button class="btn btn--primary" type="submit"><?php echo esc_html($apply_label); ?></button></div>
 			</form>
 
 			<div class="fleet-results" data-fleet-results aria-live="polite">
@@ -102,7 +117,7 @@ $return_date         = echelon_parse_reservation_date($_GET['return_date'] ?? ''
 					<div class="fleet-grid"><?php while (have_posts()) : the_post(); get_template_part('template-parts/fleet/card'); endwhile; ?></div>
 					<?php the_posts_pagination(['prev_text' => __('Previous', 'echelon'), 'next_text' => __('Next', 'echelon')]); ?>
 				<?php else : ?>
-					<div class="fleet-empty"><h2><?php esc_html_e('No vehicles match those filters.', 'echelon'); ?></h2><p><?php esc_html_e('Clear a filter or try a broader search.', 'echelon'); ?></p></div>
+					<div class="fleet-empty"><h2><?php echo esc_html($empty_heading); ?></h2><p><?php echo esc_html($empty_description); ?></p></div>
 				<?php endif; ?>
 			</div>
 		</div>

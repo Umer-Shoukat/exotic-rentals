@@ -34,7 +34,8 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
-.fleet-hero h1 em {
+.fleet-hero h1 em,
+.fleet-hero h1 .accent {
   color: #d40924;
   font-style: normal;
 }
