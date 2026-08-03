@@ -8,7 +8,7 @@ export function initReservationFlow() {
   const steps = Array.from(form.querySelectorAll('[data-step]'));
   const progress = Array.from(form.querySelectorAll('[data-progress-step]'));
   const actions = form.querySelector('.reservation-actions');
-  const back = form.querySelector('[data-reservation-back]');
+  const backButtons = Array.from(form.querySelectorAll('[data-reservation-back]'));
   const nextButtons = Array.from(form.querySelectorAll('[data-reservation-next]'));
   let current = Number(root.dataset.initialStep) === 2 ? 2 : 1;
 
@@ -18,6 +18,16 @@ export function initReservationFlow() {
   const returnTime = form.elements.return_time;
   const pickupPicker = flatpickr(pickup, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
   const returnPicker = flatpickr(returnDate, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
+  [pickupTime, returnTime].forEach((input) => flatpickr(input, {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: 'H:i',
+    altInput: true,
+    altFormat: 'h:i K',
+    minuteIncrement: 30,
+    disableMobile: true,
+    onChange: updateSummary,
+  }));
   pickup.addEventListener('change', () => {
     if (pickupPicker.selectedDates[0]) {
       const minimum = new Date(pickupPicker.selectedDates[0]);
@@ -71,6 +81,8 @@ export function initReservationFlow() {
     const total = Number(vehicle.dataset.vehiclePrice) * hours;
     root.querySelector('[data-reservation-review]').innerHTML = `
       <div><span>Vehicle</span><strong>${escapeHtml(vehicle.dataset.vehicleName)}</strong></div>
+      <div><span>Trip type</span><strong>${escapeHtml(selectedText(form.elements.trip_type))}</strong></div>
+      <div><span>Hours required</span><strong>${escapeHtml(form.elements.hours_required.value)} hours</strong></div>
       <div><span>Schedule</span><strong>${escapeHtml(pickup.value)} ${escapeHtml(pickupTime.value)} → ${escapeHtml(returnDate.value)} ${escapeHtml(returnTime.value)}</strong></div>
       <div><span>Duration</span><strong>${hours} hours</strong></div>
       <div><span>Name</span><strong>${escapeHtml(form.elements.customer_name.value)}</strong></div>
@@ -90,7 +102,7 @@ export function initReservationFlow() {
     steps.forEach((panel) => { panel.hidden = Number(panel.dataset.step) !== current; panel.classList.toggle('is-active', Number(panel.dataset.step) === current); });
     progress.forEach((item) => { const number = Number(item.dataset.progressStep); item.classList.toggle('is-active', number === current); item.classList.toggle('is-complete', number < current); });
     actions.hidden = current === 4;
-    back.hidden = current === 1;
+    backButtons.forEach((button) => { button.hidden = current === 1; });
     nextButtons.forEach((button) => { button.hidden = current === 4; });
     if (current === 4) updateReview();
     updateSummary();
@@ -105,6 +117,14 @@ export function initReservationFlow() {
 
   function fieldMessage(field) {
     const value = field.type === 'checkbox' ? field.checked : field.value.trim();
+    if (field.type === 'file') {
+      const file = field.files?.[0];
+      if (!file) return 'Upload this required document.';
+      if (file.size > 10 * 1024 * 1024) return 'Each document must be 10 MB or smaller.';
+      const extensions = field.name === 'insurance_document' ? ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'] : ['jpg', 'jpeg', 'png'];
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      if (!extensions.includes(extension)) return `Use one of these file types: ${extensions.join(', ').toUpperCase()}.`;
+    }
     if (field.name === 'vehicle_id') return selectedVehicle() ? '' : 'Choose a vehicle to continue.';
     if (field.name === 'pickup_date') {
       if (!value) return 'Enter a pick-up date.';
@@ -129,6 +149,8 @@ export function initReservationFlow() {
       }
     }
     if ((field.name === 'pickup_location_id' || field.name === 'return_location_id') && !value) return 'Select a location.';
+    if (field.name === 'trip_type' && !value) return 'Select a trip type.';
+    if (field.name === 'hours_required' && (!Number.isInteger(Number(value)) || Number(value) < 3 || Number(value) > 24)) return 'Select the number of hours required.';
     if (field.name === 'customer_name' && value.length < 2) return 'Enter your full name.';
     if (field.name === 'customer_email' && (!value || !field.validity.valid)) return 'Enter a valid email address.';
     if (field.name === 'customer_phone') {
@@ -150,10 +172,13 @@ export function initReservationFlow() {
   }
 
   function clearFieldError(field) {
+    const visibleField = field._flatpickr?.altInput || field;
     field.removeAttribute('aria-invalid');
+    visibleField.removeAttribute('aria-invalid');
     const errorId = `reservation-error-${field.name}`;
     form.querySelector(`#${errorId}`)?.remove();
     if (field.getAttribute('aria-describedby') === errorId) field.removeAttribute('aria-describedby');
+    if (visibleField.getAttribute('aria-describedby') === errorId) visibleField.removeAttribute('aria-describedby');
     field.closest('label')?.classList.remove('has-error');
   }
 
@@ -163,8 +188,10 @@ export function initReservationFlow() {
     error.className = 'reservation-field-error';
     error.id = `reservation-error-${field.name}`;
     error.textContent = message;
+    const visibleField = field._flatpickr?.altInput || field;
     field.setAttribute('aria-invalid', 'true');
-    field.setAttribute('aria-describedby', error.id);
+    visibleField.setAttribute('aria-invalid', 'true');
+    visibleField.setAttribute('aria-describedby', error.id);
     const label = field.closest('label');
     label?.classList.add('has-error');
     (label || field.parentElement).appendChild(error);
@@ -195,7 +222,7 @@ export function initReservationFlow() {
       if (message) { invalid.push({ field, message }); showFieldError(field, message); }
     });
     showValidationSummary(panel, invalid.map(({ message }) => message));
-    if (invalid.length && shouldFocus) invalid[0].field.focus({ preventScroll: true });
+    if (invalid.length && shouldFocus) (invalid[0].field._flatpickr?.altInput || invalid[0].field).focus({ preventScroll: true });
     return invalid.length === 0;
   }
 
@@ -212,14 +239,26 @@ export function initReservationFlow() {
       if (panel && !panel.querySelector('[aria-invalid="true"]')) panel.querySelector('[data-validation-summary]')?.remove();
     });
   });
-  nextButtons.forEach((button) => button.addEventListener('click', () => { if (validateStep()) showStep(current + 1); }));
-  back.addEventListener('click', () => showStep(current - 1));
+  form.addEventListener('click', (event) => {
+    const backButton = event.target.closest('[data-reservation-back]');
+    if (backButton) {
+      event.preventDefault();
+      showStep(current - 1);
+      return;
+    }
+    const nextButton = event.target.closest('[data-reservation-next]');
+    if (nextButton) {
+      event.preventDefault();
+      if (validateStep()) showStep(current + 1);
+    }
+  });
   form.addEventListener('submit', (event) => {
     const firstInvalidStep = steps.findIndex((step, index) => !validateStep(index + 1, false));
     if (firstInvalidStep >= 0) {
       event.preventDefault();
       showStep(firstInvalidStep + 1);
-      steps[firstInvalidStep].querySelector('[aria-invalid="true"]')?.focus({ preventScroll: true });
+      const invalidField = steps[firstInvalidStep].querySelector('[aria-invalid="true"]');
+      (invalidField?._flatpickr?.altInput || invalidField)?.focus({ preventScroll: true });
     }
   });
   showStep(current);

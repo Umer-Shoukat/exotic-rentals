@@ -9,10 +9,38 @@ if (!defined('ABSPATH')) {
 
 const ECHELON_RESERVATION_META = [
     'reference', 'status', 'vehicle_id', 'pickup_date', 'return_date', 'pickup_time', 'return_time', 'pickup_at', 'return_at',
-    'pickup_location_id', 'return_location_id', 'estimated_mileage',
+    'pickup_location_id', 'return_location_id', 'estimated_mileage', 'trip_type', 'hours_required',
     'customer_name', 'customer_email', 'customer_phone', 'licence_number',
-    'date_of_birth', 'occasion', 'estimated_total', 'submitted_at',
+    'date_of_birth', 'occasion', 'licence_front_file', 'licence_back_file', 'insurance_document_file', 'estimated_total', 'submitted_at',
 ];
+
+function echelon_reservation_trip_types() {
+    return [
+        'airport_arrival' => __('Airport Arrival', 'echelon'), 'airport_departure' => __('Airport Departure', 'echelon'),
+        'point_to_point' => __('Point-to-Point', 'echelon'), 'hourly' => __('Hourly / As Directed', 'echelon'),
+        'birthday_party' => __('Birthday Party', 'echelon'), 'charter' => __('Charter', 'echelon'),
+        'round_trip' => __('Round Trip', 'echelon'), 'other' => __('Other', 'echelon'),
+    ];
+}
+
+function echelon_store_private_reservation_upload($field, $reference, $allowed_extensions) {
+    $file = $_FILES[$field] ?? null;
+    if (!$file || !isset($file['error'], $file['tmp_name'], $file['name']) || (int) $file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name'])) return new WP_Error('upload_missing');
+    if ((int) ($file['size'] ?? 0) <= 0 || (int) $file['size'] > 10 * MB_IN_BYTES) return new WP_Error('upload_size');
+    $extension = strtolower(pathinfo(sanitize_file_name($file['name']), PATHINFO_EXTENSION));
+    if (!in_array($extension, $allowed_extensions, true)) return new WP_Error('upload_extension');
+    $checked = wp_check_filetype_and_ext($file['tmp_name'], $file['name']);
+    if (empty($checked['type']) || empty($checked['ext']) || !in_array(strtolower($checked['ext']), $allowed_extensions, true)) return new WP_Error('upload_type');
+
+    $base = apply_filters('echelon_private_reservation_upload_dir', dirname(ABSPATH) . '/echelon-private-reservations');
+    $directory = trailingslashit($base) . sanitize_file_name($reference);
+    if (!wp_mkdir_p($directory)) return new WP_Error('upload_directory');
+    $filename = sanitize_key($field) . '-' . wp_generate_password(20, false, false) . '.' . $extension;
+    $path = trailingslashit($directory) . $filename;
+    if (!move_uploaded_file($file['tmp_name'], $path)) return new WP_Error('upload_move');
+    @chmod($path, 0640);
+    return ['path' => $path, 'name' => sanitize_file_name($file['name']), 'type' => $checked['type']];
+}
 
 function echelon_reservation_page_url($args = []) {
     return add_query_arg($args, home_url('/reservation/'));
@@ -68,6 +96,8 @@ function echelon_handle_reservation_submission() {
     $licence = trim(sanitize_text_field(wp_unslash($_POST['licence_number'] ?? '')));
     $date_of_birth_raw = sanitize_text_field(wp_unslash($_POST['date_of_birth'] ?? ''));
     $date_of_birth = $date_of_birth_raw !== '' ? echelon_parse_reservation_date($date_of_birth_raw) : false;
+    $trip_type = sanitize_key(wp_unslash($_POST['trip_type'] ?? ''));
+    $hours_required = absint($_POST['hours_required'] ?? 0);
 
     if (get_post_type($vehicle_id) !== 'fleet_vehicle' || get_post_status($vehicle_id) !== 'publish') {
         echelon_reservation_error('vehicle');
@@ -86,6 +116,7 @@ function echelon_handle_reservation_submission() {
     $phone_digits = preg_replace('/\D+/', '', $phone);
     if (strlen($phone_digits) < 7 || strlen($phone_digits) > 15) echelon_reservation_error('phone');
     if (strlen($licence) < 4 || strlen($licence) > 50) echelon_reservation_error('licence');
+    if (!isset(echelon_reservation_trip_types()[$trip_type]) || $hours_required < 3 || $hours_required > 24) echelon_reservation_error('trip');
     if ($date_of_birth_raw !== '') {
         $today = new DateTimeImmutable('today', wp_timezone());
         if (!$date_of_birth || $date_of_birth >= $today || $date_of_birth->diff($today)->y < 25) echelon_reservation_error('age');
@@ -114,6 +145,18 @@ function echelon_handle_reservation_submission() {
         echelon_reservation_error('save');
     }
 
+    $uploads = [];
+    foreach (['licence_front' => ['jpg', 'jpeg', 'png'], 'licence_back' => ['jpg', 'jpeg', 'png'], 'insurance_document' => ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']] as $field => $extensions) {
+        $uploads[$field] = echelon_store_private_reservation_upload($field, $reference, $extensions);
+        if (is_wp_error($uploads[$field])) {
+            foreach ($uploads as $stored) if (is_array($stored) && !empty($stored['path'])) wp_delete_file($stored['path']);
+            wp_delete_post($post_id, true);
+            delete_transient('echelon_reservation_' . $token);
+            error_log('Echelon reservation upload failed for ' . $field . ': ' . $uploads[$field]->get_error_code());
+            echelon_reservation_error('documents');
+        }
+    }
+
     $data = [
         'reference'            => $reference,
         'status'               => 'pending',
@@ -127,12 +170,17 @@ function echelon_handle_reservation_submission() {
         'pickup_location_id'   => $pickup_location_id,
         'return_location_id'   => $return_location_id,
         'estimated_mileage'    => in_array(wp_unslash($_POST['estimated_mileage'] ?? '150'), ['150', '250', 'unlimited'], true) ? wp_unslash($_POST['estimated_mileage']) : '150',
+        'trip_type'            => $trip_type,
+        'hours_required'       => $hours_required,
         'customer_name'        => $name,
         'customer_email'       => $email,
         'customer_phone'       => $phone,
         'licence_number'       => $licence,
         'date_of_birth'        => $date_of_birth ? $date_of_birth->format('Y-m-d') : '',
         'occasion'             => sanitize_text_field(wp_unslash($_POST['occasion'] ?? '')),
+        'licence_front_file'   => $uploads['licence_front'],
+        'licence_back_file'    => $uploads['licence_back'],
+        'insurance_document_file' => $uploads['insurance_document'],
         'estimated_total'      => $estimated_total,
         'submitted_at'         => current_time('mysql', true),
     ];
@@ -155,6 +203,8 @@ function echelon_reservation_email_summary($post_id) {
     return implode("\n", [
         'Reference: ' . $get('reference'),
         'Vehicle: ' . $vehicle,
+        'Trip type: ' . (echelon_reservation_trip_types()[$get('trip_type')] ?? $get('trip_type')),
+        'Hours required: ' . $get('hours_required'),
         'Schedule: ' . $get('pickup_date') . ' ' . $get('pickup_time') . ' to ' . $get('return_date') . ' ' . $get('return_time'),
         'Pick-up: ' . $pickup,
         'Return: ' . $return,
@@ -163,6 +213,49 @@ function echelon_reservation_email_summary($post_id) {
         'Phone: ' . $get('customer_phone'),
         'Estimated total: ' . echelon_price($get('estimated_total')),
     ]);
+}
+
+function echelon_reservation_email_details($post_id) {
+    $get = static fn($key) => get_post_meta($post_id, '_echelon_' . $key, true);
+    return [
+        __('Reference', 'echelon') => $get('reference'),
+        __('Status', 'echelon') => ucfirst($get('status') ?: 'pending'),
+        __('Vehicle', 'echelon') => get_the_title((int) $get('vehicle_id')),
+        __('Trip Type', 'echelon') => echelon_reservation_trip_types()[$get('trip_type')] ?? $get('trip_type'),
+        __('Hours Required', 'echelon') => sprintf(__('%s hours', 'echelon'), $get('hours_required')),
+        __('Schedule', 'echelon') => $get('pickup_date') . ' ' . $get('pickup_time') . ' — ' . $get('return_date') . ' ' . $get('return_time'),
+        __('Pick-up', 'echelon') => get_the_title((int) $get('pickup_location_id')),
+        __('Return', 'echelon') => get_the_title((int) $get('return_location_id')),
+        __('Customer', 'echelon') => $get('customer_name'),
+        __('Email', 'echelon') => $get('customer_email'),
+        __('Phone', 'echelon') => $get('customer_phone'),
+        __('Estimated Total', 'echelon') => echelon_price($get('estimated_total')),
+    ];
+}
+
+function echelon_render_reservation_email($post_id, $status, $audience = 'customer') {
+    $get = static fn($key) => get_post_meta($post_id, '_echelon_' . $key, true);
+    $status_content = [
+        'pending' => [__('Request received', 'echelon'), __('Your drive is in motion.', 'echelon'), __('Our concierge is reviewing availability and will contact you within one hour to finalize the details.', 'echelon')],
+        'confirmed' => [__('Reservation confirmed', 'echelon'), __('Your vehicle is reserved.', 'echelon'), __('Your reservation is confirmed. Our concierge will contact you with the remaining delivery and payment details.', 'echelon')],
+        'cancelled' => [__('Reservation cancelled', 'echelon'), __('Your request has been cancelled.', 'echelon'), __('This reservation is no longer active. If you did not request this change or would like to rebook, please contact our concierge.', 'echelon')],
+    ];
+    [$eyebrow, $heading, $message] = $status_content[$status] ?? $status_content['pending'];
+    if ($audience === 'admin') {
+        $eyebrow = $status === 'pending' ? __('New booking request', 'echelon') : __('Booking status updated', 'echelon');
+        $heading = $status === 'pending' ? __('A new reservation needs review.', 'echelon') : sprintf(__('Reservation marked %s.', 'echelon'), $status);
+        $message = sprintf(__('Review the complete request and verification documents in WordPress. Customer: %s.', 'echelon'), $get('customer_name'));
+    }
+    $rows = '';
+    foreach (echelon_reservation_email_details($post_id) as $label => $value) {
+        $rows .= '<tr><td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#8f8f8f;font-size:12px;letter-spacing:.05em;text-transform:uppercase;vertical-align:top">' . esc_html($label) . '</td><td style="padding:12px 0;border-bottom:1px solid #2a2a2a;color:#fff;font-size:14px;text-align:right;vertical-align:top">' . esc_html($value) . '</td></tr>';
+    }
+    $cta = $audience === 'admin' ? '<tr><td style="padding:28px 32px 0"><a href="' . esc_url(admin_url('post.php?post=' . $post_id . '&action=edit')) . '" style="display:inline-block;padding:14px 22px;background:#d40924;color:#fff;font-size:12px;font-weight:700;letter-spacing:.06em;text-decoration:none;text-transform:uppercase">' . esc_html__('Review reservation', 'echelon') . '</a></td></tr>' : '';
+    return '<!doctype html><html><body style="margin:0;padding:0;background:#080808;color:#fff;font-family:Arial,sans-serif"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#080808"><tr><td align="center" style="padding:32px 12px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#121212;border-top:3px solid #d40924"><tr><td style="padding:30px 32px 18px"><div style="color:#fff;font-size:22px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">ECHELON <span style="color:#d40924">MOTIONS</span></div></td></tr><tr><td style="padding:22px 32px;background:#181818"><div style="margin-bottom:10px;color:#d40924;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">' . esc_html($eyebrow) . '</div><h1 style="margin:0 0 14px;color:#fff;font-size:30px;line-height:1.15;text-transform:uppercase">' . esc_html($heading) . '</h1><p style="margin:0;color:#b8b8b8;font-size:15px;line-height:1.65">' . esc_html($message) . '</p></td></tr><tr><td style="padding:20px 32px 0"><table role="presentation" width="100%" cellspacing="0" cellpadding="0">' . $rows . '</table></td></tr>' . $cta . '<tr><td style="padding:30px 32px;color:#777;font-size:12px;line-height:1.6">' . esc_html__('Echelon Motions · Concierge-supported luxury transportation', 'echelon') . '<br><a href="' . esc_url(home_url('/')) . '" style="color:#d40924;text-decoration:none">' . esc_html(home_url('/')) . '</a></td></tr></table></td></tr></table></body></html>';
+}
+
+function echelon_send_reservation_email($to, $subject, $html) {
+    return wp_mail($to, $subject, $html, ['Content-Type: text/html; charset=UTF-8']);
 }
 
 /**
@@ -189,11 +282,8 @@ function echelon_reservation_has_confirmed_conflict($vehicle_id, $pickup_date, $
 function echelon_send_reservation_received_emails($post_id) {
     $email = get_post_meta($post_id, '_echelon_customer_email', true);
     $reference = get_post_meta($post_id, '_echelon_reference', true);
-    $summary = echelon_reservation_email_summary($post_id);
-    $customer_message = "Thank you for your reservation request.\n\n{$summary}\n\nA concierge will contact you within one hour to confirm availability and finalize the details.";
-    $admin_message = "A new reservation request has been received.\n\n{$summary}\n\nReview it in WordPress: " . admin_url('post.php?post=' . $post_id . '&action=edit');
-    wp_mail($email, sprintf(__('Reservation request received — %s', 'echelon'), $reference), $customer_message);
-    wp_mail(get_option('admin_email'), sprintf(__('New reservation request — %s', 'echelon'), $reference), $admin_message);
+    echelon_send_reservation_email($email, sprintf(__('Reservation request received — %s', 'echelon'), $reference), echelon_render_reservation_email($post_id, 'pending', 'customer'));
+    echelon_send_reservation_email(get_option('admin_email'), sprintf(__('New reservation request — %s', 'echelon'), $reference), echelon_render_reservation_email($post_id, 'pending', 'admin'));
 }
 
 function echelon_add_reservation_meta_box() {
@@ -208,13 +298,72 @@ function echelon_render_reservation_meta_box($post) {
         delete_transient('echelon_reservation_conflict_' . get_current_user_id() . '_' . $post->ID);
         echo '<div class="notice notice-error inline"><p>' . esc_html__('This reservation remains pending because the vehicle already has a confirmed reservation for overlapping dates.', 'echelon') . '</p></div>';
     }
-    echo '<p><label for="echelon-status"><strong>' . esc_html__('Status', 'echelon') . '</strong></label><br>';
-    echo '<select id="echelon-status" name="echelon_status">';
+    echo '<div style="display:grid;grid-template-columns:minmax(160px,220px) minmax(0,1fr);gap:24px;align-items:start">';
+    echo '<div><label for="echelon-status" style="display:block;margin-bottom:8px;font-weight:600">' . esc_html__('Reservation Status', 'echelon') . '</label>';
+    echo '<select id="echelon-status" name="echelon_status" style="width:100%;min-height:40px">';
     foreach (['pending' => __('Pending', 'echelon'), 'confirmed' => __('Confirmed', 'echelon'), 'cancelled' => __('Cancelled', 'echelon')] as $value => $label) {
         echo '<option value="' . esc_attr($value) . '"' . selected($status, $value, false) . '>' . esc_html($label) . '</option>';
     }
-    echo '</select></p><pre style="white-space:pre-wrap">' . esc_html(echelon_reservation_email_summary($post->ID)) . '</pre>';
+    echo '</select><p style="margin:10px 0 0;color:#646970;font-size:12px;line-height:1.5">' . esc_html__('Changing the status sends a branded update email to the customer and administrator.', 'echelon') . '</p></div>';
+    echo '<div style="overflow:hidden;border:1px solid #dcdcde;border-radius:4px;background:#fff"><table class="widefat striped" style="border:0;box-shadow:none"><tbody>';
+    foreach (echelon_reservation_email_details($post->ID) as $label => $value) {
+        echo '<tr><th scope="row" style="width:180px;padding:11px 14px;font-weight:600;color:#3c434a">' . esc_html($label) . '</th><td style="padding:11px 14px;color:#1d2327">' . esc_html($value ?: '—') . '</td></tr>';
+    }
+    $licence_number = get_post_meta($post->ID, '_echelon_licence_number', true);
+    $date_of_birth = get_post_meta($post->ID, '_echelon_date_of_birth', true);
+    echo '<tr><th scope="row" style="padding:11px 14px;font-weight:600">' . esc_html__('License Number', 'echelon') . '</th><td style="padding:11px 14px">' . esc_html($licence_number ?: '—') . '</td></tr>';
+    echo '<tr><th scope="row" style="padding:11px 14px;font-weight:600">' . esc_html__('Date of Birth', 'echelon') . '</th><td style="padding:11px 14px">' . esc_html($date_of_birth ?: '—') . '</td></tr>';
+    echo '</tbody></table></div></div>';
+    echo '<hr style="margin:24px 0;border:0;border-top:1px solid #dcdcde"><h3 style="margin:0 0 14px">' . esc_html__('Verification Documents', 'echelon') . '</h3>';
+    echo '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">';
+    foreach (['licence_front_file' => __('Driver’s License — Front', 'echelon'), 'licence_back_file' => __('Driver’s License — Back', 'echelon'), 'insurance_document_file' => __('Insurance Document', 'echelon')] as $key => $label) {
+        $file = get_post_meta($post->ID, '_echelon_' . $key, true);
+        if (is_array($file) && !empty($file['path'])) {
+            $download_url = wp_nonce_url(admin_url('admin-post.php?action=echelon_download_reservation_document&reservation_id=' . $post->ID . '&document=' . $key), 'echelon_download_reservation_document_' . $post->ID);
+            $preview_url = add_query_arg('preview', '1', $download_url);
+            $is_image = strpos($file['type'] ?? '', 'image/') === 0;
+            echo '<article style="overflow:hidden;border:1px solid #dcdcde;border-radius:4px;background:#fff">';
+            if ($is_image) {
+                echo '<a href="' . esc_url($download_url) . '" style="display:block;height:180px;background:#f0f0f1" title="' . esc_attr(sprintf(__('Download %s', 'echelon'), $label)) . '"><img src="' . esc_url($preview_url) . '" alt="' . esc_attr($label) . '" style="display:block;width:100%;height:100%;object-fit:contain"></a>';
+            } else {
+                $extension = strtoupper(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+                echo '<div style="display:grid;place-items:center;height:180px;background:#f0f0f1;color:#50575e"><span style="padding:12px 18px;border:2px solid #8c8f94;border-radius:4px;font-size:24px;font-weight:700">' . esc_html($extension ?: __('FILE', 'echelon')) . '</span></div>';
+            }
+            echo '<div style="padding:13px 14px"><strong style="display:block;margin-bottom:5px">' . esc_html($label) . '</strong><small style="display:block;overflow:hidden;margin-bottom:10px;color:#646970;text-overflow:ellipsis;white-space:nowrap" title="' . esc_attr($file['name'] ?? '') . '">' . esc_html($file['name'] ?? '') . '</small><a class="button button-secondary" href="' . esc_url($download_url) . '">' . esc_html__('Download', 'echelon') . '</a></div></article>';
+        }
+    }
+    echo '</div>';
 }
+
+function echelon_download_reservation_document() {
+    $post_id = absint($_GET['reservation_id'] ?? 0);
+    $key = sanitize_key(wp_unslash($_GET['document'] ?? ''));
+    $allowed = ['licence_front_file', 'licence_back_file', 'insurance_document_file'];
+    if (!$post_id || !current_user_can('edit_post', $post_id) || !in_array($key, $allowed, true)) wp_die(esc_html__('You are not allowed to access this document.', 'echelon'), '', ['response' => 403]);
+    check_admin_referer('echelon_download_reservation_document_' . $post_id);
+    $file = get_post_meta($post_id, '_echelon_' . $key, true);
+    $path = is_array($file) ? ($file['path'] ?? '') : '';
+    if (!$path || !is_file($path) || !is_readable($path)) wp_die(esc_html__('The requested document could not be found.', 'echelon'), '', ['response' => 404]);
+    nocache_headers();
+    header('Content-Type: ' . sanitize_mime_type($file['type'] ?? 'application/octet-stream'));
+    $is_preview = !empty($_GET['preview']) && strpos($file['type'] ?? '', 'image/') === 0;
+    header('Content-Disposition: ' . ($is_preview ? 'inline' : 'attachment') . '; filename="' . sanitize_file_name($file['name'] ?? basename($path)) . '"');
+    header('X-Content-Type-Options: nosniff');
+    header("Content-Security-Policy: default-src 'none'; img-src 'self'; sandbox");
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+add_action('admin_post_echelon_download_reservation_document', 'echelon_download_reservation_document');
+
+function echelon_delete_reservation_documents($post_id) {
+    if (get_post_type($post_id) !== 'rental_reservation') return;
+    foreach (['licence_front_file', 'licence_back_file', 'insurance_document_file'] as $key) {
+        $file = get_post_meta($post_id, '_echelon_' . $key, true);
+        if (is_array($file) && !empty($file['path']) && is_file($file['path'])) wp_delete_file($file['path']);
+    }
+}
+add_action('before_delete_post', 'echelon_delete_reservation_documents');
 
 function echelon_save_reservation_status($post_id) {
     if (!isset($_POST['echelon_reservation_admin_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['echelon_reservation_admin_nonce'])), 'echelon_save_reservation') ||
@@ -238,13 +387,13 @@ function echelon_save_reservation_status($post_id) {
         $new_status = 'pending';
     }
     update_post_meta($post_id, '_echelon_status', $new_status);
-    if ($new_status === 'confirmed' && $old_status !== 'confirmed' && !get_post_meta($post_id, '_echelon_confirmation_sent', true)) {
+    if ($new_status !== $old_status) {
         $email = get_post_meta($post_id, '_echelon_customer_email', true);
         $reference = get_post_meta($post_id, '_echelon_reference', true);
-        $message = "Your reservation has been confirmed.\n\n" . echelon_reservation_email_summary($post_id) . "\n\nOur concierge will contact you with the remaining delivery and payment details.";
-        if (wp_mail($email, sprintf(__('Reservation confirmed — %s', 'echelon'), $reference), $message)) {
-            update_post_meta($post_id, '_echelon_confirmation_sent', current_time('mysql', true));
-        }
+        $status_label = ucfirst($new_status);
+        echelon_send_reservation_email($email, sprintf(__('Reservation %1$s — %2$s', 'echelon'), $status_label, $reference), echelon_render_reservation_email($post_id, $new_status, 'customer'));
+        echelon_send_reservation_email(get_option('admin_email'), sprintf(__('Reservation %1$s — %2$s', 'echelon'), $status_label, $reference), echelon_render_reservation_email($post_id, $new_status, 'admin'));
+        update_post_meta($post_id, '_echelon_status_email_sent_at', current_time('mysql', true));
     }
 }
 add_action('save_post_rental_reservation', 'echelon_save_reservation_status');

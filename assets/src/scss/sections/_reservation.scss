@@ -8,6 +8,8 @@
 .reservation-progress { display: grid; grid-template-columns: repeat(4, 1fr); width: calc(100% - 488px); padding: 0 0 18px; margin: 0 0 38px; border-bottom: 1px solid rgba(255,255,255,.15); list-style: none; li { position: relative; display: grid; gap: 13px; color: rgba(255,255,255,.5); font: 12px/1 var(--font-display); text-transform: uppercase; span { color: #d40924; font: 500 12px/1 var(--font-body); } &.is-active, &.is-complete { color: #fff; } &.is-active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -19px; border-bottom: 1px solid #d40924; } } }
 .reservation__layout { display: grid; grid-template-columns: minmax(0, 790px) 399px; gap: 11px; align-items: start; }
 .reservation-step__heading { margin-bottom: 40px; h2 { margin: 13px 0 0; font: 40px/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; } }
+.reservation-step__back { margin: 0 0 22px; padding: 0; border: 0; background: transparent; color: rgba(255,255,255,.68); font: 700 12px/1 var(--font-body); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: color var(--transition-fast); &:hover, &:focus-visible { color: var(--color-accent); } }
+.reservation-step__back[hidden], .reservation-actions [data-reservation-back][hidden] { display: none !important; }
 .reservation-step__vehicle-action { display: flex; justify-content: flex-end; margin: -24px 0 24px; .btn { min-width: 260px; border-radius: 0; } }
 .reservation-fleet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 24px; }
 .reservation-vehicle { display: block; background: #121212; cursor: pointer; transition: box-shadow var(--transition-fast); input { position: absolute; opacity: 0; pointer-events: none; } &.is-selected { box-shadow: 0 6px 8px rgba(212,9,36,.35); .reservation-vehicle__select { background: #d40924; border-color: #d40924; } .reservation-vehicle__check { display: grid; } } }
@@ -21,6 +23,7 @@
 .reservation-step[data-step="3"] .reservation-fields label { align-content: start; }
 .reservation-fields input:focus,
 .reservation-fields select:focus { outline: 0; border-color: var(--color-accent); box-shadow: 0 0 0 2px rgba(212,9,36,.35); }
+.reservation-fields input[type="file"] { height: auto; min-height: 48px; padding: 12px 8px; text-transform: none; }
 .reservation-fields input:-webkit-autofill,
 .reservation-fields input:-webkit-autofill:hover,
 .reservation-fields input:-webkit-autofill:focus,

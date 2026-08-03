@@ -39,6 +39,8 @@ $errors = [
     'email' => __('Please enter a valid email address.', 'echelon'),
     'phone' => __('Please enter a valid phone number.', 'echelon'),
     'licence' => __('Please enter a valid driving licence number.', 'echelon'),
+    'trip' => __('Please select a valid trip type and the number of hours required.', 'echelon'),
+    'documents' => __('Please upload both sides of your driver’s license and your insurance document using a supported file type (maximum 10 MB each).', 'echelon'),
     'age' => __('Drivers must be at least 25 years old.', 'echelon'),
     'terms' => __('You must accept the rental terms and insurance policy.', 'echelon'),
     'duplicate' => __('This reservation was already submitted. Please check your email.', 'echelon'),
@@ -68,7 +70,7 @@ get_header();
 
             <?php if ($error_code && isset($errors[$error_code])) : ?><div class="reservation__alert" role="alert"><?php echo esc_html($errors[$error_code]); ?></div><?php endif; ?>
 
-            <form class="reservation__form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" novalidate>
+            <form class="reservation__form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="action" value="echelon_submit_reservation">
                 <input type="hidden" name="submission_token" value="<?php echo esc_attr(wp_generate_uuid4()); ?>">
                 <input type="text" class="reservation__honeypot" name="company" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -112,12 +114,15 @@ get_header();
                         </section>
 
                         <section class="reservation-step" data-step="2" aria-labelledby="step-2-title" hidden>
+                            <button class="reservation-step__back" type="button" data-reservation-back><?php echo esc_html__('← Back', 'echelon'); ?></button>
                             <div class="reservation-step__heading"><p><?php esc_html_e('Step 02 / Trip Details', 'echelon'); ?></p><h2 id="step-2-title"><?php esc_html_e('When & Where', 'echelon'); ?></h2></div>
                             <div class="reservation-fields">
+                                <label><span><?php esc_html_e('Trip Type', 'echelon'); ?> *</span><select name="trip_type" required><option value=""><?php esc_html_e('Select trip type', 'echelon'); ?></option><?php foreach (echelon_reservation_trip_types() as $value => $label) : ?><option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option><?php endforeach; ?></select></label>
+                                <label><span><?php esc_html_e('Hours Required', 'echelon'); ?> *</span><select name="hours_required" required><option value=""><?php esc_html_e('Select hours', 'echelon'); ?></option><?php for ($hour = 3; $hour <= 24; $hour++) : ?><option value="<?php echo esc_attr($hour); ?>"><?php echo esc_html(sprintf(_n('%d hour', '%d hours', $hour, 'echelon'), $hour)); ?></option><?php endfor; ?></select></label>
                                 <label><span><?php esc_html_e('Pick-up Date', 'echelon'); ?> *</span><input type="text" name="pickup_date" value="<?php echo esc_attr($initial_pickup); ?>" placeholder="dd/mm/yyyy" data-reservation-date="pickup" required autocomplete="off"></label>
                                 <label><span><?php esc_html_e('Return Date', 'echelon'); ?> *</span><input type="text" name="return_date" value="<?php echo esc_attr($initial_return); ?>" placeholder="dd/mm/yyyy" data-reservation-date="return" required autocomplete="off"></label>
-                                <label><span><?php esc_html_e('Pick-up Time', 'echelon'); ?> *</span><input type="time" name="pickup_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['pickup_time'] ?? ''))); ?>" required></label>
-                                <label><span><?php esc_html_e('Return Time', 'echelon'); ?> *</span><input type="time" name="return_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['return_time'] ?? ''))); ?>" required></label>
+                                <label><span><?php esc_html_e('Pick-up Time', 'echelon'); ?> *</span><input type="text" name="pickup_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['pickup_time'] ?? ''))); ?>" data-reservation-time required autocomplete="off"></label>
+                                <label><span><?php esc_html_e('Return Time', 'echelon'); ?> *</span><input type="text" name="return_time" value="<?php echo esc_attr(sanitize_text_field(wp_unslash($_GET['return_time'] ?? ''))); ?>" data-reservation-time required autocomplete="off"></label>
                                 <label><span><?php esc_html_e('Pick-up Location', 'echelon'); ?> *</span><select name="pickup_location_id" required><?php foreach ($locations as $location) : ?><option value="<?php echo esc_attr($location->ID); ?>" <?php selected($initial_location, $location->post_name); ?>><?php echo esc_html(get_the_title($location)); ?></option><?php endforeach; ?></select></label>
                                 <label><span><?php esc_html_e('Return Location', 'echelon'); ?> *</span><select name="return_location_id" required><?php foreach ($locations as $location) : ?><option value="<?php echo esc_attr($location->ID); ?>" <?php selected($initial_location, $location->post_name); ?>><?php echo esc_html(get_the_title($location)); ?></option><?php endforeach; ?></select></label>
                                 <label><span><?php esc_html_e('Estimated Mileage', 'echelon'); ?></span><select name="estimated_mileage"><option value="150">150 mi / day</option><option value="250">250 mi / day</option><option value="unlimited"><?php esc_html_e('Request unlimited', 'echelon'); ?></option></select></label>
@@ -125,18 +130,23 @@ get_header();
                         </section>
 
                         <section class="reservation-step" data-step="3" aria-labelledby="step-3-title" hidden>
+                            <button class="reservation-step__back" type="button" data-reservation-back><?php echo esc_html__('← Back', 'echelon'); ?></button>
                             <div class="reservation-step__heading"><p><?php esc_html_e('Step 03 / Your Details', 'echelon'); ?></p><h2 id="step-3-title"><?php esc_html_e('Your Information', 'echelon'); ?></h2></div>
                             <div class="reservation-fields">
                                 <label><span><?php esc_html_e('Full Name', 'echelon'); ?> *</span><input type="text" name="customer_name" autocomplete="name" minlength="2" maxlength="100" required></label>
                                 <label><span><?php esc_html_e('Email', 'echelon'); ?> *</span><input type="email" name="customer_email" autocomplete="email" maxlength="254" required></label>
                                 <label><span><?php esc_html_e('Phone', 'echelon'); ?> *</span><input type="tel" name="customer_phone" autocomplete="tel" inputmode="tel" minlength="7" maxlength="25" required></label>
                                 <label><span><?php esc_html_e('Driving Licence Number', 'echelon'); ?> *</span><input type="text" name="licence_number" minlength="4" maxlength="50" required><small><?php esc_html_e('Your information is encrypted in transit and used only for verification.', 'echelon'); ?></small></label>
+                                <label><span><?php esc_html_e('Driver’s License — Front', 'echelon'); ?> *</span><input type="file" name="licence_front" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required><small><?php esc_html_e('JPG or PNG, maximum 10 MB.', 'echelon'); ?></small></label>
+                                <label><span><?php esc_html_e('Driver’s License — Back', 'echelon'); ?> *</span><input type="file" name="licence_back" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required><small><?php esc_html_e('JPG or PNG, maximum 10 MB.', 'echelon'); ?></small></label>
+                                <label><span><?php esc_html_e('Insurance Document', 'echelon'); ?> *</span><input type="file" name="insurance_document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" required><small><?php esc_html_e('PDF, DOC, DOCX, JPG or PNG, maximum 10 MB.', 'echelon'); ?></small></label>
                                 <label><span><?php esc_html_e('Date of Birth', 'echelon'); ?></span><input type="text" name="date_of_birth" placeholder="dd/mm/yyyy" data-reservation-date="birth" autocomplete="bday"></label>
                                 <label><span><?php esc_html_e('Occasion (Optional)', 'echelon'); ?></span><select name="occasion"><option value=""><?php esc_html_e('Select an occasion', 'echelon'); ?></option><option>Wedding</option><option>Corporate</option><option>Prom</option><option>Photoshoot</option><option>Other</option></select></label>
                             </div>
                         </section>
 
                         <section class="reservation-step" data-step="4" aria-labelledby="step-4-title" hidden>
+                            <button class="reservation-step__back" type="button" data-reservation-back><?php echo esc_html__('← Back', 'echelon'); ?></button>
                             <div class="reservation-step__heading"><p><?php esc_html_e('Step 04 / Review', 'echelon'); ?></p><h2 id="step-4-title"><?php esc_html_e('Review & Confirm', 'echelon'); ?></h2></div>
                             <div class="reservation-review" data-reservation-review></div>
                             <label class="reservation-terms"><input type="checkbox" name="terms_accepted" value="1" required><span><?php esc_html_e('I agree to the rental terms and insurance policy.', 'echelon'); ?></span></label>
