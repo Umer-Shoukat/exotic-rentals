@@ -3,14 +3,15 @@
  * Home: hero section with trust badges and featured-vehicle strip.
  */
 
-$eyebrow    = echelon_field('hero_eyebrow', get_the_ID(), 'New York · New Jersey · Connecticut');
-$heading    = echelon_field('hero_heading', get_the_ID(), "Tri-State's Premier\nExotic Rental Experience");
-$subtext    = echelon_field('hero_subtext', get_the_ID(), 'From Lamborghinis and Rolls-Royces to executive chauffeur service, we deliver luxury vehicles across Tri-State Areas. Premium cars, white-glove service, and a seamless booking experience from start to finish.');
-$bg         = echelon_field('hero_background', get_the_ID(), null);
-$bg_mobile  = echelon_field('hero_background_mobile', get_the_ID(), null);
-$cta1       = echelon_field('hero_cta_primary', get_the_ID(), ['title' => 'Browse Our Fleet', 'url' => home_url('/fleet')]);
-$cta2       = echelon_field('hero_cta_secondary', get_the_ID(), ['title' => 'How It Works', 'url' => '#how-it-works']);
-$badges     = echelon_field('hero_badges', get_the_ID(), [
+$page_id = get_queried_object_id();
+$eyebrow    = echelon_field('hero_eyebrow', $page_id, 'New York · New Jersey · Connecticut');
+$heading    = echelon_field('hero_heading', $page_id, "Tri-State's Premier\nExotic Rental Experience");
+$subtext    = echelon_field('hero_subtext', $page_id, 'From Lamborghinis and Rolls-Royces to executive chauffeur service, we deliver luxury vehicles across Tri-State Areas. Premium cars, white-glove service, and a seamless booking experience from start to finish.');
+$bg         = echelon_field('hero_background', $page_id, null);
+$bg_mobile  = echelon_field('hero_background_mobile', $page_id, null);
+$cta1       = echelon_field('hero_cta_primary', $page_id, ['title' => 'Browse Our Fleet', 'url' => home_url('/fleet')]);
+$cta2       = echelon_field('hero_cta_secondary', $page_id, ['title' => 'How It Works', 'url' => '#how-it-works']);
+$badges     = echelon_field('hero_badges', $page_id, [
     ['icon' => 'star', 'label' => '5-Star Rated'],
     ['icon' => 'shield-check', 'label' => 'Fully Insured'],
     ['icon' => 'headset', 'label' => '24/7 Concierge'],
@@ -93,7 +94,7 @@ if (!$featured->have_posts()) {
 						</span>
 						<span class="hero__strip-stat">
 							<span class="hero__strip-label"><?php esc_html_e('Starting At', 'echelon'); ?></span>
-							<?php $hero_hourly_rate = echelon_field('price_per_hour', get_the_ID(), ''); $hero_daily_rate = ''; ?>
+							<?php $hero_hourly_rate = echelon_field('price_per_hour', get_the_ID(), ''); $hero_daily_rate = echelon_field('daily_rental_price', get_the_ID(), ''); ?>
 							<?php if ($hero_hourly_rate !== '' || $hero_daily_rate !== '') : ?><span class="hero__strip-value"><?php if ($hero_hourly_rate !== '') : ?><?php echo esc_html(echelon_price($hero_hourly_rate)); ?>/<?php esc_html_e('hour', 'echelon'); ?><?php endif; ?><?php if ($hero_hourly_rate !== '' && $hero_daily_rate !== '') : ?> · <?php endif; ?><?php if ($hero_daily_rate !== '') : ?><?php echo esc_html(echelon_price($hero_daily_rate)); ?>/<?php esc_html_e('day', 'echelon'); ?><?php endif; ?></span><?php endif; ?>
 						</span>
 						<span class="hero__strip-image">

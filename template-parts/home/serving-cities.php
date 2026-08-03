@@ -40,18 +40,6 @@ $heading = echelon_field('cities_heading', $page_id, 'Serving New York City and 
 $intro = echelon_field('cities_intro', $page_id, 'Across Manhattan, Brooklyn, Queens, the Bronx, and Long Island, our concierge team coordinates the closest available vehicle and chauffeur. Extended service to New Jersey, Connecticut, and Pennsylvania is available by request.');
 $map_image = echelon_field('cities_map', $page_id, null);
 $map_link = echelon_field('cities_cta', $page_id, ['title' => 'View All Locations', 'url' => home_url('/locations')]);
-if ($eyebrow === 'Where We Deliver') {
-    $eyebrow = 'Where We Serve';
-}
-if ($heading === 'Serving The Cities That Demand More') {
-    $heading = 'Serving New York City and Long Island';
-}
-if (stripos((string) $intro, 'From coast to coast') !== false) {
-    $intro = 'Across Manhattan, Brooklyn, Queens, the Bronx, and Long Island, our concierge team coordinates the closest available vehicle and chauffeur. Extended service to New Jersey, Connecticut, and Pennsylvania is available by request.';
-}
-if (is_array($map_link) && ($map_link['title'] ?? '') === 'Active Service Zones') {
-    $map_link['title'] = 'View All Locations';
-}
 $map_url = '';
 
 if (is_array($map_image) && !empty($map_image['ID'])) {
@@ -72,8 +60,8 @@ if (!$is_fallback) {
 }
 $map_viewport = echelon_map_viewport_for_locations($map_coordinates, 640, 481);
 $google_map_url = echelon_google_static_map_url(640, 481, $map_viewport);
-$map_url = $google_map_url ?: ($map_url ?: ECHELON_THEME_URI . '/assets/images/figma/serving-cities-map.png');
-$using_google_map = $google_map_url !== '';
+$using_google_map = $map_url === '' && $google_map_url !== '';
+$map_url = $map_url ?: ($google_map_url ?: ECHELON_THEME_URI . '/assets/images/figma/serving-cities-map.png');
 $map_center_lat = isset($map_viewport['latitude']) ? (float) $map_viewport['latitude'] : (float) echelon_setting('google_maps_center_lat', '40.730610');
 $map_center_lng = isset($map_viewport['longitude']) ? (float) $map_viewport['longitude'] : (float) echelon_setting('google_maps_center_lng', '-74.006000');
 $map_zoom = isset($map_viewport['zoom']) ? (int) $map_viewport['zoom'] : echelon_sanitize_map_zoom(echelon_setting('google_maps_zoom', 8));

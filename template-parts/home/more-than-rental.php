@@ -11,29 +11,17 @@ $services = new WP_Query([
     'no_found_rows'  => true,
 ]);
 
-$eyebrow = echelon_field('occasions_eyebrow', get_the_ID(), 'Services');
-$heading = echelon_field('occasions_heading', get_the_ID(), 'Chauffeur Services For Every Occasion');
-$desc    = echelon_field('occasions_desc', get_the_ID(), 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.');
-$cta     = echelon_field('occasions_cta', get_the_ID(), ['title' => 'View More', 'url' => get_post_type_archive_link('service')]);
-$normalized_heading = preg_replace('/\s+/', ' ', trim((string) $heading));
-if (in_array($normalized_heading, ['More Than a Rental', 'CHAUFFEUR SERVICES FOR EVERY OCCASION'], true)) {
-	$heading = 'Chauffeur Services For Every Occasion';
-}
-if (stripos((string) $desc, 'first look at the aisle') !== false || stripos((string) $desc, 'we tailor the car') !== false) {
-	$desc = 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.';
-}
+$page_id = get_queried_object_id();
+$eyebrow = echelon_field('occasions_eyebrow', $page_id, 'Services');
+$heading = echelon_field('occasions_heading', $page_id, 'Chauffeur Services For Every Occasion');
+$desc    = echelon_field('occasions_desc', $page_id, 'Whatever the occasion - a wedding, a boardroom arrival, or a shoot at golden hour - we tailor the vehicle, the chauffeur, and the schedule.');
+$cta     = echelon_field('occasions_cta', $page_id, ['title' => 'View More', 'url' => get_post_type_archive_link('service')]);
 $heading_parts = preg_split('/(rental)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 $fallback_images = [
 	'wedding'    => 'wedding.jpg',
 	'prom'       => 'prom.jpg',
 	'corporate'  => 'corporate.jpg',
 	'photoshoot' => 'photoshoot.jpg',
-];
-$service_copy = [
-	'wedding'    => ['title' => 'Wedding Transportation', 'desc' => 'A composed, on-time arrival for your ceremony and reception.'],
-	'prom'       => ['title' => 'Prom Transportation', 'desc' => 'A safe, chauffeured ride your group will remember.'],
-	'corporate'  => ['title' => 'Corporate & Executive', 'desc' => 'Professional chauffeur service for meetings, clients, and travel.'],
-	'photoshoot' => ['title' => 'Photoshoot & Production', 'desc' => 'The right vehicle for the right shot.'],
 ];
 ?>
 <section class="section more-than-rental" id="services" data-reveal>
@@ -62,10 +50,6 @@ $service_copy = [
 					foreach ($fallback_images as $keyword => $filename) {
 						if (strpos($title_key, $keyword) !== false) {
 							$fallback_image = $filename;
-							if (isset($service_copy[$keyword])) {
-								$card_title = $service_copy[$keyword]['title'];
-								$card_desc = $service_copy[$keyword]['desc'];
-							}
 							break;
 						}
 					}

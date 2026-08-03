@@ -3,10 +3,11 @@
  * Home: "Luxury Fleet Brands" logo strip.
  */
 
-$heading = echelon_field('brands_heading', get_the_ID(), 'Luxury Fleet Brands');
-$desc    = echelon_field('brands_desc', get_the_ID(), 'Exotic, performance, and executive vehicles selected
+$page_id = get_queried_object_id();
+$heading = echelon_field('brands_heading', $page_id, 'Luxury Fleet Brands');
+$desc    = echelon_field('brands_desc', $page_id, 'Exotic, performance, and executive vehicles selected
 for weddings, corporate travel, and high-presence arrivals across New York City.');
-$brands  = echelon_field('brands', get_the_ID(), [
+$brands  = echelon_field('brands', $page_id, [
     ['logo' => null, 'name' => 'Audi', 'fallback' => 'audi.png'],
     ['logo' => null, 'name' => 'Bentley', 'fallback' => 'bentley.png'],
     ['logo' => null, 'name' => 'BMW', 'fallback' => 'bmw.png'],

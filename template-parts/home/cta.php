@@ -9,15 +9,6 @@ $heading = echelon_field('cta_heading', $page_id, 'Ready To Plan Your Ride?');
 $desc    = echelon_field('cta_desc', $page_id, 'Whatever the occasion, our concierge team will confirm the right vehicle, chauffeur, and schedule for you.');
 $image   = echelon_field('cta_image', $page_id, null);
 $button  = echelon_field('cta_button', $page_id, ['title' => 'Start Your Reservation', 'url' => home_url('/reservation')]);
-if ($heading === 'Ready To Redefine Your Drive?') {
-	$heading = 'Ready To Plan Your Ride?';
-}
-if (stripos((string) $desc, 'first look at the aisle') !== false || stripos((string) $desc, 'we tailor the car') !== false) {
-	$desc = 'Whatever the occasion, our concierge team will confirm the right vehicle, chauffeur, and schedule for you.';
-}
-if (is_array($button) && ($button['title'] ?? '') === 'Start Your Reservation' && preg_match('#/fleet/?$#', (string) ($button['url'] ?? ''))) {
-	$button['url'] = home_url('/reservation');
-}
 ?>
 <section class="cta-band" data-reveal>
 	<div class="cta-band__media" aria-hidden="true">

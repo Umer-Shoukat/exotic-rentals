@@ -85,6 +85,12 @@
   object-fit: contain;
 }
 
+.feature-card__icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-accent);
+}
+
 .feature-card__title {
   position: relative;
   padding-bottom: 16px;

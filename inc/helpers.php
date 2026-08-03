@@ -71,7 +71,50 @@ function echelon_field($selector, $post_id = false, $default = '') {
         return $default;
     }
     $value = get_field($selector, $post_id);
+    if ($value === null || $value === false || $value === '' || $value === []) {
+        $fixed_value = echelon_free_home_collection($selector, $post_id);
+        if ($fixed_value !== null && $fixed_value !== []) {
+            return $fixed_value;
+        }
+    }
     return ($value === null || $value === false || $value === '') ? $default : $value;
+}
+
+/**
+ * Rebuild homepage collection arrays from ACF Free-compatible fixed fields.
+ * Existing Pro repeater/gallery values remain authoritative when present.
+ */
+function echelon_free_home_collection($selector, $post_id = false) {
+    $collections = [
+        'hero_badges' => ['prefix' => 'hero_badge', 'count' => 4, 'columns' => ['icon', 'label'], 'content' => ['label']],
+        'stats' => ['prefix' => 'stat_card', 'count' => 4, 'columns' => ['icon', 'value', 'label'], 'content' => ['value', 'label']],
+        'brands' => ['prefix' => 'brand_logo', 'count' => 8, 'columns' => ['logo', 'name'], 'content' => ['logo', 'name']],
+        'concierge_checklist' => ['prefix' => 'concierge_check', 'count' => 4, 'columns' => ['icon', 'label'], 'content' => ['label']],
+        'concierge_chat_messages' => ['prefix' => 'concierge_message', 'count' => 4, 'columns' => ['sender', 'message'], 'content' => ['message']],
+        'terms' => ['prefix' => 'requirement_card', 'count' => 4, 'columns' => ['icon', 'value', 'label'], 'content' => ['value', 'label']],
+        'features' => ['prefix' => 'driver_feature', 'count' => 4, 'columns' => ['icon', 'title', 'description'], 'content' => ['title', 'description']],
+        'instagram_images' => ['prefix' => 'instagram_image', 'count' => 8, 'columns' => ['image'], 'content' => ['image'], 'flatten' => true],
+    ];
+    if (!isset($collections[$selector]) || !function_exists('get_field')) {
+        return null;
+    }
+
+    $config = $collections[$selector];
+    $rows = [];
+    for ($index = 1; $index <= $config['count']; $index++) {
+        $row = [];
+        foreach ($config['columns'] as $column) {
+            $value = get_field($config['prefix'] . '_' . $index . '_' . $column, $post_id);
+            $row[$column] = $value;
+        }
+        $has_value = array_filter($config['content'], static function ($column) use ($row) {
+            return isset($row[$column]) && $row[$column] !== '' && $row[$column] !== false;
+        });
+        if ($has_value) {
+            $rows[] = !empty($config['flatten']) ? $row[$config['columns'][0]] : $row;
+        }
+    }
+    return $rows;
 }
 
 /**

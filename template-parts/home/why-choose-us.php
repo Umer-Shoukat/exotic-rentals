@@ -3,13 +3,14 @@
  * Home: "Why Clients Choose Us" — intro + 4 stat cards.
  */
 
-$heading = echelon_field('stats_heading', get_the_ID(), 'WHY CLIENTS CHOOSE ECHELON MOTIONS');
-$desc    = echelon_field('stats_desc', get_the_ID(), 'We measure
+$page_id = get_queried_object_id();
+$heading = echelon_field('stats_heading', $page_id, 'WHY CLIENTS CHOOSE ECHELON MOTIONS');
+$desc    = echelon_field('stats_desc', $page_id, 'We measure
 ourselves on what actually matters to a client: how carefully the pickup is scheduled, how
 presentation-ready the vehicle is, and how easy it is to reach a real person when plans change.
 The numbers below reflect that standard.');
-$cta     = echelon_field('stats_cta', get_the_ID(), ['title' => 'Learn More', 'url' => home_url('/about')]);
-$stats   = echelon_field('stats', get_the_ID(), [
+$cta     = echelon_field('stats_cta', $page_id, ['title' => 'Learn More', 'url' => home_url('/about')]);
+$stats   = echelon_field('stats', $page_id, [
     ['icon' => 'truck', 'value' => 'LUXURY AND EXOTIC VEHICLES', 'label' => 'Our fleet includes high-performance, comfortable, and
 elegant vehicles suited to different occasions.'],
     ['icon' => 'check', 'value' => '100%', 'label' => 'Every vehicle is inspected, detailed, and verified before it ever reaches a client.'],

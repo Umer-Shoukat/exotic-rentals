@@ -9,6 +9,33 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Expand a small collection into ordinary ACF Free fields. This keeps the
+ * editing UI licensed and predictable without requiring the Pro repeater.
+ */
+function echelon_acf_free_collection_fields($key_prefix, $name_prefix, $item_label, $count, $columns) {
+    $fields = [[
+        'key' => 'field_' . $key_prefix . '_heading',
+        'label' => $item_label . 's',
+        'type' => 'message',
+        'message' => sprintf(__('Complete only the items you want to display (up to %d).', 'echelon'), $count),
+    ]];
+    for ($index = 1; $index <= $count; $index++) {
+        foreach ($columns as $column_name => $definition) {
+            $field = $definition;
+            $field['key'] = 'field_' . $key_prefix . '_' . $index . '_' . $column_name;
+            $field['name'] = $name_prefix . '_' . $index . '_' . $column_name;
+            $field['label'] = sprintf('%s %d — %s', $item_label, $index, $definition['label']);
+            $field['wrapper'] = ['width' => (string) floor(100 / max(1, count($columns)))];
+            if (($field['type'] ?? '') === 'select') {
+                $field['allow_null'] = 1;
+            }
+            $fields[] = $field;
+        }
+    }
+    return $fields;
+}
+
 function echelon_register_acf_fields() {
     if (!function_exists('acf_add_local_field_group')) {
         return;
@@ -397,60 +424,45 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_h_bg_mobile', 'name' => 'hero_background_mobile', 'label' => 'Mobile Background Image', 'type' => 'image', 'preview_size' => 'medium_large', 'instructions' => 'Optional portrait crop used below 768px.'],
             ['key' => 'field_h_cta1', 'name' => 'hero_cta_primary', 'label' => 'Primary CTA', 'type' => 'link', 'default_value' => ['title' => 'Browse Our Fleet', 'url' => '/fleet']],
             ['key' => 'field_h_cta2', 'name' => 'hero_cta_secondary', 'label' => 'Secondary CTA', 'type' => 'link', 'default_value' => ['title' => 'How It Works', 'url' => '#how-it-works']],
-            [
-                'key' => 'field_h_badges', 'name' => 'hero_badges', 'label' => 'Trust Badges', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_h_badge_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_h_badge_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_badge', 'hero_badge', 'Trust Badge', 4, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'label' => ['label' => 'Label', 'type' => 'text'],
+            ]),
 
             // Stats
             ['key' => 'field_h_tab_stats', 'label' => 'Stats', 'type' => 'tab'],
             ['key' => 'field_h_stats_heading', 'name' => 'stats_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'WHY CLIENTS CHOOSE ECHELON MOTIONS'],
             ['key' => 'field_h_stats_desc', 'name' => 'stats_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'We measure ourselves on the things that actually matter to a client: how quickly the car arrives, how spotless it is when you step in, and how easy it is to reach a real human at 3 a.m. The numbers below are the proof.'],
             ['key' => 'field_h_stats_cta', 'name' => 'stats_cta', 'label' => 'CTA', 'type' => 'link', 'default_value' => ['title' => 'Learn More', 'url' => '/about']],
-            [
-                'key' => 'field_h_stats', 'name' => 'stats', 'label' => 'Stat Cards', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_h_stat_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_h_stat_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text'],
-                    ['key' => 'field_h_stat_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_stat', 'stat_card', 'Stat Card', 4, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'value' => ['label' => 'Value', 'type' => 'text'],
+                'label' => ['label' => 'Label', 'type' => 'textarea', 'rows' => 2],
+            ]),
 
             // Fleet brands
             ['key' => 'field_h_tab_brands', 'label' => 'Fleet Brands', 'type' => 'tab'],
             ['key' => 'field_h_brands_heading', 'name' => 'brands_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Luxury Fleet Brands'],
             ['key' => 'field_h_brands_desc', 'name' => 'brands_desc', 'label' => 'Description', 'type' => 'text', 'default_value' => 'Exotic, performance, and executive vehicles curated for high-presence arrivals.'],
-            [
-                'key' => 'field_h_brands', 'name' => 'brands', 'label' => 'Brand Logos', 'type' => 'repeater', 'layout' => 'table', 'min' => 0,
-                'sub_fields' => [
-                    ['key' => 'field_h_brand_logo', 'name' => 'logo', 'label' => 'Logo', 'type' => 'image', 'preview_size' => 'thumbnail', 'return_format' => 'array'],
-                    ['key' => 'field_h_brand_name', 'name' => 'name', 'label' => 'Name', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_brand', 'brand_logo', 'Brand', 8, [
+                'logo' => ['label' => 'Logo', 'type' => 'image', 'preview_size' => 'thumbnail', 'return_format' => 'array'],
+                'name' => ['label' => 'Name', 'type' => 'text'],
+            ]),
 
             // Concierge
             ['key' => 'field_h_tab_concierge', 'label' => 'Concierge', 'type' => 'tab'],
             ['key' => 'field_h_concierge_heading', 'name' => 'concierge_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Your Personal Exotic Car Concierge'],
             ['key' => 'field_h_concierge_desc', 'name' => 'concierge_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'We measure ourselves on the things that actually matter to a client: how quickly the car arrives, how spotless it is when you step in, and how easy it is to reach a real human at 3 a.m.'],
-            [
-                'key' => 'field_h_checklist', 'name' => 'concierge_checklist', 'label' => 'Checklist', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_h_checklist_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_h_checklist_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_check', 'concierge_check', 'Checklist Item', 4, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'label' => ['label' => 'Label', 'type' => 'text'],
+            ]),
             ['key' => 'field_h_concierge_cta', 'name' => 'concierge_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Start With Dates', 'url' => '/fleet']],
             ['key' => 'field_h_chat_title', 'name' => 'concierge_chat_title', 'label' => 'Chat Widget Title', 'type' => 'text', 'default_value' => 'Echelon Concierge'],
-            [
-                'key' => 'field_h_chat_messages', 'name' => 'concierge_chat_messages', 'label' => 'Chat Messages', 'type' => 'repeater', 'layout' => 'table', 'min' => 0,
-                'sub_fields' => [
-                    ['key' => 'field_h_chat_sender', 'name' => 'sender', 'label' => 'Sender', 'type' => 'select', 'choices' => ['agent' => 'Agent', 'user' => 'User']],
-                    ['key' => 'field_h_chat_message', 'name' => 'message', 'label' => 'Message', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_message', 'concierge_message', 'Chat Message', 4, [
+                'sender' => ['label' => 'Sender', 'type' => 'select', 'choices' => ['agent' => 'Agent', 'user' => 'User']],
+                'message' => ['label' => 'Message', 'type' => 'text'],
+            ]),
 
             // Service details
             ['key' => 'field_h_tab_terms', 'label' => 'Service Details', 'type' => 'tab'],
@@ -460,34 +472,28 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_h_agent_title', 'name' => 'agent_title', 'label' => 'Agent Title', 'type' => 'text', 'default_value' => 'Available 24/7'],
             ['key' => 'field_h_agent_photo', 'name' => 'agent_photo', 'label' => 'Agent Photo', 'type' => 'image', 'preview_size' => 'thumbnail'],
             ['key' => 'field_h_agent_phone', 'name' => 'agent_phone', 'label' => 'Agent Phone', 'type' => 'text'],
-            [
-                'key' => 'field_h_terms', 'name' => 'terms', 'label' => 'Requirement Cards', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_h_term_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_h_term_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text'],
-                    ['key' => 'field_h_term_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_requirement', 'requirement_card', 'Requirement Card', 4, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'value' => ['label' => 'Value', 'type' => 'text'],
+                'label' => ['label' => 'Label', 'type' => 'text'],
+            ]),
 
             // Built for drivers
             ['key' => 'field_h_tab_features', 'label' => 'Built For Drivers', 'type' => 'tab'],
             ['key' => 'field_h_features_heading', 'name' => 'features_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Built For Drivers Who Notice Everything.'],
-            [
-                'key' => 'field_h_features', 'name' => 'features', 'label' => 'Features', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_h_feature_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_h_feature_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
-                    ['key' => 'field_h_feature_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('h_feature', 'driver_feature', 'Feature', 4, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'title' => ['label' => 'Title', 'type' => 'text'],
+                'description' => ['label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+            ]),
 
             // Instagram
             ['key' => 'field_h_tab_instagram', 'label' => 'Instagram', 'type' => 'tab'],
             ['key' => 'field_h_ig_handle', 'name' => 'instagram_handle', 'label' => 'Handle', 'type' => 'text', 'default_value' => '@echelonmotions'],
             ['key' => 'field_h_ig_link', 'name' => 'instagram_link', 'label' => 'Profile Link', 'type' => 'url'],
-            [
-                'key' => 'field_h_ig_images', 'name' => 'instagram_images', 'label' => 'Images', 'type' => 'gallery', 'min' => 0,
-            ],
+            ...echelon_acf_free_collection_fields('h_instagram', 'instagram_image', 'Instagram Image', 8, [
+                'image' => ['label' => 'Image', 'type' => 'image', 'preview_size' => 'thumbnail', 'return_format' => 'array'],
+            ]),
 
             // Occasions / services
             ['key' => 'field_h_tab_occasions', 'label' => 'More Than a Rental', 'type' => 'tab'],

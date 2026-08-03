@@ -3,18 +3,19 @@
  * Home: "Your Personal Exotic Car Concierge" — checklist + chat mockup.
  */
 
-$heading    = echelon_field('concierge_heading', get_the_ID(), 'Your Personal Exotic Car Concierge');
-$desc       = echelon_field('concierge_desc', get_the_ID(), 'Our concierge team confirms availability,
+$page_id = get_queried_object_id();
+$heading    = echelon_field('concierge_heading', $page_id, 'Your Personal Exotic Car Concierge');
+$desc       = echelon_field('concierge_desc', $page_id, 'Our concierge team confirms availability,
 coordinates pickup logistics, and stays reachable before, during, and after your reservation.');
-$checklist  = echelon_field('concierge_checklist', get_the_ID(), [
+$checklist  = echelon_field('concierge_checklist', $page_id, [
     ['icon' => 'clock', 'label' => 'Availability Checks'],
     ['icon' => 'shield-check', 'label' => 'Chauffeur Scheduling'],
     ['icon' => 'calendar', 'label' => 'Reservation Requests'],
     ['icon' => 'id-card', 'label' => 'Payment Link Support'],
 ]);
-$cta        = echelon_field('concierge_cta', get_the_ID(), ['title' => 'Start With Dates', 'url' => home_url('/fleet')]);
-$chat_title = echelon_field('concierge_chat_title', get_the_ID(), 'Echelon Concierge');
-$messages   = echelon_field('concierge_chat_messages', get_the_ID(), [
+$cta        = echelon_field('concierge_cta', $page_id, ['title' => 'Start With Dates', 'url' => home_url('/fleet')]);
+$chat_title = echelon_field('concierge_chat_title', $page_id, 'Echelon Concierge');
+$messages   = echelon_field('concierge_chat_messages', $page_id, [
     ['sender' => 'user', 'message' => 'I need a Rolls-Royce with a driver this weekend.'],
     ['sender' => 'agent', 'message' => "Let me confirm availability — what's your pickup city and dates?"],
     ['sender' => 'user', 'message' => 'Manhattan, Saturday to Sunday.'],

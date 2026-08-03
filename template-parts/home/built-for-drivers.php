@@ -3,8 +3,9 @@
  * Home: "Built For Drivers Who Notice Everything" - 4-col numbered features.
  */
 
-$heading  = echelon_field('features_heading', get_the_ID(), 'Built For Drivers Who Notice Everything.');
-$features = [
+$page_id = get_queried_object_id();
+$heading = echelon_field('features_heading', $page_id, 'Built For Drivers Who Notice Everything.');
+$features = echelon_field('features', $page_id, [
     [
         'icon'        => 'gauge',
         'title'       => 'PERFORMANCE MEETS PRESENCE',
@@ -25,7 +26,7 @@ $features = [
         'title'       => 'TAILORED EXPERIENCES',
         'description' => 'From a single airport pickup to a full weekend itinerary, our team tailors the vehicle and the schedule to your event.',
     ],
-];
+]);
 
 $accent_position = stripos($heading, 'notice');
 ?>
@@ -47,7 +48,7 @@ $accent_position = stripos($heading, 'notice');
 				<div class="feature-card" style="--stack-index: <?php echo esc_attr($index); ?>;">
 					<div class="feature-card__top">
 						<span class="feature-card__number"><?php echo esc_html(sprintf('%02d', $index + 1)); ?></span>
-						<img class="feature-card__brand" src="<?php echo esc_url(ECHELON_THEME_URI . '/assets/images/figma/feature-card-logo.png'); ?>" alt="" width="72" height="16">
+						<?php echelon_icon($feature['icon'] ?? 'check', 'feature-card__icon'); ?>
 					</div>
 					<h3 class="feature-card__title"><?php echo esc_html($feature['title']); ?></h3>
 					<p class="feature-card__desc"><?php echo esc_html($feature['description']); ?></p>

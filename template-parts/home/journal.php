@@ -21,9 +21,6 @@ $eyebrow = echelon_field('journal_eyebrow', $page_id, 'The Journal');
 $heading = echelon_field('journal_heading', $page_id, 'Latest From Echelon Motions');
 $description = echelon_field('journal_desc', $page_id, 'Fleet drops, driving guides, and the occasional look behind the garage door.');
 $cta = echelon_field('journal_cta', $page_id, ['title' => 'View All Articles', 'url' => get_post_type_archive_link('post') ?: home_url('/blog')]);
-if ($heading === 'Latest From Exotic Rental') {
-	$heading = 'Latest From Echelon Motions';
-}
 $heading_parts = preg_split('/(?=Echelon Motions)/i', $heading, 2);
 $heading_primary = trim($heading_parts[0] ?? $heading);
 $heading_accent = trim($heading_parts[1] ?? '');

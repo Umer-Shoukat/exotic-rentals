@@ -3,40 +3,19 @@
  * Home: chauffeur service details.
  */
 
-$heading     = echelon_field('terms_heading', get_the_ID(), 'SERVICE DETAILS');
-$desc        = echelon_field('terms_desc', get_the_ID(), 'Our concierge team is available 24/7 to help confirm the right vehicle, chauffeur, and schedule for your plans.');
-$agent_name  = echelon_field('agent_name', get_the_ID(), 'Echelon Concierge');
-$agent_title = echelon_field('agent_title', get_the_ID(), 'Available 24/7');
-$agent_photo = echelon_field('agent_photo', get_the_ID(), null);
-$agent_phone = echelon_field('agent_phone', get_the_ID(), echelon_setting('contact_phone'));
-$terms       = echelon_field('terms', get_the_ID(), [
+$page_id = get_queried_object_id();
+$heading     = echelon_field('terms_heading', $page_id, 'SERVICE DETAILS');
+$desc        = echelon_field('terms_desc', $page_id, 'Our concierge team is available 24/7 to help confirm the right vehicle, chauffeur, and schedule for your plans.');
+$agent_name  = echelon_field('agent_name', $page_id, 'Echelon Concierge');
+$agent_title = echelon_field('agent_title', $page_id, 'Available 24/7');
+$agent_photo = echelon_field('agent_photo', $page_id, null);
+$agent_phone = echelon_field('agent_phone', $page_id, echelon_setting('contact_phone'));
+$terms       = echelon_field('terms', $page_id, [
     ['icon' => 'headset', 'value' => '24/7', 'label' => 'Concierge Support'],
     ['icon' => 'shield-check', 'value' => 'Commercial', 'label' => 'Insurance Coverage'],
     ['icon' => 'clock', 'value' => 'Hourly', 'label' => 'Or Point-To-Point'],
     ['icon' => 'pin', 'value' => 'NYC & LI', 'label' => 'Extended Service By Request'],
 ]);
-
-$normalized_heading = preg_replace('/\s+/', ' ', trim((string) $heading));
-if (in_array($normalized_heading, ['Rental Terms', 'SERVICE REQUIREMENTS'], true)) {
-	$heading = 'SERVICE DETAILS';
-}
-if (stripos((string) $desc, 'perfect car') !== false || stripos((string) $desc, 'right vehicle and the right') !== false) {
-	$desc = 'Our concierge team is available 24/7 to help confirm the right vehicle, chauffeur, and schedule for your plans.';
-}
-if ($agent_name === 'Marcus D.') {
-	$agent_name = 'Echelon Concierge';
-}
-if ($agent_title === 'Founder, Atlas Ventures') {
-	$agent_title = 'Available 24/7';
-}
-if (is_array($terms) && preg_grep('/Minimum Age|Driver\'s License|Security Deposit/i', array_column($terms, 'label'))) {
-	$terms = [
-		['icon' => 'headset', 'value' => '24/7', 'label' => 'Concierge Support'],
-		['icon' => 'shield-check', 'value' => 'Commercial', 'label' => 'Insurance Coverage'],
-		['icon' => 'clock', 'value' => 'Hourly', 'label' => 'Or Point-To-Point'],
-		['icon' => 'pin', 'value' => 'NYC & LI', 'label' => 'Extended Service By Request'],
-	];
-}
 
 $heading_parts = preg_split('/(details)/i', $heading, -1, PREG_SPLIT_DELIM_CAPTURE);
 ?>
