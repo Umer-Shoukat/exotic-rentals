@@ -491,9 +491,6 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_h_tab_instagram', 'label' => 'Instagram', 'type' => 'tab'],
             ['key' => 'field_h_ig_handle', 'name' => 'instagram_handle', 'label' => 'Handle', 'type' => 'text', 'default_value' => '@echelonmotions'],
             ['key' => 'field_h_ig_link', 'name' => 'instagram_link', 'label' => 'Profile Link', 'type' => 'url'],
-            ...echelon_acf_free_collection_fields('h_instagram', 'instagram_image', 'Instagram Image', 8, [
-                'image' => ['label' => 'Image', 'type' => 'image', 'preview_size' => 'thumbnail', 'return_format' => 'array'],
-            ]),
 
             // Occasions / services
             ['key' => 'field_h_tab_occasions', 'label' => 'More Than a Rental', 'type' => 'tab'],

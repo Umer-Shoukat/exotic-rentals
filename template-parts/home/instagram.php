@@ -6,25 +6,18 @@
 $page_id = get_queried_object_id();
 $handle = echelon_field('instagram_handle', $page_id, '@echelonmotions');
 $link   = echelon_field('instagram_link', $page_id, 'https://instagram.com/');
-$images = echelon_field('instagram_images', $page_id, []);
 $feed_items = [];
 $instagram_posts = get_posts([
 	'post_type' => 'instagram_item', 'post_status' => 'publish', 'posts_per_page' => 12,
 	'orderby' => ['menu_order' => 'ASC', 'date' => 'DESC'],
 ]);
 
-if ($images) {
-	foreach ($images as $index => $image) {
-		$feed_items[] = ['image' => $image, 'url' => $link, 'label' => sprintf(__('Instagram photo %d', 'echelon'), $index + 1)];
-	}
-} else {
-	foreach ($instagram_posts as $instagram_post) {
-		$feed_items[] = [
-			'image' => get_post_thumbnail_id($instagram_post),
-			'url' => echelon_field('instagram_url', $instagram_post->ID, $link),
-			'label' => get_the_title($instagram_post),
-		];
-	}
+foreach ($instagram_posts as $instagram_post) {
+	$feed_items[] = [
+		'image' => get_post_thumbnail_id($instagram_post),
+		'url' => echelon_field('instagram_url', $instagram_post->ID, $link),
+		'label' => get_the_title($instagram_post),
+	];
 }
 
 $real_feed_count = count($feed_items);

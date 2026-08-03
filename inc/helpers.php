@@ -93,7 +93,6 @@ function echelon_free_home_collection($selector, $post_id = false) {
         'concierge_chat_messages' => ['prefix' => 'concierge_message', 'count' => 4, 'columns' => ['sender', 'message'], 'content' => ['message']],
         'terms' => ['prefix' => 'requirement_card', 'count' => 4, 'columns' => ['icon', 'value', 'label'], 'content' => ['value', 'label']],
         'features' => ['prefix' => 'driver_feature', 'count' => 4, 'columns' => ['icon', 'title', 'description'], 'content' => ['title', 'description']],
-        'instagram_images' => ['prefix' => 'instagram_image', 'count' => 8, 'columns' => ['image'], 'content' => ['image'], 'flatten' => true],
     ];
     if (!isset($collections[$selector]) || !function_exists('get_field')) {
         return null;
