@@ -70,19 +70,23 @@ function echelon_field($selector, $post_id = false, $default = '') {
     if (!function_exists('get_field')) {
         return $default;
     }
-    $value = get_field($selector, $post_id);
-    if ($value === null || $value === false || $value === '' || $value === []) {
-        $fixed_value = echelon_free_home_collection($selector, $post_id);
-        if ($fixed_value !== null && $fixed_value !== []) {
-            return $fixed_value;
-        }
+
+    // Fixed ACF Free collection fields are the current editing interface.
+    // Prefer them when populated so stale values from a former Pro repeater do
+    // not mask changes made in the individual homepage fields.
+    $fixed_value = echelon_free_home_collection($selector, $post_id);
+    if ($fixed_value !== null && $fixed_value !== []) {
+        return $fixed_value;
     }
+
+    $value = get_field($selector, $post_id);
     return ($value === null || $value === false || $value === '') ? $default : $value;
 }
 
 /**
- * Rebuild homepage collection arrays from ACF Free-compatible fixed fields.
- * Existing Pro repeater/gallery values remain authoritative when present.
+ * Rebuild collection arrays from ACF Free-compatible fixed fields.
+ * Populated fixed fields are authoritative; legacy Pro repeater/gallery values
+ * remain available as a fallback through echelon_field().
  */
 function echelon_free_home_collection($selector, $post_id = false) {
     $collections = [
@@ -93,6 +97,9 @@ function echelon_free_home_collection($selector, $post_id = false) {
         'concierge_chat_messages' => ['prefix' => 'concierge_message', 'count' => 4, 'columns' => ['sender', 'message'], 'content' => ['message']],
         'terms' => ['prefix' => 'requirement_card', 'count' => 4, 'columns' => ['icon', 'value', 'label'], 'content' => ['value', 'label']],
         'features' => ['prefix' => 'driver_feature', 'count' => 4, 'columns' => ['icon', 'title', 'description'], 'content' => ['title', 'description']],
+        'about_stats' => ['prefix' => 'about_stat', 'count' => 4, 'columns' => ['value', 'label'], 'content' => ['value', 'label']],
+        'about_values' => ['prefix' => 'about_value', 'count' => 6, 'columns' => ['icon', 'title', 'description'], 'content' => ['title', 'description']],
+        'about_journey_steps' => ['prefix' => 'about_journey_step', 'count' => 6, 'columns' => ['title', 'description'], 'content' => ['title', 'description']],
     ];
     if (!isset($collections[$selector]) || !function_exists('get_field')) {
         return null;

@@ -10,20 +10,8 @@ get_header();
 while (have_posts()) : the_post();
 	$page_id = get_the_ID();
 	$hero_image = echelon_field('about_hero_image', $page_id, get_post_thumbnail_id());
-	$hero_description = echelon_field('about_hero_description', $page_id, '');
-	if (!$hero_description || stripos($hero_description, 'Team Members') !== false || stripos($hero_description, 'web crawler expert') !== false) {
-		$hero_description = __("Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown.", 'echelon');
-	}
-	if (stripos($hero_description, 'wedding arrival') !== false || stripos($hero_description, 'important business engagement') !== false) {
-		$hero_description = __("Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown.", 'echelon');
-	}
-	$story_content = echelon_field('about_story_content', $page_id, '');
-	if (!$story_content || stripos($story_content, 'Team Members') !== false || stripos($story_content, 'web crawler expert') !== false || stripos($story_content, 'Our Beloved Partners') !== false) {
-		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon') . '</p>';
-	}
-	if (stripos($story_content, 'final destination') !== false || (stripos($story_content, 'client') !== false && stripos($story_content, 'occasion') !== false)) {
-		$story_content = '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon') . '</p>';
-	}
+	$hero_description = echelon_field('about_hero_description', $page_id, __("Echelon Motions was built for clients who expect more than a pickup. Every reservation is handled by a professional chauffeur, in a vehicle prepared to the same standard, whether it's a wedding in Manhattan or a boardroom arrival in Midtown.", 'echelon'));
+	$story_content = echelon_field('about_story_content', $page_id, '<p>' . __('Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.', 'echelon') . '</p>');
 	$story_cta = echelon_field('about_story_cta', $page_id, ['title' => __('Explore Our Fleet', 'echelon'), 'url' => home_url('/fleet/'), 'target' => '']);
 	$stats = echelon_field('about_stats', $page_id, [
 		['value' => __('Curated', 'echelon'), 'label' => __('Exceptional Vehicles', 'echelon')],
@@ -31,19 +19,6 @@ while (have_posts()) : the_post();
 		['value' => __('Planned', 'echelon'), 'label' => __('Carefully Scheduled Pickups', 'echelon')],
 		['value' => '24/7', 'label' => __('Concierge Support', 'echelon')],
 	]);
-	foreach ($stats as &$stat) {
-		if ('500+' === ($stat['value'] ?? '')) {
-			$stat['value'] = __('Curated', 'echelon');
-		}
-		if ('45M' === ($stat['value'] ?? '')) {
-			$stat['value'] = __('Planned', 'echelon');
-			$stat['label'] = __('Carefully Scheduled Pickups', 'echelon');
-		}
-		if (stripos($stat['label'] ?? '', 'Average Delivery Time') !== false) {
-			$stat['label'] = __('Carefully Scheduled Pickups', 'echelon');
-		}
-	}
-	unset($stat);
 	$values = echelon_field('about_values', $page_id, [
 		['icon' => 'shield-check', 'title' => __('Uncompromising Quality', 'echelon'), 'description' => __('Every vehicle is selected, inspected, and meticulously prepared before it reaches your door.', 'echelon')],
 		['icon' => 'headset', 'title' => __('Human Service', 'echelon'), 'description' => __('A knowledgeable concierge stays available before, during, and after every reservation.', 'echelon')],
@@ -58,7 +33,8 @@ while (have_posts()) : the_post();
 	<section class="about-hero">
 		<div class="about-hero__media" aria-hidden="true">
 			<?php if ($hero_image) : ?>
-				<?php echo wp_get_attachment_image($hero_image, 'vehicle-hero', false, ['class' => 'about-hero__image', 'loading' => 'eager', 'fetchpriority' => 'high']); ?>
+				<?php $hero_image_id = is_array($hero_image) ? (int) ($hero_image['ID'] ?? 0) : (int) $hero_image; ?>
+				<?php echo wp_get_attachment_image($hero_image_id, 'vehicle-hero', false, ['class' => 'about-hero__image', 'loading' => 'eager', 'fetchpriority' => 'high']); ?>
 			<?php else : ?>
 				<img class="about-hero__image" src="<?php echo esc_url(get_theme_file_uri('assets/images/figma/hero-homepage-v3.jpg')); ?>" alt="" loading="eager" fetchpriority="high">
 			<?php endif; ?>

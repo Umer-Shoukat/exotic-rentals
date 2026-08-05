@@ -49,7 +49,6 @@ function echelon_register_acf_fields() {
 
     $about_locations = [
         [['param' => 'page_template', 'operator' => '==', 'value' => 'page-about.php']],
-        [['param' => 'page_template', 'operator' => '==', 'value' => 'page-about-us.php']],
     ];
     foreach (['about', 'about-us'] as $about_slug) {
         $about_page = get_page_by_path($about_slug);
@@ -235,38 +234,35 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_ap_story_content', 'name' => 'about_story_content', 'label' => 'Story Copy', 'type' => 'wysiwyg', 'tabs' => 'visual', 'toolbar' => 'basic', 'media_upload' => 0, 'default_value' => '<p>Echelon Motions started with a simple observation: most car services treat the vehicle as the product. We treat the arrival as the product - the vehicle is just one part of getting that right.</p>', 'instructions' => 'Use this field for the company story. Legacy page-editor placeholder content is no longer displayed.'],
             ['key' => 'field_ap_story_cta', 'name' => 'about_story_cta', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Explore Our Fleet', 'url' => '/fleet/']],
             ['key' => 'field_ap_tab_stats', 'label' => 'Statistics', 'type' => 'tab'],
-            [
-                'key' => 'field_ap_stats', 'name' => 'about_stats', 'label' => 'Statistics', 'type' => 'repeater', 'layout' => 'table', 'min' => 0, 'max' => 4,
-                'sub_fields' => [
-                    ['key' => 'field_ap_stat_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text'],
-                    ['key' => 'field_ap_stat_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text'],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('ap_stat', 'about_stat', 'Statistic', 4, [
+                'value' => ['label' => 'Value', 'type' => 'text'],
+                'label' => ['label' => 'Label', 'type' => 'text'],
+            ]),
             ['key' => 'field_ap_tab_values', 'label' => 'Values', 'type' => 'tab'],
             ['key' => 'field_ap_values_eyebrow', 'name' => 'about_values_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'What Guides Us'],
             ['key' => 'field_ap_values_heading', 'name' => 'about_values_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'The Echelon Standard'],
             ['key' => 'field_ap_values_accent', 'name' => 'about_values_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Standard'],
             ['key' => 'field_ap_values_desc', 'name' => 'about_values_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
-            [
-                'key' => 'field_ap_values', 'name' => 'about_values', 'label' => 'Value Cards', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 6,
-                'sub_fields' => [
-                    ['key' => 'field_ap_value_icon', 'name' => 'icon', 'label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
-                    ['key' => 'field_ap_value_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
-                    ['key' => 'field_ap_value_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('ap_value', 'about_value', 'Value Card', 6, [
+                'icon' => ['label' => 'Icon', 'type' => 'select', 'choices' => echelon_icon_choices()],
+                'title' => ['label' => 'Title', 'type' => 'text'],
+                'description' => ['label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+            ]),
             ['key' => 'field_ap_tab_journey', 'label' => 'Journey', 'type' => 'tab'],
             ['key' => 'field_ap_journey_eyebrow', 'name' => 'about_journey_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'From Request To Road'],
             ['key' => 'field_ap_journey_heading', 'name' => 'about_journey_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Your Journey, Handled'],
             ['key' => 'field_ap_journey_accent', 'name' => 'about_journey_accent', 'label' => 'Accent Text', 'type' => 'text', 'default_value' => 'Handled'],
             ['key' => 'field_ap_journey_desc', 'name' => 'about_journey_description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 3],
-            [
-                'key' => 'field_ap_steps', 'name' => 'about_journey_steps', 'label' => 'Journey Steps', 'type' => 'repeater', 'layout' => 'block', 'min' => 0, 'max' => 6,
-                'sub_fields' => [
-                    ['key' => 'field_ap_step_title', 'name' => 'title', 'label' => 'Title', 'type' => 'text'],
-                    ['key' => 'field_ap_step_desc', 'name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2],
-                ],
-            ],
+            ...echelon_acf_free_collection_fields('ap_journey_step', 'about_journey_step', 'Journey Step', 6, [
+                'title' => ['label' => 'Title', 'type' => 'text'],
+                'description' => ['label' => 'Description', 'type' => 'textarea', 'rows' => 2],
+            ]),
+            ['key' => 'field_ap_tab_cta', 'label' => 'CTA', 'type' => 'tab'],
+            ['key' => 'field_ap_cta_eyebrow', 'name' => 'cta_eyebrow', 'label' => 'Eyebrow', 'type' => 'text', 'default_value' => 'Reserve Today'],
+            ['key' => 'field_ap_cta_heading', 'name' => 'cta_heading', 'label' => 'Heading', 'type' => 'text', 'default_value' => 'Ready To Plan Your Ride?'],
+            ['key' => 'field_ap_cta_desc', 'name' => 'cta_desc', 'label' => 'Description', 'type' => 'textarea', 'rows' => 2, 'default_value' => 'Whatever the occasion, our concierge team will confirm the right vehicle, chauffeur, and schedule for you.'],
+            ['key' => 'field_ap_cta_image', 'name' => 'cta_image', 'label' => 'Image', 'type' => 'image', 'preview_size' => 'large'],
+            ['key' => 'field_ap_cta_button', 'name' => 'cta_button', 'label' => 'Button', 'type' => 'link', 'default_value' => ['title' => 'Start Your Reservation', 'url' => '/reservation']],
         ],
         'location' => $about_locations,
     ]);
