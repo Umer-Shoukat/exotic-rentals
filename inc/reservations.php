@@ -102,10 +102,16 @@ function echelon_add_reservation_settings_page() {
         __('Form Settings', 'echelon'),
         'manage_options',
         'echelon-reservation-settings',
-        'echelon_render_reservation_settings_page'
+        'echelon_render_reservation_settings_page',
+        20
     );
 }
 add_action('admin_menu', 'echelon_add_reservation_settings_page');
+
+function echelon_remove_manual_reservation_menu() {
+    remove_submenu_page('edit.php?post_type=rental_reservation', 'post-new.php?post_type=rental_reservation');
+}
+add_action('admin_menu', 'echelon_remove_manual_reservation_menu', 99);
 
 function echelon_render_reservation_settings_page() {
     if (!current_user_can('manage_options')) return;

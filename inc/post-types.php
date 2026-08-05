@@ -115,6 +115,7 @@ function echelon_register_post_types() {
         'menu_icon'           => 'dashicons-calendar-alt',
         'supports'            => ['title'],
         'capability_type'     => 'post',
+        'capabilities'        => ['create_posts' => 'do_not_allow'],
         'map_meta_cap'        => true,
         'exclude_from_search' => true,
         'show_in_rest'        => false,
