@@ -275,6 +275,8 @@ you have in mind. We'll help with the vehicle, chauffeur, timing, and every deta
             ['key' => 'field_v_brand', 'name' => 'brand', 'label' => 'Brand (short label)', 'type' => 'text', 'placeholder' => 'e.g. Mercedes'],
             ['key' => 'field_v_price_hour', 'name' => 'price_per_hour', 'label' => 'Price / Hour', 'type' => 'number', 'prepend' => '$', 'min' => 0],
             ['key' => 'field_v_daily_rental', 'name' => 'daily_rental_price', 'label' => 'Price / Day', 'type' => 'number', 'prepend' => '$', 'min' => 0],
+            ['key' => 'field_v_chauffeur_available', 'name' => 'chauffeur_available', 'label' => 'Available Chauffeur Driven', 'type' => 'true_false', 'default_value' => 1, 'ui' => 1],
+            ['key' => 'field_v_self_drive_available', 'name' => 'self_drive_available', 'label' => 'Available Self Driven', 'type' => 'true_false', 'default_value' => 1, 'ui' => 1],
             ['key' => 'field_v_min_hours', 'name' => 'minimum_booking_hours', 'label' => 'Minimum Booking', 'type' => 'number', 'append' => 'hours', 'min' => 3, 'default_value' => 3],
             ['key' => 'field_v_rate_note', 'name' => 'hourly_rate_note', 'label' => 'Hourly Rate Note', 'type' => 'text', 'placeholder' => 'e.g. Stars & ambient light'],
             ['key' => 'field_v_tab_addons', 'label' => 'Add-ons & Policies', 'type' => 'tab'],
