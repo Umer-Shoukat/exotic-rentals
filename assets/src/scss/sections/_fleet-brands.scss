@@ -67,9 +67,14 @@
   transition: filter var(--transition-base), opacity var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
 
   img {
-    max-width: 72%;
-    max-height: 56px;
+    width: 76%;
+    height: 68px;
     object-fit: contain;
+  }
+
+  .fleet-brands__fallback {
+    width: 78%;
+    height: 72px;
   }
 
   span {

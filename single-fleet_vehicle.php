@@ -24,7 +24,8 @@ while (have_posts()) : the_post();
     $title = get_the_title();
     $brand = echelon_field('brand', $vehicle_id, 'Lamborghini');
     $year = echelon_field('year', $vehicle_id, '2018');
-    $doors = echelon_field('doors', $vehicle_id, '2');
+    $doors = echelon_field('doors', $vehicle_id, '');
+    $doors_label = $doors !== '' ? $doors . '-Door ' : '';
     $price = echelon_field('price_per_hour', $vehicle_id, '');
     $minimum_hours = max(3, (int) echelon_field('minimum_booking_hours', $vehicle_id, 3));
     $rate_note = echelon_field('hourly_rate_note', $vehicle_id, '');
@@ -122,7 +123,7 @@ while (have_posts()) : the_post();
     <section class="container vehicle-detail__overview">
         <div class="vehicle-detail__copy">
             <p class="eyebrow"><?php echo esc_html($brand); ?></p>
-            <h2><?php echo esc_html($year . ' · ' . $doors . '-Door '); ?><span><?php echo esc_html($brand); ?></span></h2>
+            <h2><?php echo esc_html($year . ' · ' . $doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
             <p><?php echo esc_html($description); ?></p>
             <p><?php esc_html_e('Every rental is prepared by our team, inspected before delivery, and supported by a dedicated concierge throughout your reservation.', 'echelon'); ?></p>
         </div>
@@ -154,7 +155,7 @@ while (have_posts()) : the_post();
 
     <section class="container vehicle-detail__specifications">
         <p class="eyebrow"><?php esc_html_e('At A Glance', 'echelon'); ?></p>
-        <h2><?php echo esc_html($year . ' · ' . $doors . '-Door '); ?><span><?php echo esc_html($brand); ?></span></h2>
+        <h2><?php echo esc_html($year . ' · ' . $doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
         <div class="vehicle-detail__spec-grid">
             <?php foreach ($specs as [$icon, $label, $value]) : ?><div class="vehicle-detail__spec"><?php echelon_icon($icon); ?><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html($value); ?></strong></div><?php endforeach; ?>
         </div>
