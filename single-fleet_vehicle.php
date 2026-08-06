@@ -52,7 +52,7 @@ while (have_posts()) : the_post();
     $exterior = echelon_field('exterior_color', $vehicle_id, 'Black');
     $interior = echelon_field('interior_color', $vehicle_id, 'Black Leather');
     $vehicle_categories = wp_get_post_terms($vehicle_id, 'vehicle_category', ['fields' => 'names']);
-    $vehicle_category = !is_wp_error($vehicle_categories) && $vehicle_categories ? $vehicle_categories[0] : $doors . '-Door';
+    $vehicle_category = !is_wp_error($vehicle_categories) && $vehicle_categories ? $vehicle_categories[0] : '';
     $hero_rate = $daily_rental_price !== '' ? $daily_rental_price : $price;
     $hero_rate_period = $daily_rental_price !== '' ? __('day', 'echelon') : __('hour', 'echelon');
     $reserve_url = add_query_arg('vehicle', $vehicle_id, home_url('/reservation/'));
