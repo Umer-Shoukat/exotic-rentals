@@ -59,10 +59,10 @@ while (have_posts()) : the_post();
                 </div>
                 <div class="location-support__benefits">
                     <?php foreach ([
-                        ['truck', __('Curated Fleet', 'echelon'), __('Detailed, fueled, delivered — every single time.', 'echelon')],
-                        ['pin', __('Location Planning', 'echelon'), __('No hidden fees. What you see is what you pay.', 'echelon')],
-                        ['calendar', __('Availability Flow', 'echelon'), __('Real people, always on, from booking to return.', 'echelon')],
-                        ['shield-check', __('Approval Ready', 'echelon'), __('Comprehensive coverage included on every trip.', 'echelon')],
+                        ['truck', __('PREMIUM FLEET', 'echelon'), __('Luxury vehicles, maintained to the highest standards.', 'echelon')],
+                        ['pin', __('FLEXIBLE RENTALS', 'echelon'), __('Daily, weekend, and extended rental options.', 'echelon')],
+                        ['calendar', __('SEAMLESS BOOKING', 'echelon'), __('Reserve your vehicle in just a few steps.', 'echelon')],
+                        ['shield-check', __('READY TO DRIVE', 'echelon'), __('Clean, fueled, and ready for every reservation.', 'echelon')],
                     ] as $benefit) : ?>
                         <article><?php echelon_icon($benefit[0]); ?><h3><?php echo esc_html($benefit[1]); ?></h3><p><?php echo esc_html($benefit[2]); ?></p></article>
                     <?php endforeach; ?>
