@@ -62,6 +62,29 @@ p {
   background: var(--color-accent);
 }
 
+@media (max-width: 767px) {
+  // Long flanked eyebrows need one stable anchor when the label wraps.
+  .eyebrow--flanked:not(.eyebrow--center) {
+    display: inline-grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    max-width: 100%;
+    align-items: start;
+    column-gap: 16px;
+    font-size: 12px;
+    line-height: 1.45;
+    letter-spacing: 0.13em;
+
+    &::before {
+      width: 38px;
+      margin-top: 0.65em;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
 .section-heading {
   margin-bottom: var(--space-5);
 }
