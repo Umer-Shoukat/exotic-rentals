@@ -1,8 +1,11 @@
 .vehicle-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  height: 446px;
+  min-height: 446px;
+  height: auto;
   border-radius: 0;
   overflow: hidden;
   transition: border-color var(--transition-base), transform var(--transition-base);
@@ -18,6 +21,7 @@
 }
 
 .vehicle-card__media {
+  flex: 0 0 auto;
   display: block;
   position: relative;
   height: 260px;
@@ -38,9 +42,11 @@
 
 .vehicle-card__body {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 16px;
-  height: 186px;
+  min-height: 186px;
+  height: auto;
   padding: 11px 28px;
 }
 
