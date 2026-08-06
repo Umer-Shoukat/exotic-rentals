@@ -16,6 +16,7 @@ import { initReservationFlow } from './modules/reservation.js';
 import { initFleetFilters } from './modules/fleet.js';
 import { initVehicleGallery } from './modules/vehicle-gallery.js';
 import { initHomepageMotion } from './modules/homepage-motion.js';
+import { initTimePickers } from './modules/time-picker.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSliders();
   initHeroStrip();
   initBookingForm();
+  initTimePickers();
   initMap();
   initReservationFlow();
   initFleetFilters();

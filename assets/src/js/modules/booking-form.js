@@ -41,18 +41,6 @@ export function initBookingForm() {
     form.addEventListener('submit', validateWindow);
   });
 
-  document.querySelectorAll('input[type="time"]').forEach((input) => {
-    input.addEventListener('click', () => {
-      if (typeof input.showPicker !== 'function') return;
-
-      try {
-        input.showPicker();
-      } catch {
-        // Some browsers only allow showPicker during trusted user activation.
-      }
-    });
-  });
-
   document.querySelectorAll('[data-vehicle-combobox]').forEach((combobox) => {
     const search = combobox.querySelector('[data-vehicle-search]');
     const value = combobox.querySelector('[data-vehicle-value]');

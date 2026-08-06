@@ -25,16 +25,6 @@ export function initReservationFlow() {
   const maximumUploadBytes = Number(root.dataset.maximumUploadMb || 10) * 1024 * 1024;
   const pickupPicker = flatpickr(pickup, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
   const returnPicker = flatpickr(returnDate, { dateFormat: 'd/m/Y', minDate: 'today', disableMobile: true });
-  [pickupTime, returnTime].forEach((input) => flatpickr(input, {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: 'H:i',
-    altInput: true,
-    altFormat: 'h:i K',
-    minuteIncrement: 30,
-    disableMobile: true,
-    onChange: updateSummary,
-  }));
   pickup.addEventListener('change', () => {
     if (pickupPicker.selectedDates[0]) {
       const minimum = new Date(pickupPicker.selectedDates[0]);
@@ -234,7 +224,7 @@ export function initReservationFlow() {
   }
 
   function clearFieldError(field) {
-    const visibleField = field._flatpickr?.altInput || field;
+    const visibleField = field._timePickerTrigger || field._flatpickr?.altInput || field;
     field.removeAttribute('aria-invalid');
     visibleField.removeAttribute('aria-invalid');
     const errorId = `reservation-error-${field.name}`;
@@ -250,7 +240,7 @@ export function initReservationFlow() {
     error.className = 'reservation-field-error';
     error.id = `reservation-error-${field.name}`;
     error.textContent = message;
-    const visibleField = field._flatpickr?.altInput || field;
+    const visibleField = field._timePickerTrigger || field._flatpickr?.altInput || field;
     field.setAttribute('aria-invalid', 'true');
     visibleField.setAttribute('aria-invalid', 'true');
     visibleField.setAttribute('aria-describedby', error.id);
@@ -284,7 +274,7 @@ export function initReservationFlow() {
       if (message) { invalid.push({ field, message }); showFieldError(field, message); }
     });
     showValidationSummary(panel, invalid.map(({ message }) => message));
-    if (invalid.length && shouldFocus) (invalid[0].field._flatpickr?.altInput || invalid[0].field).focus({ preventScroll: true });
+    if (invalid.length && shouldFocus) (invalid[0].field._timePickerTrigger || invalid[0].field._flatpickr?.altInput || invalid[0].field).focus({ preventScroll: true });
     return invalid.length === 0;
   }
 
@@ -323,7 +313,7 @@ export function initReservationFlow() {
       event.preventDefault();
       showStep(firstInvalidStep + 1);
       const invalidField = steps[firstInvalidStep].querySelector('[aria-invalid="true"]');
-      (invalidField?._flatpickr?.altInput || invalidField)?.focus({ preventScroll: true });
+      (invalidField?._timePickerTrigger || invalidField?._flatpickr?.altInput || invalidField)?.focus({ preventScroll: true });
     }
   });
   updateServiceAvailability();
