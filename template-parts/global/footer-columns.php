@@ -53,7 +53,7 @@ $collection = get_posts([
 </div>
 
 <div class="footer-col">
-	<h3 class="footer-col__title"><?php esc_html_e('The Collection', 'echelon'); ?></h3>
+	<h3 class="footer-col__title"><?php esc_html_e('Our Fleet', 'echelon'); ?></h3>
 	<ul class="footer-col__list">
 		<?php if ($collection) : ?>
 			<?php foreach ($collection as $vehicle) : ?>

@@ -22,7 +22,7 @@ while (have_posts()) : the_post();
     }
 
     $title = get_the_title();
-    $brand = echelon_field('brand', $vehicle_id, 'Lamborghini');
+    $brand = echelon_field('brand', $vehicle_id, '');
     $year = echelon_field('year', $vehicle_id, '2018');
     $doors = echelon_field('doors', $vehicle_id, '');
     $doors_label = $doors !== '' ? $doors . '-Door ' : '';
@@ -57,7 +57,7 @@ while (have_posts()) : the_post();
     $hero_rate = $daily_rental_price !== '' ? $daily_rental_price : $price;
     $hero_rate_period = $daily_rental_price !== '' ? __('day', 'echelon') : __('hour', 'echelon');
     $reserve_url = add_query_arg('vehicle', $vehicle_id, home_url('/reservation/'));
-    $description = has_excerpt() ? get_the_excerpt() : __('Built for presence and engineered for exhilaration, this exotic delivers an unmistakable driving experience with concierge-level service from pickup to return.', 'echelon');
+    $description = has_excerpt() ? get_the_excerpt() : __(' ', 'echelon');
     $specs = [
         ['bolt', __('Horsepower', 'echelon'), $hp . ' HP'],
         ['gauge', __('Acceleration', 'echelon'), '0–60 in ' . $zero_to_sixty],
