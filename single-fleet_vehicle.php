@@ -125,7 +125,7 @@ while (have_posts()) : the_post();
             <p class="eyebrow"><?php echo esc_html($brand); ?></p>
             <h2><?php echo esc_html($year . ' · ' . $doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
             <p><?php echo esc_html($description); ?></p>
-            <p><?php esc_html_e('Every rental is prepared by our team, inspected before delivery, and supported by a dedicated concierge throughout your reservation.', 'echelon'); ?></p>
+            <p><?php esc_html_e('', 'echelon'); ?></p>
         </div>
         <aside class="vehicle-detail__booking" aria-label="<?php esc_attr_e('Vehicle reservation summary', 'echelon'); ?>">
             <?php if ($price !== '' || $daily_rental_price !== '') : ?><div class="vehicle-detail__rate"><span><?php esc_html_e('Rates', 'echelon'); ?></span><strong><?php if ($price !== '') : ?><?php echo esc_html(echelon_price($price)); ?><small>/<?php esc_html_e('hour', 'echelon'); ?></small><?php endif; ?><?php if ($price !== '' && $daily_rental_price !== '') : ?><br><?php endif; ?><?php if ($daily_rental_price !== '') : ?><?php echo esc_html(echelon_price($daily_rental_price)); ?><small>/<?php esc_html_e('day', 'echelon'); ?></small><?php endif; ?></strong><?php if ($rate_note !== '') : ?><small><?php echo esc_html($rate_note); ?></small><?php endif; ?></div><?php endif; ?>
@@ -162,16 +162,16 @@ while (have_posts()) : the_post();
     </section>
 
     <section class="container vehicle-detail__benefits" data-reveal>
-        <p class="eyebrow"><?php esc_html_e('Why This Car', 'echelon'); ?></p>
-        <h2><?php esc_html_e('Built For The', 'echelon'); ?> <span><?php esc_html_e('Moment', 'echelon'); ?></span></h2>
+        <p class="eyebrow"><?php esc_html_e('WHY CHOOSE THIS VEHICLE', 'echelon'); ?></p>
+        <h2><?php esc_html_e('EVERY DETAIL, TAKEN CARE OF', 'echelon'); ?> <span><?php esc_html_e('CARE OF', 'echelon'); ?></span></h2>
         <div class="vehicle-detail__benefit-grid">
-            <?php foreach ([['star', 'Head-Turning Presence', 'Arrive with unmistakable road presence.'], ['gauge', 'Performance & Sound', 'Immediate response and an unforgettable soundtrack.'], ['shield-check', 'Fully Insured', 'Coverage and preparation are handled before delivery.'], ['headset', 'Concierge Support', 'A real person is available throughout your rental.'], ['truck', 'Airport Transfers', 'Flexible delivery and collection across service areas.']] as [$icon, $heading, $copy]) : ?><div><?php echelon_icon($icon); ?><h3><?php echo esc_html($heading); ?></h3><p><?php echo esc_html($copy); ?></p></div><?php endforeach; ?>
+            <?php foreach ([['star', 'READY TO DRIVE', 'Professionally cleaned, inspected, and prepared before every reservation'], ['gauge', 'PREMIUM COMFORT', 'Enjoy a refined cabin designed for relaxing, comfortable travel.'], ['shield-check', 'FLEXIBLE OPTIONS', 'Available for self-drive rentals or chauffeur service, based on your needs.'], ['headset', 'PERSONAL SUPPORT', 'Our team is here to help before, during, and after your booking.'], ['truck', 'PICKUP OR DELIVERY', 'Choose convenient pickup or have your vehicle delivered to you']] as [$icon, $heading, $copy]) : ?><div><?php echelon_icon($icon); ?><h3><?php echo esc_html($heading); ?></h3><p><?php echo esc_html($copy); ?></p></div><?php endforeach; ?>
         </div>
     </section>
 
     <section class="container vehicle-detail__steps">
         <p class="eyebrow"><?php esc_html_e('Pickup & Return', 'echelon'); ?></p>
-        <h2><?php esc_html_e('How To Get', 'echelon'); ?> <span><?php esc_html_e('Your Car', 'echelon'); ?></span></h2>
+        <h2><?php esc_html_e('HOW IT ', 'echelon'); ?> <span><?php esc_html_e('WORKS', 'echelon'); ?></span></h2>
         <div class="vehicle-detail__step-grid">
             <?php foreach ([['01', 'Choose & Book', 'Select your dates and send your reservation request.'], ['02', 'Verify & Prepare', 'Our concierge confirms availability, documents, and delivery.'], ['03', 'Delivery & Drive', 'Meet your prepared vehicle and enjoy the experience.']] as [$number, $heading, $copy]) : ?><div><strong><?php echo esc_html($number); ?></strong><h3><?php echo esc_html($heading); ?></h3><p><?php echo esc_html($copy); ?></p><span><?php esc_html_e('Concierge supported', 'echelon'); ?></span></div><?php endforeach; ?>
         </div>
