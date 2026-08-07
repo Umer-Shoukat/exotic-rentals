@@ -170,10 +170,11 @@ while (have_posts()) : the_post();
     </section>
 
     <section class="container vehicle-detail__steps">
-        <p class="eyebrow"><?php esc_html_e('Pickup & Return', 'echelon'); ?></p>
-        <h2><?php esc_html_e('HOW IT ', 'echelon'); ?> <span><?php esc_html_e('WORKS', 'echelon'); ?></span></h2>
+        <p class="eyebrow"><?php esc_html_e('HOW IT WORKS', 'echelon'); ?></p>
+        <h2><?php esc_html_e('YOUR LUXURY RENTAL, ', 'echelon'); ?> <span><?php esc_html_e('MADE SIMPLE', 'echelon'); ?></span></h2>
         <div class="vehicle-detail__step-grid">
-            <?php foreach ([['01', 'Choose & Book', 'Select your dates and send your reservation request.'], ['02', 'Verify & Prepare', 'Our concierge confirms availability, documents, and delivery.'], ['03', 'Delivery & Drive', 'Meet your prepared vehicle and enjoy the experience.']] as [$number, $heading, $copy]) : ?><div><strong><?php echo esc_html($number); ?></strong><h3><?php echo esc_html($heading); ?></h3><p><?php echo esc_html($copy); ?></p><span><?php esc_html_e('Concierge supported', 'echelon'); ?></span></div><?php endforeach; ?>
+            <?php foreach ([['01', 'CHOOSE YOUR VEHICLE', 'Browse our fleet, select your preferred vehicle, and submit your reservation request'], ['02', 'WE CONFIRM THE DETAILS', 'Our team will confirm availability, answer your questions, and finalize every detail with you.'], 
+            ['03', 'PICK UP OR DELIVERY', 'Pick up your vehicle or have it delivered, then enjoy your journey with complete confidence.']] as [$number, $heading, $copy]) : ?><div><strong><?php echo esc_html($number); ?></strong><h3><?php echo esc_html($heading); ?></h3><p><?php echo esc_html($copy); ?></p><span><?php esc_html_e('', 'echelon'); ?></span></div><?php endforeach; ?>
         </div>
     </section>
 
