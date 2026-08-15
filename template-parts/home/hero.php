@@ -17,20 +17,28 @@ $badges     = echelon_field('hero_badges', $page_id, [
     ['icon' => 'headset', 'label' => '24/7 Concierge'],
 ]);
 
-$featured = new WP_Query([
-    'post_type'      => 'fleet_vehicle',
-    'posts_per_page' => 6,
-    'meta_key'       => 'featured',
-    'meta_value'     => '1',
-    'no_found_rows'  => true,
-]);
+$featured = null;
 
-if (!$featured->have_posts()) {
+// Temporarily disabled per client request. Keep the featured-vehicle strip
+// code below intact until the client confirms its permanent removal.
+$show_featured_vehicle_strip = false;
+
+if ($show_featured_vehicle_strip) {
     $featured = new WP_Query([
         'post_type'      => 'fleet_vehicle',
         'posts_per_page' => 6,
+        'meta_key'       => 'featured',
+        'meta_value'     => '1',
         'no_found_rows'  => true,
     ]);
+
+    if (!$featured->have_posts()) {
+        $featured = new WP_Query([
+            'post_type'      => 'fleet_vehicle',
+            'posts_per_page' => 6,
+            'no_found_rows'  => true,
+        ]);
+    }
 }
 ?>
 <section class="hero" data-reveal-group>
@@ -79,7 +87,7 @@ if (!$featured->have_posts()) {
 		<?php endif; ?>
 	</div>
 
-	<?php if ($featured->have_posts()) :
+	<?php if ($show_featured_vehicle_strip && $featured instanceof WP_Query && $featured->have_posts()) :
 		$vehicle_links = array_map(static function ($vehicle) {
 			return add_query_arg('vehicle', $vehicle->ID, home_url('/reservation/'));
 		}, $featured->posts);

@@ -23,7 +23,6 @@ while (have_posts()) : the_post();
 
     $title = get_the_title();
     $brand = echelon_field('brand', $vehicle_id, '');
-    $year = echelon_field('year', $vehicle_id, '2018');
     $doors = echelon_field('doors', $vehicle_id, '');
     $doors_label = $doors !== '' ? $doors . '-Door ' : '';
     $price = echelon_field('price_per_hour', $vehicle_id, '');
@@ -44,6 +43,8 @@ while (have_posts()) : the_post();
     }
     $toll_policy = echelon_field('toll_policy', $vehicle_id, '');
     $travel_policy = echelon_field('travel_policy', $vehicle_id, '');
+    $included_miles = 125;
+    $mileage_overage_rate = min(5, max(3, (float) echelon_field('mileage_overage_rate', $vehicle_id, 5)));
     $daily_rental_price = echelon_field('daily_rental_price', $vehicle_id, '');
     $daily_deposit = echelon_field('daily_rental_security_deposit', $vehicle_id, '');
     $hp = echelon_field('horsepower', $vehicle_id, '630');
@@ -76,10 +77,10 @@ while (have_posts()) : the_post();
             <div class="vehicle-detail__hero-main">
                 <p class="vehicle-detail__hero-brand"><?php echo esc_html($brand); ?></p>
                 <h1><?php echo esc_html($title); ?></h1>
-                <p class="vehicle-detail__hero-meta"><?php echo esc_html(implode(' · ', [$year, $vehicle_category, $exterior])); ?></p>
+                <p class="vehicle-detail__hero-meta"><?php echo esc_html(implode(' · ', array_filter([$vehicle_category, $exterior]))); ?></p>
             </div>
             <div class="vehicle-detail__hero-stats" aria-label="<?php esc_attr_e('Vehicle highlights', 'echelon'); ?>">
-                <div><strong><?php echo esc_html($year); ?></strong><span><?php esc_html_e('Year', 'echelon'); ?></span></div>
+                <div><strong><?php echo esc_html($seats); ?></strong><span><?php esc_html_e('Seats', 'echelon'); ?></span></div>
                 <div><strong><?php echo esc_html($hp); ?> HP</strong><span><?php esc_html_e('Power', 'echelon'); ?></span></div>
                 <div><strong><?php echo esc_html($engine); ?></strong><span><?php esc_html_e('Engine', 'echelon'); ?></span></div>
             </div>
@@ -123,7 +124,7 @@ while (have_posts()) : the_post();
     <section class="container vehicle-detail__overview">
         <div class="vehicle-detail__copy">
             <p class="eyebrow"><?php echo esc_html($brand); ?></p>
-            <h2><?php echo esc_html($year . ' · ' . $doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
+            <h2><?php echo esc_html($doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
             <p><?php echo esc_html($description); ?></p>
             <p><?php esc_html_e('', 'echelon'); ?></p>
         </div>
@@ -132,7 +133,8 @@ while (have_posts()) : the_post();
             <dl>
                 <div><dt><?php esc_html_e('Minimum Booking', 'echelon'); ?></dt><dd><?php echo esc_html(sprintf(_n('%d hour', '%d hours', $minimum_hours, 'echelon'), $minimum_hours)); ?></dd></div>
                 <?php $security_deposit = echelon_field('security_deposit', $vehicle_id, ''); if ($security_deposit !== '') : ?><div><dt><?php esc_html_e('Security Deposit', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_price($security_deposit)); ?></dd></div><?php endif; ?>
-                <div><dt><?php esc_html_e('Included Miles', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_field('included_miles', $vehicle_id, 100)); ?>/<?php esc_html_e('day', 'echelon'); ?></dd></div>
+                <div><dt><?php esc_html_e('Included Miles', 'echelon'); ?></dt><dd><?php echo esc_html($included_miles); ?>/<?php esc_html_e('day', 'echelon'); ?></dd></div>
+                <div><dt><?php esc_html_e('Additional Mileage', 'echelon'); ?></dt><dd><?php echo esc_html(echelon_price($mileage_overage_rate)); ?>/<?php esc_html_e('mile', 'echelon'); ?></dd></div>
                 <div><dt><?php esc_html_e('Minimum Age', 'echelon'); ?></dt><dd>25+</dd></div>
             </dl>
             <a class="btn btn--primary btn--block" href="<?php echo esc_url($reserve_url); ?>"><?php esc_html_e('Book Now', 'echelon'); ?><?php echelon_icon('arrow-right'); ?></a>
@@ -140,7 +142,7 @@ while (have_posts()) : the_post();
         </aside>
     </section>
 
-    <?php if ($addons || $toll_policy !== '' || $travel_policy !== '' || $daily_rental_price !== '') : ?>
+    <?php if ($included_miles || $addons || $toll_policy !== '' || $travel_policy !== '' || $daily_rental_price !== '') : ?>
         <section class="container vehicle-detail__benefits vehicle-detail__rental-details">
             <p class="eyebrow"><?php esc_html_e('Rental Details', 'echelon'); ?></p>
             <h2><?php esc_html_e('Options &', 'echelon'); ?> <span><?php esc_html_e('Policies', 'echelon'); ?></span></h2>
@@ -148,6 +150,7 @@ while (have_posts()) : the_post();
                 <?php if ($addons) : ?><div><?php echelon_icon('star'); ?><h3><?php esc_html_e('Add-ons', 'echelon'); ?></h3><?php foreach ($addons as $addon) : ?><p><?php echo esc_html($addon['name'] . ' — ' . echelon_price($addon['price'])); ?></p><?php endforeach; ?></div><?php endif; ?>
                 <?php if ($toll_policy !== '') : ?><div><?php echelon_icon('truck'); ?><h3><?php esc_html_e('Toll Policy', 'echelon'); ?></h3><p><?php echo esc_html($toll_policy); ?></p></div><?php endif; ?>
                 <?php if ($travel_policy !== '') : ?><div><?php echelon_icon('pin'); ?><h3><?php esc_html_e('Travel Policy', 'echelon'); ?></h3><p><?php echo esc_html($travel_policy); ?></p></div><?php endif; ?>
+                <div><?php echelon_icon('gauge'); ?><h3><?php esc_html_e('Mileage Policy', 'echelon'); ?></h3><p><?php echo esc_html(sprintf(__('%1$d miles per day are included. Additional mileage is charged at %2$s per mile for this vehicle.', 'echelon'), $included_miles, echelon_price($mileage_overage_rate))); ?></p></div>
                 <?php if ($daily_rental_price !== '') : ?><div><?php echelon_icon('calendar'); ?><h3><?php esc_html_e('Daily Rental Option', 'echelon'); ?></h3><p><?php echo esc_html(echelon_price($daily_rental_price)); ?> / <?php esc_html_e('day', 'echelon'); ?><?php if ($daily_deposit !== '') : ?><br><?php echo esc_html(sprintf(__('Security deposit: %s', 'echelon'), echelon_price($daily_deposit))); ?><?php endif; ?></p></div><?php endif; ?>
             </div>
         </section>
@@ -155,7 +158,7 @@ while (have_posts()) : the_post();
 
     <section class="container vehicle-detail__specifications">
         <p class="eyebrow"><?php esc_html_e('At A Glance', 'echelon'); ?></p>
-        <h2><?php echo esc_html($year . ' · ' . $doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
+        <h2><?php echo esc_html($doors_label); ?><span><?php echo esc_html($brand); ?></span></h2>
         <div class="vehicle-detail__spec-grid">
             <?php foreach ($specs as [$icon, $label, $value]) : ?><div class="vehicle-detail__spec"><?php echelon_icon($icon); ?><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html($value); ?></strong></div><?php endforeach; ?>
         </div>

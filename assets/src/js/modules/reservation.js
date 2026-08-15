@@ -60,6 +60,11 @@ export function initReservationFlow() {
 
   const bookingDays = () => Math.ceil(bookingHours() / 24);
   const serviceLabel = () => selectedService() === 'chauffeur' ? 'Chauffeur Driven' : selectedService() === 'self_drive' ? 'Self Driven' : '—';
+  const selectedAddons = () => Array.from(form.querySelectorAll('[data-addon-price]:checked:not(:disabled)')).map((control) => ({
+    label: control.dataset.addonLabel || control.name,
+    price: Number(control.dataset.addonPrice || 0),
+  }));
+  const addonTotal = () => selectedAddons().reduce((total, addon) => total + addon.price, 0);
 
   function updateServiceAvailability() {
     const vehicle = selectedVehicle();
@@ -74,6 +79,12 @@ export function initReservationFlow() {
 
   function updateConditionalFields() {
     const service = selectedService();
+    const vehicle = selectedVehicle();
+    const smokingOption = form.elements.smoking_option;
+    const smokingPrice = Math.max(0, Number(vehicle?.dataset.vehicleSmokingPrice || 450));
+    if (smokingOption) smokingOption.dataset.addonPrice = String(smokingPrice);
+    const smokingPriceLabel = form.querySelector('[data-smoking-option-price]');
+    if (smokingPriceLabel) smokingPriceLabel.textContent = `+${currency(smokingPrice)}`;
     billingType.value = service === 'chauffeur' ? 'hourly' : service === 'self_drive' ? 'daily' : '';
     form.querySelectorAll('[data-service-field]').forEach((wrapper) => {
       const visible = wrapper.dataset.serviceField === service;
@@ -81,7 +92,10 @@ export function initReservationFlow() {
       wrapper.querySelectorAll('input, select, textarea').forEach((field) => {
         field.disabled = !visible;
         field.required = visible && field.dataset.configRequired === '1';
-        if (!visible) clearFieldError(field);
+        if (!visible) {
+          if (field.type === 'checkbox' || field.type === 'radio') field.checked = false;
+          clearFieldError(field);
+        }
       });
     });
 
@@ -117,8 +131,12 @@ export function initReservationFlow() {
     root.querySelector('[data-summary-hours]').textContent = units || '—';
     root.querySelector('[data-summary-pickup]').textContent = selectedText(form.elements.pickup_location_id);
     root.querySelector('[data-summary-return]').textContent = selectedText(form.elements.return_location_id);
+    const addons = selectedAddons();
+    const addonsRow = root.querySelector('[data-summary-addons-row]');
+    addonsRow.hidden = addons.length === 0;
+    root.querySelector('[data-summary-addons]').textContent = addons.map((addon) => addon.price > 0 ? `${addon.label} (${currency(addon.price)})` : addon.label).join(', ') || '—';
     const minimumUnits = service === 'self_drive' ? Math.ceil(minimumSelfDriveHours / 24) : Math.max(minimumChauffeurHours, Number(vehicle.dataset.vehicleMinimumHours || 3));
-    root.querySelector('[data-summary-total]').textContent = currency(rate * (units || minimumUnits));
+    root.querySelector('[data-summary-total]').textContent = currency((rate * (units || minimumUnits)) + addonTotal());
   }
 
   function updateReview() {
@@ -128,7 +146,8 @@ export function initReservationFlow() {
     const days = bookingDays();
     const units = service === 'self_drive' ? days : hours;
     const rate = service === 'self_drive' ? Number(vehicle.dataset.vehicleDailyPrice) : Number(vehicle.dataset.vehiclePrice);
-    const total = rate * units;
+    const addons = selectedAddons();
+    const total = (rate * units) + addonTotal();
     root.querySelector('[data-reservation-review]').innerHTML = `
       <div><span>Vehicle</span><strong>${escapeHtml(vehicle.dataset.vehicleName)}</strong></div>
       <div><span>Service</span><strong>${escapeHtml(serviceLabel())}</strong></div>
@@ -136,6 +155,7 @@ export function initReservationFlow() {
       ${service === 'chauffeur' ? `<div><span>Trip type</span><strong>${escapeHtml(selectedText(form.elements.trip_type))}</strong></div>` : ''}
       <div><span>Schedule</span><strong>${escapeHtml(pickup.value)} ${escapeHtml(pickupTime.value)} → ${escapeHtml(returnDate.value)} ${escapeHtml(returnTime.value)}</strong></div>
       <div><span>Duration</span><strong>${service === 'self_drive' ? `${days} day${days === 1 ? '' : 's'}` : `${hours} hour${hours === 1 ? '' : 's'}`}</strong></div>
+      ${addons.map((addon) => `<div><span>${escapeHtml(addon.label)}</span><strong>${addon.price > 0 ? `+${currency(addon.price)}` : 'Selected'}</strong></div>`).join('')}
       <div><span>Name</span><strong>${escapeHtml(form.elements.customer_name.value)}</strong></div>
       <div><span>Contact</span><strong>${escapeHtml(form.elements.customer_phone.value)}</strong></div>
       <div class="reservation-review__total"><span>Estimated total</span><strong>${currency(total)}</strong></div>`;
@@ -285,6 +305,7 @@ export function initReservationFlow() {
     updateSummary();
   }));
   serviceControls.forEach((control) => control.addEventListener('change', updateConditionalFields));
+  form.querySelectorAll('[data-addon-price]').forEach((control) => control.addEventListener('change', updateSummary));
   [pickupTime, returnTime, form.elements.pickup_location_id, form.elements.return_location_id].forEach((control) => control.addEventListener('change', updateSummary));
   form.querySelectorAll('input, select').forEach((field) => {
     const eventName = field.type === 'radio' || field.type === 'checkbox' || field.tagName === 'SELECT' ? 'change' : 'input';

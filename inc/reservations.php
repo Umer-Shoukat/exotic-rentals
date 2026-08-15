@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 const ECHELON_RESERVATION_META = [
     'reference', 'status', 'vehicle_id', 'pickup_date', 'return_date', 'pickup_time', 'return_time', 'pickup_at', 'return_at',
     'pickup_location_id', 'return_location_id', 'estimated_mileage', 'trip_type', 'hours_required', 'rental_service', 'billing_type',
-    'duration_hours', 'duration_days', 'unit_rate',
+    'duration_hours', 'duration_days', 'unit_rate', 'drop_off_service', 'smoking_option', 'smoking_option_price', 'out_of_state_travel', 'addon_total',
     'customer_name', 'customer_email', 'customer_phone', 'licence_number',
     'date_of_birth', 'occasion', 'licence_front_file', 'licence_back_file', 'insurance_document_file', 'estimated_total', 'submitted_at',
 ];
@@ -235,6 +235,9 @@ function echelon_handle_reservation_submission() {
     $billing_type = sanitize_key(wp_unslash($_POST['billing_type'] ?? ''));
     $occasion = sanitize_text_field(wp_unslash($_POST['occasion'] ?? ''));
     $estimated_mileage = sanitize_text_field(wp_unslash($_POST['estimated_mileage'] ?? ''));
+    $drop_off_service = !empty($_POST['drop_off_service']);
+    $smoking_option = !empty($_POST['smoking_option']);
+    $out_of_state_travel = !empty($_POST['out_of_state_travel']);
 
     if (get_post_type($vehicle_id) !== 'fleet_vehicle' || get_post_status($vehicle_id) !== 'publish') {
         echelon_reservation_error('vehicle');
@@ -261,7 +264,7 @@ function echelon_handle_reservation_submission() {
     if ($rental_service === 'chauffeur' && ((echelon_reservation_field_required('trip_type') && !isset(echelon_reservation_trip_types()[$trip_type])) || ($trip_type && !isset(echelon_reservation_trip_types()[$trip_type])))) echelon_reservation_error('trip');
     if ($rental_service === 'self_drive' && ((echelon_reservation_field_required('licence_number') && strlen($licence) < 4) || strlen($licence) > 50 || ($licence !== '' && strlen($licence) < 4))) echelon_reservation_error('licence');
     if (echelon_reservation_field_required('occasion') && $occasion === '') echelon_reservation_error('details');
-    if ($rental_service === 'self_drive' && echelon_reservation_field_required('estimated_mileage') && !in_array($estimated_mileage, ['150', '250', 'unlimited'], true)) echelon_reservation_error('details');
+    if ($rental_service === 'self_drive' && echelon_reservation_field_required('estimated_mileage') && !in_array($estimated_mileage, ['125', '150', '250', 'unlimited'], true)) echelon_reservation_error('details');
     if ($rental_service === 'self_drive' && echelon_reservation_field_required('date_of_birth') && !$date_of_birth) echelon_reservation_error('age');
     if ($rental_service === 'self_drive' && $date_of_birth_raw !== '') {
         $today = new DateTimeImmutable('today', wp_timezone());
@@ -273,7 +276,13 @@ function echelon_handle_reservation_submission() {
     $days = (int) ceil($hours / 24);
     $unit_rate = (float) echelon_field($billing_type === 'daily' ? 'daily_rental_price' : 'price_per_hour', $vehicle_id, 0);
     if ($unit_rate <= 0) echelon_reservation_error('vehicle');
-    $estimated_total = $unit_rate * ($billing_type === 'daily' ? $days : $hours);
+    // Paid add-ons are valid only for self-drive rentals. Prices are always
+    // calculated server-side so posted values cannot alter the total.
+    $drop_off_service = $rental_service === 'self_drive' && $drop_off_service;
+    $smoking_option = $rental_service === 'self_drive' && $smoking_option;
+    $smoking_option_price = max(0, (float) echelon_field('smoking_option_price', $vehicle_id, 450));
+    $addon_total = ($drop_off_service ? 150 : 0) + ($smoking_option ? $smoking_option_price : 0);
+    $estimated_total = ($unit_rate * ($billing_type === 'daily' ? $days : $hours)) + $addon_total;
 
     $token = sanitize_key(wp_unslash($_POST['submission_token'] ?? ''));
     if (!$token || get_transient('echelon_reservation_' . $token)) {
@@ -321,7 +330,7 @@ function echelon_handle_reservation_submission() {
         'return_at'            => $return_date->format('Y-m-d H:i:s'),
         'pickup_location_id'   => $pickup_location_id,
         'return_location_id'   => $return_location_id,
-        'estimated_mileage'    => $rental_service === 'self_drive' && in_array($estimated_mileage, ['150', '250', 'unlimited'], true) ? $estimated_mileage : '',
+        'estimated_mileage'    => $rental_service === 'self_drive' && in_array($estimated_mileage, ['125', '150', '250', 'unlimited'], true) ? $estimated_mileage : '',
         'trip_type'            => $rental_service === 'chauffeur' ? $trip_type : '',
         'hours_required'       => $billing_type === 'hourly' ? $hours : '',
         'rental_service'       => $rental_service,
@@ -329,6 +338,11 @@ function echelon_handle_reservation_submission() {
         'duration_hours'       => $hours,
         'duration_days'        => $days,
         'unit_rate'            => $unit_rate,
+        'drop_off_service'     => $drop_off_service ? 1 : 0,
+        'smoking_option'       => $smoking_option ? 1 : 0,
+        'smoking_option_price' => $smoking_option_price,
+        'out_of_state_travel'  => $out_of_state_travel ? 1 : 0,
+        'addon_total'          => $addon_total,
         'customer_name'        => $name,
         'customer_email'       => $email,
         'customer_phone'       => $phone,
@@ -358,6 +372,12 @@ function echelon_reservation_email_summary($post_id) {
     $pickup = get_the_title((int) $get('pickup_location_id'));
     $return = get_the_title((int) $get('return_location_id'));
     $service = $get('rental_service');
+    $stored_smoking_price = $get('smoking_option_price') !== '' ? $get('smoking_option_price') : 450;
+    $options = array_filter([
+        $get('drop_off_service') ? 'Drop-Off Service (+$150)' : '',
+        $get('smoking_option') ? 'Smoking Option (+' . echelon_price($stored_smoking_price) . ')' : '',
+        $get('out_of_state_travel') ? 'Out-of-State Travel' : '',
+    ]);
     $lines = [
         'Reference: ' . $get('reference'),
         'Vehicle: ' . $vehicle,
@@ -371,6 +391,7 @@ function echelon_reservation_email_summary($post_id) {
         'Email: ' . $get('customer_email'),
         'Phone: ' . $get('customer_phone'),
         'Occasion: ' . $get('occasion'),
+        'Options: ' . implode(', ', $options),
         'Estimated total: ' . echelon_price($get('estimated_total')),
     ];
     $duration = $service === 'self_drive'
@@ -383,6 +404,12 @@ function echelon_reservation_email_summary($post_id) {
 function echelon_reservation_email_details($post_id) {
     $get = static fn($key) => get_post_meta($post_id, '_echelon_' . $key, true);
     $service = $get('rental_service');
+    $stored_smoking_price = $get('smoking_option_price') !== '' ? $get('smoking_option_price') : 450;
+    $options = array_filter([
+        $get('drop_off_service') ? __('Drop-Off Service (+$150)', 'echelon') : '',
+        $get('smoking_option') ? sprintf(__('Smoking Option (+%s)', 'echelon'), echelon_price($stored_smoking_price)) : '',
+        $get('out_of_state_travel') ? __('Out-of-State Travel', 'echelon') : '',
+    ]);
     $details = [
         __('Reference', 'echelon') => $get('reference'),
         __('Status', 'echelon') => ucfirst($get('status') ?: 'pending'),
@@ -397,6 +424,8 @@ function echelon_reservation_email_details($post_id) {
         __('Email', 'echelon') => $get('customer_email'),
         __('Phone', 'echelon') => $get('customer_phone'),
         __('Occasion', 'echelon') => $get('occasion'),
+        __('Options', 'echelon') => implode(', ', $options),
+        __('Add-On Total', 'echelon') => (float) $get('addon_total') > 0 ? echelon_price($get('addon_total')) : '',
         __('Estimated Total', 'echelon') => echelon_price($get('estimated_total')),
     ];
     if ($service === 'self_drive') {
