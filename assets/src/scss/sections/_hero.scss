@@ -1,11 +1,11 @@
 .hero {
   position: relative;
-  height: 833px;
-  min-height: 833px;
+  height: 760px;
+  min-height: 760px;
   overflow: hidden;
 
   @include down(lg) {
-    min-height: 760px;
+    min-height: 720px;
   }
 
   @include down(md) {
