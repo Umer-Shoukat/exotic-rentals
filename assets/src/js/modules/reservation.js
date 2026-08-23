@@ -85,6 +85,11 @@ export function initReservationFlow() {
     if (smokingOption) smokingOption.dataset.addonPrice = String(smokingPrice);
     const smokingPriceLabel = form.querySelector('[data-smoking-option-price]');
     if (smokingPriceLabel) smokingPriceLabel.textContent = `+${currency(smokingPrice)}`;
+    const chauffeurSmokingOption = form.elements.chauffeur_smoking_option;
+    const chauffeurSmokingPrice = Math.max(0, Number(vehicle?.dataset.vehicleChauffeurSmokingPrice || 100));
+    if (chauffeurSmokingOption) chauffeurSmokingOption.dataset.addonPrice = String(chauffeurSmokingPrice);
+    const chauffeurSmokingPriceLabel = form.querySelector('[data-chauffeur-smoking-option-price]');
+    if (chauffeurSmokingPriceLabel) chauffeurSmokingPriceLabel.textContent = `+${currency(chauffeurSmokingPrice)}`;
     billingType.value = service === 'chauffeur' ? 'hourly' : service === 'self_drive' ? 'daily' : '';
     form.querySelectorAll('[data-service-field]').forEach((wrapper) => {
       const visible = wrapper.dataset.serviceField === service;
@@ -98,6 +103,14 @@ export function initReservationFlow() {
         }
       });
     });
+
+    const chauffeurSmokingWrapper = form.querySelector('[data-chauffeur-smoking-option]');
+    const chauffeurSmokingAvailable = service === 'chauffeur' && vehicle?.dataset.vehicleChauffeurSmokingEnabled === '1';
+    if (chauffeurSmokingWrapper) chauffeurSmokingWrapper.hidden = !chauffeurSmokingAvailable;
+    if (chauffeurSmokingOption) {
+      chauffeurSmokingOption.disabled = !chauffeurSmokingAvailable;
+      if (!chauffeurSmokingAvailable) chauffeurSmokingOption.checked = false;
+    }
 
     form.querySelectorAll('[data-service-price]').forEach((price) => { price.hidden = Boolean(service) && price.dataset.servicePrice !== service; });
     const terms = form.querySelector('[data-reservation-terms]');

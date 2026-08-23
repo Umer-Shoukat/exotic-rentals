@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 const ECHELON_RESERVATION_META = [
     'reference', 'status', 'vehicle_id', 'pickup_date', 'return_date', 'pickup_time', 'return_time', 'pickup_at', 'return_at',
     'pickup_location_id', 'return_location_id', 'estimated_mileage', 'trip_type', 'hours_required', 'rental_service', 'billing_type',
-    'duration_hours', 'duration_days', 'unit_rate', 'drop_off_service', 'smoking_option', 'smoking_option_price', 'out_of_state_travel', 'addon_total',
+    'duration_hours', 'duration_days', 'unit_rate', 'drop_off_service', 'smoking_option', 'smoking_option_price', 'chauffeur_smoking_option', 'chauffeur_smoking_option_price', 'out_of_state_travel', 'addon_total',
     'customer_name', 'customer_email', 'customer_phone', 'licence_number',
     'date_of_birth', 'occasion', 'licence_front_file', 'licence_back_file', 'insurance_document_file', 'estimated_total', 'submitted_at',
 ];
@@ -237,6 +237,7 @@ function echelon_handle_reservation_submission() {
     $estimated_mileage = sanitize_text_field(wp_unslash($_POST['estimated_mileage'] ?? ''));
     $drop_off_service = !empty($_POST['drop_off_service']);
     $smoking_option = !empty($_POST['smoking_option']);
+    $chauffeur_smoking_option = !empty($_POST['chauffeur_smoking_option']);
     $out_of_state_travel = !empty($_POST['out_of_state_travel']);
 
     if (get_post_type($vehicle_id) !== 'fleet_vehicle' || get_post_status($vehicle_id) !== 'publish') {
@@ -281,7 +282,12 @@ function echelon_handle_reservation_submission() {
     $drop_off_service = $rental_service === 'self_drive' && $drop_off_service;
     $smoking_option = $rental_service === 'self_drive' && $smoking_option;
     $smoking_option_price = max(0, (float) echelon_field('smoking_option_price', $vehicle_id, 450));
-    $addon_total = ($drop_off_service ? 150 : 0) + ($smoking_option ? $smoking_option_price : 0);
+    $chauffeur_smoking_enabled = (bool) echelon_field('chauffeur_smoking_option_enabled', $vehicle_id, false);
+    $chauffeur_smoking_option = $rental_service === 'chauffeur' && $chauffeur_smoking_enabled && $chauffeur_smoking_option;
+    $chauffeur_smoking_option_price = max(0, (float) echelon_field('chauffeur_smoking_option_price', $vehicle_id, 100));
+    $addon_total = ($drop_off_service ? 150 : 0)
+        + ($smoking_option ? $smoking_option_price : 0)
+        + ($chauffeur_smoking_option ? $chauffeur_smoking_option_price : 0);
     $estimated_total = ($unit_rate * ($billing_type === 'daily' ? $days : $hours)) + $addon_total;
 
     $token = sanitize_key(wp_unslash($_POST['submission_token'] ?? ''));
@@ -341,6 +347,8 @@ function echelon_handle_reservation_submission() {
         'drop_off_service'     => $drop_off_service ? 1 : 0,
         'smoking_option'       => $smoking_option ? 1 : 0,
         'smoking_option_price' => $smoking_option_price,
+        'chauffeur_smoking_option' => $chauffeur_smoking_option ? 1 : 0,
+        'chauffeur_smoking_option_price' => $chauffeur_smoking_option_price,
         'out_of_state_travel'  => $out_of_state_travel ? 1 : 0,
         'addon_total'          => $addon_total,
         'customer_name'        => $name,
@@ -373,9 +381,11 @@ function echelon_reservation_email_summary($post_id) {
     $return = get_the_title((int) $get('return_location_id'));
     $service = $get('rental_service');
     $stored_smoking_price = $get('smoking_option_price') !== '' ? $get('smoking_option_price') : 450;
+    $stored_chauffeur_smoking_price = $get('chauffeur_smoking_option_price') !== '' ? $get('chauffeur_smoking_option_price') : 100;
     $options = array_filter([
         $get('drop_off_service') ? 'Drop-Off Service (+$150)' : '',
         $get('smoking_option') ? 'Smoking Option (+' . echelon_price($stored_smoking_price) . ')' : '',
+        $get('chauffeur_smoking_option') ? 'Smoking Option (+' . echelon_price($stored_chauffeur_smoking_price) . ')' : '',
         $get('out_of_state_travel') ? 'Out-of-State Travel' : '',
     ]);
     $lines = [
@@ -405,9 +415,11 @@ function echelon_reservation_email_details($post_id) {
     $get = static fn($key) => get_post_meta($post_id, '_echelon_' . $key, true);
     $service = $get('rental_service');
     $stored_smoking_price = $get('smoking_option_price') !== '' ? $get('smoking_option_price') : 450;
+    $stored_chauffeur_smoking_price = $get('chauffeur_smoking_option_price') !== '' ? $get('chauffeur_smoking_option_price') : 100;
     $options = array_filter([
         $get('drop_off_service') ? __('Drop-Off Service (+$150)', 'echelon') : '',
         $get('smoking_option') ? sprintf(__('Smoking Option (+%s)', 'echelon'), echelon_price($stored_smoking_price)) : '',
+        $get('chauffeur_smoking_option') ? sprintf(__('Smoking Option (+%s)', 'echelon'), echelon_price($stored_chauffeur_smoking_price)) : '',
         $get('out_of_state_travel') ? __('Out-of-State Travel', 'echelon') : '',
     ]);
     $details = [
