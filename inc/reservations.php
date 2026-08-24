@@ -31,6 +31,16 @@ function echelon_vehicle_supports_service($vehicle_id, $service) {
     return $enabled && (float) echelon_field($rate_key, $vehicle_id, 0) > 0;
 }
 
+/**
+ * Existing vehicles offered this option before an explicit toggle existed.
+ * Treat missing metadata as enabled so deploying the toggle does not silently
+ * remove an existing self-drive add-on; an administrator can disable it per car.
+ */
+function echelon_vehicle_self_drive_smoking_enabled($vehicle_id) {
+    return !metadata_exists('post', $vehicle_id, 'self_drive_smoking_option_enabled')
+        || (bool) get_post_meta($vehicle_id, 'self_drive_smoking_option_enabled', true);
+}
+
 function echelon_reservation_setting_defaults() {
     return [
         'minimum_chauffeur_hours' => 3,
@@ -277,10 +287,11 @@ function echelon_handle_reservation_submission() {
     $days = (int) ceil($hours / 24);
     $unit_rate = (float) echelon_field($billing_type === 'daily' ? 'daily_rental_price' : 'price_per_hour', $vehicle_id, 0);
     if ($unit_rate <= 0) echelon_reservation_error('vehicle');
-    // Paid add-ons are valid only for self-drive rentals. Prices are always
-    // calculated server-side so posted values cannot alter the total.
+    // Add-on eligibility and prices are always calculated server-side so
+    // posted values cannot enable unavailable options or alter the total.
     $drop_off_service = $rental_service === 'self_drive' && $drop_off_service;
-    $smoking_option = $rental_service === 'self_drive' && $smoking_option;
+    $self_drive_smoking_enabled = echelon_vehicle_self_drive_smoking_enabled($vehicle_id);
+    $smoking_option = $rental_service === 'self_drive' && $self_drive_smoking_enabled && $smoking_option;
     $smoking_option_price = max(0, (float) echelon_field('smoking_option_price', $vehicle_id, 450));
     $chauffeur_smoking_enabled = (bool) echelon_field('chauffeur_smoking_option_enabled', $vehicle_id, false);
     $chauffeur_smoking_option = $rental_service === 'chauffeur' && $chauffeur_smoking_enabled && $chauffeur_smoking_option;

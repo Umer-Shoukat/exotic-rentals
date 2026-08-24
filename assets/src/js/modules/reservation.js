@@ -104,6 +104,14 @@ export function initReservationFlow() {
       });
     });
 
+    const selfDriveSmokingWrapper = form.querySelector('[data-self-drive-smoking-option]');
+    const selfDriveSmokingAvailable = service === 'self_drive' && vehicle?.dataset.vehicleSelfDriveSmokingEnabled === '1';
+    if (selfDriveSmokingWrapper) selfDriveSmokingWrapper.hidden = !selfDriveSmokingAvailable;
+    if (smokingOption) {
+      smokingOption.disabled = !selfDriveSmokingAvailable;
+      if (!selfDriveSmokingAvailable) smokingOption.checked = false;
+    }
+
     const chauffeurSmokingWrapper = form.querySelector('[data-chauffeur-smoking-option]');
     const chauffeurSmokingAvailable = service === 'chauffeur' && vehicle?.dataset.vehicleChauffeurSmokingEnabled === '1';
     if (chauffeurSmokingWrapper) chauffeurSmokingWrapper.hidden = !chauffeurSmokingAvailable;
