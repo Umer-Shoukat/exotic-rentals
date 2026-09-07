@@ -31,6 +31,7 @@ $initial_location = isset($_GET['pickup_location']) ? sanitize_title(wp_unslash(
 $received = isset($_GET['reservation']) && $_GET['reservation'] === 'received';
 $reference = isset($_GET['reference']) ? sanitize_text_field(wp_unslash($_GET['reference'])) : '';
 $error_code = isset($_GET['reservation_error']) ? sanitize_key($_GET['reservation_error']) : '';
+$required_hours = isset($_GET['required_hours']) ? max(1, absint($_GET['required_hours'])) : 0;
 $reservation_settings = echelon_reservation_settings();
 $minimum_chauffeur_hours = (int) $reservation_settings['minimum_chauffeur_hours'];
 $minimum_self_drive_hours = (int) $reservation_settings['minimum_self_drive_hours'];
@@ -41,7 +42,14 @@ $errors = [
     'invalid' => __('We could not validate this request.', 'echelon'),
     'vehicle' => __('Please select an available vehicle.', 'echelon'),
     'location' => __('Please select valid pick-up and return locations.', 'echelon'),
-    'dates' => __('Return must be after pick-up and must meet the minimum duration for the selected service.', 'echelon'),
+    'dates_invalid' => __('We could not read the selected pick-up or return date/time. Please select both dates and times again.', 'echelon'),
+    'return_not_after_pickup' => __('Return date and time must be after the pick-up date and time.', 'echelon'),
+    'pickup_in_past' => __('Pick-up date and time have already passed. Please choose a future pick-up time.', 'echelon'),
+    'chauffeur_minimum' => sprintf(__('Chauffeur-driven service requires at least %d hours. Please choose a later return time.', 'echelon'), $minimum_chauffeur_hours),
+    'vehicle_minimum' => $required_hours
+        ? sprintf(__('The selected vehicle requires at least %d hours. Please choose a later return time.', 'echelon'), $required_hours)
+        : __('The selected vehicle has a longer minimum booking duration. Please choose a later return time.', 'echelon'),
+    'self_drive_minimum' => sprintf(__('Self-drive service requires at least %d hours. Please choose a later return date and time.', 'echelon'), $minimum_self_drive_hours),
     'details' => __('Please complete all required details and accept the rental terms.', 'echelon'),
     'name' => __('Please enter your full name.', 'echelon'),
     'email' => __('Please enter a valid email address.', 'echelon'),

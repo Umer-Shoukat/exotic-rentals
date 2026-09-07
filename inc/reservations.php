@@ -214,8 +214,12 @@ function echelon_parse_reservation_datetime($date_value, $time_value) {
     return false;
 }
 
-function echelon_reservation_error($code) {
-    wp_safe_redirect(echelon_reservation_page_url(['reservation_error' => sanitize_key($code)]));
+function echelon_reservation_error($code, $context = []) {
+    $args = ['reservation_error' => sanitize_key($code)];
+    if (isset($context['required_hours'])) {
+        $args['required_hours'] = max(1, absint($context['required_hours']));
+    }
+    wp_safe_redirect(echelon_reservation_page_url($args));
     exit;
 }
 
@@ -261,12 +265,29 @@ function echelon_handle_reservation_submission() {
         get_post_type($return_location_id) !== 'location' || get_post_status($return_location_id) !== 'publish') {
         echelon_reservation_error('location');
     }
+    $minimum_chauffeur_hours = (int) echelon_reservation_setting('minimum_chauffeur_hours');
+    $vehicle_minimum_hours = (int) echelon_field('minimum_booking_hours', $vehicle_id, 3);
     $minimum_hours = $rental_service === 'self_drive'
         ? (int) echelon_reservation_setting('minimum_self_drive_hours')
-        : max((int) echelon_reservation_setting('minimum_chauffeur_hours'), (int) echelon_field('minimum_booking_hours', $vehicle_id, 3));
+        : max($minimum_chauffeur_hours, $vehicle_minimum_hours);
     $duration_seconds = $pickup_date && $return_date ? $return_date->getTimestamp() - $pickup_date->getTimestamp() : 0;
-    if (!$pickup_date || !$return_date || $return_date <= $pickup_date || $pickup_date < new DateTimeImmutable('now', wp_timezone()) || $duration_seconds < $minimum_hours * HOUR_IN_SECONDS) {
-        echelon_reservation_error('dates');
+    if (!$pickup_date || !$return_date) {
+        echelon_reservation_error('dates_invalid');
+    }
+    if ($return_date <= $pickup_date) {
+        echelon_reservation_error('return_not_after_pickup');
+    }
+    if ($pickup_date < new DateTimeImmutable('now', wp_timezone())) {
+        echelon_reservation_error('pickup_in_past');
+    }
+    if ($duration_seconds < $minimum_hours * HOUR_IN_SECONDS) {
+        if ($rental_service === 'self_drive') {
+            echelon_reservation_error('self_drive_minimum', ['required_hours' => $minimum_hours]);
+        }
+        echelon_reservation_error(
+            $vehicle_minimum_hours > $minimum_chauffeur_hours ? 'vehicle_minimum' : 'chauffeur_minimum',
+            ['required_hours' => $minimum_hours]
+        );
     }
     if ((echelon_reservation_field_required('customer_name') && strlen($name) < 2) || strlen($name) > 100 || ($name !== '' && strlen($name) < 2)) echelon_reservation_error('name');
     if ((echelon_reservation_field_required('customer_email') && !is_email($email)) || ($email !== '' && !is_email($email)) || strlen($email) > 254) echelon_reservation_error('email');
